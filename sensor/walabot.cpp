@@ -8,12 +8,14 @@ namespace cdi {
 namespace sensor {
 const std::string Walabot::settings_folder{"/var/lib/walabot"};
 
-Walabot::Walabot(const Settings& settings, bool moving_target)
-    : settings_{settings}, moving_target_{moving_target}
+Walabot::Walabot(const std::shared_ptr<Receiver> receiver,
+                 const Settings& settings, bool moving_target)
+    : receiver_{receiver}, settings_{settings}, moving_target_{moving_target}
 {
     Walabot_SetSettingsFolder(const_cast<char*>(settings_folder.c_str()));
     Walabot_ConnectAny();
     Walabot_SetProfile(PROF_SENSOR);
+
     Walabot_SetArenaR(settings_.cm.min, settings_.cm.max, settings_.cm.res);
     Walabot_SetArenaTheta(settings_.degrees.min, settings_.degrees.max,
                           settings_.degrees.res);
@@ -52,11 +54,11 @@ void Walabot::record(const int iterations) const
         Walabot_GetSensorTargets(&targets, &num_targets);
         Walabot_GetRawImageSlice(&raster_image, &size_x, &size_y, &slice_depth,
                                  &power);
-	std::cout << "num targets: " << num_targets << std::endl;
-        for(int index = 0; index < num_targets; ++i) {
-            std::cout << index << ":" << targets[index].xPosCm << ":"
-                      << targets[index].yPosCm << ":" << targets[index].zPosCm
-                      << ":" << targets[index].amplitude << "\r";
+        for(int index = 0; index < num_targets; ++index) {
+            receiver_->process(
+                static_cast<TSensorId>(index),
+                Reading{targets[index].xPosCm, targets[index].yPosCm,
+                        targets[index].zPosCm, targets[index].amplitude});
         }
     }
 }

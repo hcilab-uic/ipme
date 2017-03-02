@@ -1,7 +1,10 @@
 #ifndef CDI_SENSOR_WALABOT_H
 #define CDI_SENSOR_WALABOT_H
 
+#include <memory>
 #include <string>
+
+#include "receiver.h"
 
 namespace cdi {
 namespace sensor {
@@ -22,24 +25,25 @@ class Walabot {
             : cm{cm_}, degrees{degrees_}, phi{phi_}
         {
         }
-	
+
         Inner cm;
         Inner degrees;
         Inner phi;
     }; // struct Settings
 
-    Walabot(const Settings& settings, bool moving_target);
+    Walabot(const std::shared_ptr<Receiver> receiver,
+            const Settings& settings, bool moving_target);
     virtual ~Walabot();
-    /* void initialize() const; */
-    /* void start() const; */
     void record(const int iterations) const;
 
   private:
+    std::shared_ptr<Receiver> receiver_;
     const Settings settings_;
     const bool moving_target_;
 
     static const std::string settings_folder;
 }; // class Walabot
+
 } // namespace sensor
 } // namespace cdi
 
