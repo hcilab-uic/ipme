@@ -24,6 +24,7 @@ Walabot::Walabot(const std::shared_ptr<Receiver> receiver,
 
     Walabot_SetDynamicImageFilter(moving_target_ ? FILTER_TYPE_MTI
                                                  : FILTER_TYPE_NONE);
+    //    Walabot_SetDynamicImageFilter(FILTER_TYPE_MTI);
     Walabot_Start();
     if(!moving_target_) {
         Walabot_StartCalibration();
@@ -48,17 +49,24 @@ void Walabot::record(const int iterations) const
     double slice_depth;
     double power;
 
-    for(int i = 0; i < iterations; ++i) {
+    for(int i = 0;; ++i) {
         Walabot_GetStatus(&app_status, &calibration_process);
         Walabot_Trigger();
-        Walabot_GetSensorTargets(&targets, &num_targets);
         Walabot_GetRawImageSlice(&raster_image, &size_x, &size_y, &slice_depth,
                                  &power);
+        receiver_->process_image_slice(raster_image, size_x, size_y,
+                                       slice_depth, power);
+
+        Walabot_GetSensorTargets(&targets, &num_targets);
         for(int index = 0; index < num_targets; ++index) {
             receiver_->process(
                 static_cast<TSensorId>(index),
                 Reading{targets[index].xPosCm, targets[index].yPosCm,
                         targets[index].zPosCm, targets[index].amplitude});
+        }
+
+        if(iterations > 0 && i > iterations) {
+            break;
         }
     }
 }
