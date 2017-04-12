@@ -13,7 +13,7 @@ class SignalDisplayer : public cdi::sensor::Receiver {
   public:
     SignalDisplayer(int width, int height);
 
-    virtual void process(const cdi::sensor::TSensorId sensor_id,
+    virtual void process(const cdi::sensor::TargetId sensor_id,
                          const cdi::sensor::Reading& reading) override;
 
     virtual void process_image_slice(int* raster_image, int size_x, int size_y,
@@ -30,7 +30,7 @@ SignalDisplayer::SignalDisplayer(int width, int height)
 {
 }
 
-void SignalDisplayer::process(const cdi::sensor::TSensorId /* sensor_id */,
+void SignalDisplayer::process(const cdi::sensor::TargetId /* sensor_id */,
                               const cdi::sensor::Reading& /* reading */)
 {
 }
@@ -88,6 +88,6 @@ int main()
     auto receiver = std::make_shared<SignalDisplayer>(500, 61);
 
     cdi::sensor::Walabot walabot{receiver, settings, true};
-    walabot.record(0);
+    walabot.record_image(0);
     std::cout << "sdasdf" << std::endl;
 }

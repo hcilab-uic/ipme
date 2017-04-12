@@ -7,7 +7,8 @@ namespace cdi {
 namespace sensor {
 class Receiver {
   public:
-    virtual void process(const TSensorId sensor_id, const Reading& reading) = 0;
+    virtual ~Receiver() = default;
+    virtual void process(const TargetId sensor_id, const Reading& reading) = 0;
     virtual void process_image_slice(int* raster_image, int size_x, int size_y,
                                      double depth, double power) = 0;
 };

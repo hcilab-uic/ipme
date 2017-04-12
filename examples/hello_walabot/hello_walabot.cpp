@@ -7,13 +7,13 @@
 
 class MyReceiver : public cdi::sensor::Receiver {
   public:
-    virtual void process(const cdi::sensor::TSensorId sensor_id,
+    virtual void process(const cdi::sensor::TargetId sensor_id,
                          const cdi::sensor::Reading& reading) override;
     virtual void process_image_slice(int* raster_image, int size_x, int size_y,
                                      double depth, double power) override;
 };
 
-void MyReceiver::process(const cdi::sensor::TSensorId sensor_id,
+void MyReceiver::process(const cdi::sensor::TargetId sensor_id,
                          const cdi::sensor::Reading& reading)
 {
     std::cout << "target: " << sensor_id << ", [X: " << reading.x
@@ -37,11 +37,12 @@ void MyReceiver::process_image_slice(int* raster_image, int size_x, int size_y,
 int main()
 {
     using Settings = cdi::sensor::Walabot::Settings;
-    Settings settings{Settings::Radial{30, 200, 3}, Settings::Radial{-15, 15, 5},
+    Settings settings{Settings::Radial{30, 200, 3},
+                      Settings::Radial{-15, 15, 5},
                       Settings::Radial{-60, 60, 5}};
 
     auto receiver = std::make_shared<MyReceiver>();
 
     cdi::sensor::Walabot walabot{receiver, settings, true};
-    walabot.record(100);
+    walabot.record_image(100);
 }

@@ -40,12 +40,10 @@ Walabot::~Walabot()
     Walabot_Disconnect();
 }
 
-void Walabot::record(const int iterations) const
+void Walabot::record_image(const int iterations) const
 {
     APP_STATUS app_status;
     double calibration_process{};
-    SensorTarget* targets = nullptr;
-    int num_targets{};
     int* raster_image = nullptr;
     int size_x;
     int size_y;
@@ -60,18 +58,36 @@ void Walabot::record(const int iterations) const
         receiver_->process_image_slice(raster_image, size_x, size_y,
                                        slice_depth, power);
 
-        Walabot_GetSensorTargets(&targets, &num_targets);
-        for(int index = 0; index < num_targets; ++index) {
-            receiver_->process(
-                static_cast<TSensorId>(index),
-                Reading{targets[index].xPosCm, targets[index].yPosCm,
-                        targets[index].zPosCm, targets[index].amplitude});
-        }
-
         if(iterations > 0 && i > iterations) {
             break;
         }
     }
 }
+
+void Walabot::record_targets(const int iterations) const
+{
+    APP_STATUS app_status{STATUS_DISCONNECTED};
+    double calibration_process{};
+    SensorTarget* targets = nullptr;
+    int num_targets{};
+
+    while(app_status == STATUS_DISCONNECTED) {
+        Walabot_GetStatus(&app_status, &calibration_process);
+        std::cout << "Calibration complete: " << calibration_process
+                  << std::endl;
+    }
+
+    for(int i = 0; i == 0 || i < iterations; ++i) {
+        Walabot_Trigger();
+        Walabot_GetSensorTargets(&targets, &num_targets);
+        for(int index = 0; index < num_targets; ++index) {
+            receiver_->process(
+                static_cast<TargetId>(index),
+                Reading{targets[index].xPosCm, targets[index].yPosCm,
+                        targets[index].zPosCm, targets[index].amplitude});
+        }
+    }
+}
+
 } // namespace sensor
 } // namespace cdi

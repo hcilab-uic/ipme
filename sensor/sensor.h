@@ -4,7 +4,7 @@
 namespace cdi {
 namespace sensor {
 
-using TSensorId = int;
+using TargetId = int;
 
 struct Reading {
     Reading(const double x_, const double y_, const double z_,
