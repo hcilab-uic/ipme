@@ -37,8 +37,8 @@ void MyReceiver::process_image_slice(int* raster_image, int size_x, int size_y,
 int main()
 {
     using Settings = cdi::sensor::Walabot::Settings;
-    Settings settings{Settings::Inner{30, 200, 3}, Settings::Inner{-15, 15, 5},
-                      Settings::Inner{-60, 60, 5}};
+    Settings settings{Settings::Radial{30, 200, 3}, Settings::Radial{-15, 15, 5},
+                      Settings::Radial{-60, 60, 5}};
 
     auto receiver = std::make_shared<MyReceiver>();
 

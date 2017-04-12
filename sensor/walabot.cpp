@@ -24,7 +24,10 @@ Walabot::Walabot(const std::shared_ptr<Receiver> receiver,
 
     Walabot_SetDynamicImageFilter(moving_target_ ? FILTER_TYPE_MTI
                                                  : FILTER_TYPE_NONE);
-    //    Walabot_SetDynamicImageFilter(FILTER_TYPE_MTI);
+    double threshold{};
+    Walabot_GetThreshold(&threshold);
+    std::cout << threshold << std::endl;
+    Walabot_SetThreshold(0);
     Walabot_Start();
     if(!moving_target_) {
         Walabot_StartCalibration();

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -7,20 +8,6 @@
 
 #include "sensor.h"
 #include "walabot.h"
-
-// class MyReceiver : public cdi::sensor::Receiver {
-//  public:
-//    virtual void process(const cdi::sensor::TSensorId sensor_id,
-//                         const cdi::sensor::Reading& reading) override;
-//};
-
-// void MyReceiver::process(const cdi::sensor::TSensorId sensor_id,
-//                         const cdi::sensor::Reading& reading)
-//{
-//    std::cout << "target: " << sensor_id << ", [X: " << reading.x
-//              << "], [Y: " << reading.y << "], [Z: " << reading.z
-//              << "], [Amplitude: " << reading.amplitude << "]" << std::endl;
-//}
 
 class SignalDisplayer : public cdi::sensor::Receiver {
   public:
@@ -38,19 +25,6 @@ class SignalDisplayer : public cdi::sensor::Receiver {
     cv::Mat image_;
 };
 
-int main()
-{
-    using Settings = cdi::sensor::Walabot::Settings;
-    Settings settings{Settings::Inner{30, 200, 3}, Settings::Inner{-15, 15, 5},
-                      Settings::Inner{-60, 60, 5}};
-
-    auto receiver = std::make_shared<SignalDisplayer>(570, 250);
-
-    cdi::sensor::Walabot walabot{receiver, settings, true};
-    walabot.record(0);
-    std::cout << "sdasdf" << std::endl;
-}
-
 SignalDisplayer::SignalDisplayer(int width, int height)
     : width_{width}, height_{height}, image_{height, width, CV_8UC3}
 {
@@ -59,19 +33,6 @@ SignalDisplayer::SignalDisplayer(int width, int height)
 void SignalDisplayer::process(const cdi::sensor::TSensorId /* sensor_id */,
                               const cdi::sensor::Reading& /* reading */)
 {
-    //    if(sensor_id) {
-    //    }
-    //    int x = (reading.x + 90) / 180 * 600;
-    //    int y = (reading.y + 90) / 180 * 800;
-
-    //    //    unsigned char red = 255 - reading.z;
-    //    unsigned char blue = reading.z;
-    //    image_.at<cv::Vec3b>(x, y) = cv::Vec3b{0, 0, blue};
-
-    //    cv::Mat cm_img;
-    //    cv::applyColorMap(image_, cm_img, cv::COLORMAP_JET);
-    //    cv::imshow("", cm_img);
-    //    cv::waitKey(1);
 }
 
 void SignalDisplayer::process_image_slice(int* raster_image, int size_x,
@@ -80,23 +41,31 @@ void SignalDisplayer::process_image_slice(int* raster_image, int size_x,
 {
     const int pixel_width = width_ / size_x;
     const int pixel_height = height_ / size_y;
-    std::cout << "Depth: " << depth << ", power: " << power << ", X: " << size_x
-              << ", Y: " << size_y << ", pixel width: " << pixel_width
-              << ", pixel_height: " << pixel_height << std::endl;
+    if(depth && power) {
+    }
+    //    std::cout << "Depth: " << depth << ", power: " << power << ", X: " <<
+    //    size_x
+    //              << ", Y: " << size_y << ", p w: " << pixel_width
+    //              << ", p h: " << pixel_height << "\n";
     for(int i = 0; i < size_x; ++i) {
         for(int j = 0; j < size_y; ++j) {
             int index = (size_x * j) + i;
             int dot = raster_image[index];
-            //            unsigned char red = static_cast<unsigned char>(255 -
-            //            dot);
-            //            unsigned char green = 0;
+            unsigned char red = static_cast<unsigned char>(255 - dot);
+            unsigned char green = static_cast<unsigned char>(dot);
             unsigned char blue = static_cast<unsigned char>(dot);
+            const auto color_dot = cv::Vec3b{red, green, blue};
 
-            for(int m = 0; m < pixel_height; ++m) {
-                for(int n = 0; n < pixel_width; ++n) {
-                    int y = (i * pixel_height) + m;
-                    int x = (j * pixel_width) + n;
-                    image_.at<cv::Vec3b>(x, y) = cv::Vec3b{blue, 0, 0};
+            //            double phi = -90.0 + (i * (90 + 90)) / (size_x - 1);
+            //            double R = 1 + j * 499.0 / (size_y - 1);
+            //            int y = R * std::sin(phi);
+            //            int x = R * std::cos(phi);
+            //            image_.at<cv::Vec3b>(y, x) = color_dot;
+            for(int m = 0; m < pixel_width; ++m) {
+                for(int n = 0; n < pixel_height; ++n) {
+                    int y = (j * pixel_height) + n;
+                    int x = (i * pixel_width) + m;
+                    image_.at<cv::Vec3b>(y, x) = color_dot;
                 }
             }
         }
@@ -106,4 +75,19 @@ void SignalDisplayer::process_image_slice(int* raster_image, int size_x,
     cv::imshow("", cm_img);
     //    cv::imshow("", image_);
     cv::waitKey(1);
+}
+
+int main()
+{
+    using Settings = cdi::sensor::Walabot::Settings;
+    Settings::Radial radial{1, 500, 1};
+    Settings::Theta theta{0, 180, 1};
+    Settings::Phi phi{-90, 90, 3};
+    Settings settings{radial, theta, phi};
+
+    auto receiver = std::make_shared<SignalDisplayer>(500, 61);
+
+    cdi::sensor::Walabot walabot{receiver, settings, true};
+    walabot.record(0);
+    std::cout << "sdasdf" << std::endl;
 }

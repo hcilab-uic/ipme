@@ -21,18 +21,24 @@ class Walabot {
             double res;
         };
 
-        Settings(const Inner& cm_, const Inner& degrees_, const Inner& phi_)
+        //        class Radial : public Inner {
+        //        };
+        using Radial = Inner;
+        using Theta = Inner;
+        using Phi = Inner;
+
+        Settings(const Radial& cm_, const Theta& degrees_, const Phi& phi_)
             : cm{cm_}, degrees{degrees_}, phi{phi_}
         {
         }
 
-        Inner cm;
-        Inner degrees;
-        Inner phi;
+        Radial cm;
+        Theta degrees;
+        Phi phi;
     }; // struct Settings
 
-    Walabot(const std::shared_ptr<Receiver> receiver,
-            const Settings& settings, bool moving_target);
+    Walabot(const std::shared_ptr<Receiver> receiver, const Settings& settings,
+            bool moving_target);
     virtual ~Walabot();
     void record(const int iterations) const;
 
