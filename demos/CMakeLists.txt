@@ -4,6 +4,4 @@ find_package(Boost REQUIRED)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-add_subdirectory(debug_tool)
-add_subdirectory(signal_server)
-add_subdirectory(streaming_server)
+add_subdirectory(camera_zoom)
