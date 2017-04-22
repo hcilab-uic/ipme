@@ -82,8 +82,8 @@ void Server_receiver::start_server()
     boost::asio::ip::tcp::acceptor acceptor{io_service_,
                                             boost::asio::ip::tcp::v4(), port_};
     for(;;) {
-        auto socket{
-            std::make_shared<boost::asio::ip::tcp::socket>(io_service_)};
+        auto socket(
+            std::make_shared<boost::asio::ip::tcp::socket>(io_service_));
         std::thread t{[&] { session(socket); }};
     }
 }
