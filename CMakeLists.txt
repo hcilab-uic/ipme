@@ -3,10 +3,10 @@ project(cross_device_interaction)
 
 set(CMAKE_CXX_FLAGS "-std=c++14 -D__LINUX__ -Wall -Wextra -Werror -pedantic")
 
-set(BUILD_CV_TOOLS CACHE BOOL OFF)
+set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
+#option(BUILD_VISUALIZATION_TOOLS "Build visualization tools" OFF)
 
-if(${BUILD_CV_TOOLS})
-    set(CMAKE_MODULE_PATH CACHE FILEPATH ${CMAKE_MODULE_PATH})
+if(${BUILD_VISUALIZATION_TOOLS})
     find_package(OpenCV REQUIRED CONFIG)
 endif()
 

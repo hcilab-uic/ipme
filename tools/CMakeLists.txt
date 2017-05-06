@@ -1,6 +1,6 @@
 find_package(Boost REQUIRED)
 
-if(${BUILD_CV_TOOLS})
+if(${BUILD_VISUALIZATION_TOOLS})
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} /home/harish/.local/opencv)
     find_package(OpenCV REQUIRED CONFIG)
     include_directories(${OpenCV_INCLUDE_DIRS})
