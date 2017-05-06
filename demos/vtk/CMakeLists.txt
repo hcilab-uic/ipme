@@ -1,0 +1,1 @@
+build_viz_demo(dump_vtkpolydata)
