@@ -11,3 +11,6 @@ set(lib_HEADERS SOURCES
 )
 
 add_custom_target(lib_HEADERS ${lib_HEADERS})
+
+add_subdirectory(sensor)
+

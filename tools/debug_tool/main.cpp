@@ -6,8 +6,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "sensor.h"
-#include "walabot.h"
+#include "sensor/sensor.h"
+#include "sensor/walabot.h"
 
 class SignalDisplayer : public cdi::sensor::Receiver {
   public:

@@ -11,10 +11,14 @@ set(cdilib_DIR ${CMAKE_SOURCE_DIR}/lib)
 if(${BUILD_VISUALIZATION_TOOLS})
     find_package(OpenCV REQUIRED CONFIG)
     find_package(VTK REQUIRED CONFIG)
+
+    include_directories(${OpenCV_INCLUDE_DIRS})
+    include_directories(${VTK_INCLUDE_DIRS})
+
 endif()
 
-add_subdirectory(demos)
-add_subdirectory(sensor)
 add_subdirectory(lib)
+
+add_subdirectory(demos)
 add_subdirectory(examples)
 add_subdirectory(tools)

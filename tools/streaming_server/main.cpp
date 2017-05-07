@@ -10,8 +10,8 @@
 #include <mutex>
 #include <thread>
 
-#include "sensor.h"
-#include "walabot.h"
+#include "sensor/sensor.h"
+#include "sensor/walabot.h"
 
 #define UNUSED(variable)
 

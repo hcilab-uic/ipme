@@ -1,13 +1,5 @@
 #include <random>
 
-#include <vtkCellArray.h>
-#include <vtkPoints.h>
-#include <vtkPolyData.h>
-#include <vtkSmartPointer.h>
-#include <vtkVersion.h>
-#include <vtkVertexGlyphFilter.h>
-#include <vtkXMLPolyDataWriter.h>
-
 #include "data/point3d.h"
 #include "utils/random.h"
 #include "visualization/polydata.h"

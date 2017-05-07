@@ -6,8 +6,8 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/video.hpp>
 
-#include "sensor.h"
-#include "walabot.h"
+#include "sensor/sensor.h"
+#include "sensor/walabot.h"
 
 #define UNUSED(var)
 

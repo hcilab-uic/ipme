@@ -2,8 +2,8 @@
 #include <memory>
 #include <sstream>
 
-#include "sensor.h"
-#include "walabot.h"
+#include "sensor/sensor.h"
+#include "sensor/walabot.h"
 
 class MyReceiver : public cdi::sensor::Receiver {
   public:

@@ -1,5 +1,4 @@
 #include <vtkPolyData.h>
-#include <vtkSmartPointer.h>
 #include <vtkVersion.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkXMLPolyDataWriter.h>
@@ -11,7 +10,7 @@ Polydata<TPoint>::Polydata() : points_{vtkSmartPointer<vtkPoints>::New()}
 {
 }
 
-template<typename TPoint>
+template <typename TPoint>
 void Polydata<TPoint>::write_file(
     const boost::filesystem::path& output_filename)
 {
