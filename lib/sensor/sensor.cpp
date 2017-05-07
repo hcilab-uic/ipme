@@ -1,11 +1,25 @@
 #include "sensor.h"
 
+#include "utils/string_utils.h"
+
 namespace cdi {
 namespace sensor {
 
 Spec_range::Spec_range(const Spec_range::Min min_, const Spec_range::Max max_,
                        const Spec_range::Resolution resolution_)
     : min{min_}, max{max_}, resolution{resolution_}
+{
+}
+
+Spec_range::Spec_range(const std::vector<std::string>& range_vector)
+    : Spec_range(utils::to_double(range_vector[0]),
+                 utils::to_double(range_vector[1]),
+                 utils::to_double(range_vector[2]))
+{
+}
+
+Spec_range::Spec_range(const std::string& range, const std::string& delim)
+    : Spec_range(utils::split_string(range, delim))
 {
 }
 

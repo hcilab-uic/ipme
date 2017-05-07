@@ -1,3 +1,5 @@
+include_directories(${CMAKE_SOURCE_DIR}/lib)
+
 set(SRCS
     sensor.cpp
     walabot.cpp

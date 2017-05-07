@@ -1,7 +1,8 @@
-#ifndef CDI_SENSOR_SENSOR_H
-#define CDI_SENSOR_SENSOR_H
+#ifndef CDI_LIB_SENSOR_SENSOR_H
+#define CDI_LIB_SENSOR_SENSOR_H
 
-#include <tuple>
+#include <string>
+#include <vector>
 
 namespace cdi {
 namespace sensor {
@@ -33,6 +34,8 @@ struct Spec_range {
     using Resolution = double;
 
     Spec_range(const Min min_, const Max max_, const Resolution resolution_);
+    Spec_range(const std::vector<std::string>& range_vector);
+    Spec_range(const std::string& range, const std::string& delim = ":");
 
     Min min;
     Max max;
@@ -75,4 +78,4 @@ class Sensor {
 
 } // namespace sensor
 } // namespace cdi
-#endif // CDI_SENSOR_SENSOR_H
+#endif // CDI_LIB_SENSOR_SENSOR_H
