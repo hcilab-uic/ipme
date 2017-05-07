@@ -6,6 +6,7 @@
 #include "sensor/walabot3d.h"
 #include "sensor/walabot_receiver_writer.h"
 #include "utils/logger.h"
+#include "utils/string_utils.h"
 
 int main(int argc, char* argv[])
 {
@@ -20,6 +21,14 @@ int main(int argc, char* argv[])
             ("filename,f",
              po::value<boost::filesystem::path>()->default_value("scene.vtp"),
              "output file name (.vtp)")
+            ("radial,r", po::value<std::string>()->default_value("0:500:0.001"),
+             "Radian range and resolution")
+            ("theta,t",
+             po::value<std::string>()->default_value("-15:15:0.00001"),
+             "Theta range and resolution")
+            ("phi,p",
+             po::value<std::string>()->default_value("-90:90:0.0001"),
+             "Phi range and resolution")
     ;
     // clang-format on
 
@@ -27,15 +36,25 @@ int main(int argc, char* argv[])
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
-    cdi::sensor::Settings::Radial radial{20, 500, 0.001};
-    cdi::sensor::Settings::Theta theta{-15, 15, 0.00001};
-    cdi::sensor::Settings::Phi phi{-90, 90, 0.0001};
+    ///// Setup R-Theta-Phi from command line arguments
+    cdi::sensor::Settings::Radial radial{vm["radial"].as<std::string>(), ":"};
+    cdi::sensor::Settings::Theta theta{vm["theta"].as<std::string>(), ":"};
+    cdi::sensor::Settings::Phi phi{vm["phi"].as<std::string>(), ":"};
+    ///////////////////////
+
+    INFO() << "Settings";
+    INFO() << "Radial: [" << radial.min << ", " << radial.max << ", "
+           << radial.resolution << "]";
+    INFO() << "Theta: [" << theta.min << ", " << theta.max << ", "
+           << theta.resolution << "]";
+    INFO() << "Phi: [" << phi.min << ", " << phi.max << ", " << phi.resolution
+           << "]";
+
     cdi::sensor::Settings settings{radial, theta, phi};
 
     using Point_t = cdi::data::Point3D<double>;
 
     INFO() << "Starting receiver";
-
     auto receiver =
         std::make_shared<cdi::sensor::Walabot_receiver_writer<Point_t>>();
     cdi::sensor::Walabot3d<Point_t> walabot{receiver, settings, false};

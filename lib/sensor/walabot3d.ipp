@@ -105,9 +105,9 @@ void cdi::sensor::Walabot3d<Point_t>::process_snapshot(int* raster_image,
 
                 const int index = (size_y * size_z * i) + (size_z * j) * k;
                 int raster = raster_image[index];
-                //                if(raster < 0 || raster > 255) {
-                //                    continue;
-                //                }
+                if(raster < 0 || raster > 255) {
+                    continue;
+                }
 
                 Point_t point{r * sin_theta * cos_phi, r * sin_theta * sin_phi,
                               r * cos_theta, raster, power};
