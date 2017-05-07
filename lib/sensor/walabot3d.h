@@ -32,7 +32,7 @@ class Walabot3d : public Sensor {
     void process_snapshot(int* raster_image, int size_x, int size_y, int size_z,
                           double power);
 
-    std::unique_ptr<Receiver3d<Point_t>> receiver_;
+    std::shared_ptr<Receiver3d<Point_t>> receiver_;
     const Settings settings_;
     const Spec_range::Min theta_span_;
     const Spec_range::Min phi_span_;

@@ -8,6 +8,7 @@ set(SRCS
     sensor.h
     walabot.h
     walabot3d.h walabot3d.ipp
+    walabot_receiver_writer.h walabot_receiver_writer.ipp
     )
 
 add_library(sensor ${SRCS})

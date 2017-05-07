@@ -2,6 +2,8 @@
 
 #include <WalabotAPI.h>
 
+#include "utils/logger.h"
+
 namespace cdi {
 namespace sensor {
 
@@ -81,10 +83,9 @@ static double degrees_to_radians(double degrees)
 }
 
 template <typename Point_t>
-void cdi::sensor::Walabot3d<Point_t>::process_snapshot(int* /*raster_image */,
+void cdi::sensor::Walabot3d<Point_t>::process_snapshot(int* raster_image,
                                                        int size_x, int size_y,
-                                                       int size_z,
-                                                       double /* power */)
+                                                       int size_z, double power)
 {
     for(int i = 0; i < size_x; ++i) {
         for(int j = 0; j < size_y; ++j) {
@@ -102,9 +103,18 @@ void cdi::sensor::Walabot3d<Point_t>::process_snapshot(int* /*raster_image */,
                 const double sin_phi = sin(degrees_to_radians(phi));
                 const double cos_phi = cos(degrees_to_radians(phi));
 
+                const int index = (size_y * size_z * i) + (size_z * j) * k;
+                int raster = raster_image[index];
+                //                if(raster < 0 || raster > 255) {
+                //                    continue;
+                //                }
+
                 Point_t point{r * sin_theta * cos_phi, r * sin_theta * sin_phi,
-                              r * cos_theta};
+                              r * cos_theta, raster, power};
                 receiver_->process(point);
+                DEBUG() << "x: " << point.x << ", y: " << point.y
+                        << ", z: " << point.z << ", raster: " << point.raster
+                        << ", power: " << point.raster;
             }
         }
     }

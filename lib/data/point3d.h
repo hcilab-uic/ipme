@@ -5,10 +5,10 @@
 
 namespace cdi {
 namespace data {
-template <typename TCoordinate = double>
 /**
  * @brief The Point3D class for storing 3-dimensional point
  */
+template <typename TCoordinate = double>
 struct Point3D {
     /**
      * @brief Point3D Constructor
