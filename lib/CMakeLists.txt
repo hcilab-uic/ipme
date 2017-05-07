@@ -5,12 +5,17 @@
 # adding the relevant header files
 
 set(lib_HEADERS SOURCES
+    utils/logger.h
     utils/random.h utils/random.ipp
     data/point3d.h data/point3d.ipp
     visualization/polydata.h visualization/polydata.ipp
 )
 
+set(lib_SOURCES utils/logger.cpp)
+
 add_custom_target(lib_HEADERS ${lib_HEADERS})
+
+add_library(cdi ${lib_SOURCES} ${Boost_LIBRARIES})
 
 add_subdirectory(sensor)
 
