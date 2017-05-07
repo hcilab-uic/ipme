@@ -12,12 +12,15 @@ int main()
     util::Random<double> xrand{0, 100};
     util::Random<double> yrand{0, 100};
     util::Random<double> zrand{0, 100};
+    util::Random<int> raster{0, 255};
+    util::Random<double> power{0, 50};
 
     viz::Polydata<cdi::data::Point3D<double>> data;
 
     for(unsigned int i = 0; i < 10000; ++i) {
         data.add_point(cdi::data::Point3D<double>(xrand.next(), yrand.next(),
-                                                  zrand.next()));
+                                                  zrand.next(), raster.next(),
+                                                  power.next()));
     }
 
     data.write_file("random_points.vtp");

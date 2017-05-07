@@ -4,6 +4,8 @@
 #include <boost/filesystem.hpp>
 #include <memory>
 
+#include <vtkDoubleArray.h>
+#include <vtkIntArray.h>
 #include <vtkPoints.h>
 #include <vtkSmartPointer.h>
 
@@ -23,10 +25,7 @@ class Polydata {
      * @brief add_point inline function to add point
      * @param point to be added
      */
-    inline void add_point(const TPoint& point)
-    {
-        points_->InsertNextPoint(point.x, point.y, point.z);
-    }
+    inline void add_point(const TPoint& point);
 
     /**
      * @brief write_file function to output file
@@ -36,6 +35,8 @@ class Polydata {
 
   private:
     vtkSmartPointer<vtkPoints> points_;
+    vtkSmartPointer<vtkDoubleArray> point_powers_;
+    vtkSmartPointer<vtkIntArray> point_rasters_;
 };
 } // namespace visualization
 } // namespace cdi
