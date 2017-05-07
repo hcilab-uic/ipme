@@ -8,8 +8,8 @@
 #include <vtkVertexGlyphFilter.h>
 #include <vtkXMLPolyDataWriter.h>
 
+#include "data/point3d.h"
 #include "utils/random.h"
-#include "visualization/point3d.h"
 #include "visualization/polydata.h"
 
 int main()
@@ -21,11 +21,11 @@ int main()
     util::Random<double> yrand{0, 100};
     util::Random<double> zrand{0, 100};
 
-    viz::Polydata<viz::Point3D<double>> data;
+    viz::Polydata<cdi::data::Point3D<double>> data;
 
     for(unsigned int i = 0; i < 10000; ++i) {
-        data.add_point(
-            viz::Point3D<double>(xrand.next(), yrand.next(), zrand.next()));
+        data.add_point(cdi::data::Point3D<double>(xrand.next(), yrand.next(),
+                                                  zrand.next()));
     }
 
     data.write_file("random_points.vtp");

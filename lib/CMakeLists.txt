@@ -6,7 +6,7 @@
 
 set(lib_HEADERS SOURCES
     utils/random.h utils/random.ipp
-    visualization/point3d.h visualization/point3d.ipp
+    data/point3d.h data/point3d.ipp
     visualization/polydata.h visualization/polydata.ipp
 )
 

@@ -2,7 +2,7 @@
 #define LIB_VISUALIZATION_POINT3D_H
 
 namespace cdi {
-namespace visualization {
+namespace data {
 template <typename TCoordinate = double>
 /**
  * @brief The Point3D class for storing 3-dimensional point
@@ -21,7 +21,7 @@ struct Point3D {
     const TCoordinate z;
 };
 
-} // namespace visualization
+} // namespace data
 } // namespace cdi
 
 #include "point3d.ipp"

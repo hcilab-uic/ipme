@@ -6,7 +6,7 @@
 
 #include <vtkPoints.h>
 
-#include "point3d.h"
+#include "data/point3d.h"
 
 namespace cdi {
 namespace visualization {
