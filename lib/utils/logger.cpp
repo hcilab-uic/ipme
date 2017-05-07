@@ -25,9 +25,9 @@ logging::sources::severity_logger<logging::trivial::severity_level> Logger::log;
         kw::format =
             (expr::stream << expr::format_date_time<boost::posix_time::ptime>(
                                  "TimeStamp", "%Y%m%d %H:%M:%S")
-                          << ": <" << logging::trivial::severity << ">"
-                          << "[" << expr::attr<std::string>(__FILE__) << "]"
-                          << expr::smessage));
+                          << " <" << logging::trivial::severity << ">"
+                          << "[" << expr::attr<std::string>(__FILE__)
+                          << "]: " << expr::smessage));
 
     logging::add_common_attributes();
 }
