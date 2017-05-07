@@ -40,7 +40,7 @@ Walabot::~Walabot()
     Walabot_Disconnect();
 }
 
-void Walabot::record_image(const int iterations) const
+void Walabot::record_image_slice(const int iterations) const
 {
     APP_STATUS app_status;
     double calibration_process{};

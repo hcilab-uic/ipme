@@ -1,5 +1,10 @@
+<<<<<<< Updated upstream
+find_package(Boost REQUIRED)
+
 include_directories(${cdilib_DIR})
 
+=======
+>>>>>>> Stashed changes
 if(${BUILD_VISUALIZATION_TOOLS})
     add_subdirectory(debug_tool)
     add_subdirectory(signal_server)

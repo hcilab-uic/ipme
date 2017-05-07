@@ -44,5 +44,5 @@ int main()
     auto receiver = std::make_shared<MyReceiver>();
 
     cdi::sensor::Walabot walabot{receiver, settings, true};
-    walabot.record_image(100);
+    walabot.record_image_slice(100);
 }

@@ -40,7 +40,8 @@ class Walabot {
     Walabot(const std::shared_ptr<Receiver> receiver, const Settings& settings,
             bool moving_target);
     virtual ~Walabot();
-    void record_image(const int iterations) const;
+    void record_image_slice(const int iterations) const;
+    void record_raw_image(const int iterations) const;
     void record_targets(const int iterations) const;
 
   private:

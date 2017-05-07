@@ -18,10 +18,14 @@ if(${BUILD_VISUALIZATION_TOOLS})
 
     include_directories(${OpenCV_INCLUDE_DIRS})
     include_directories(${VTK_INCLUDE_DIRS})
+<<<<<<< Updated upstream
+
+=======
 endif()
 
 if(${BUILD_SENSOR_WALABOT})
     include_directories(${CMAKE_SOURCE_DIR}/sensor)
+>>>>>>> Stashed changes
 endif()
 
 add_subdirectory(lib)

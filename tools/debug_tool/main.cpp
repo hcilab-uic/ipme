@@ -88,6 +88,6 @@ int main()
     auto receiver = std::make_shared<SignalDisplayer>(500, 61);
 
     cdi::sensor::Walabot walabot{receiver, settings, true};
-    walabot.record_image(0);
+    walabot.record_image_slice(0);
     std::cout << "sdasdf" << std::endl;
 }
