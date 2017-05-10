@@ -12,3 +12,5 @@ if(${BUILD_VISUALIZATION_TOOLS})
     add_subdirectory(camera_zoom)
     add_subdirectory(vtk)
 endif()
+
+add_subdirectory(hello_walabot)
