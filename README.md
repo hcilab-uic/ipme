@@ -1,5 +1,9 @@
 # Interaction Proxemics in Multi-Device Ecologies
 
+---
+## [Project Internal Wiki](https://bitbucket.org/hcilab-uic/ipme/wiki/Home)
+
+---
 ## A brief intro to the code base
 
 ### Coding conventions
