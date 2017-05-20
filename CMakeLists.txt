@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.0)
-project(cross_device_interaction)
+project(ipme)
 
 # Unfortunately VTK headers have a lot of errors with -pedantic flag. So
 # removing -pedantic for now
 set(CMAKE_CXX_FLAGS "-std=c++14 -D__LINUX__ -DBOOST_LOG_DYN_LINK -Wall -Wextra -Werror")
+
 set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")
+set(BUILD_VICON_CODE false CACHE BOOL "Build code using VICON motion capture")
 
 set(cdilib_DIR ${CMAKE_SOURCE_DIR}/lib)
 
@@ -25,6 +27,10 @@ endif()
 
 if(${BUILD_SENSOR_WALABOT})
     include_directories(${CMAKE_SOURCE_DIR}/sensor)
+endif()
+
+if(${BUILD_VICON_CODE})
+    set(OMICRON_SOURCE_PATH CACHE PATH "Path to Omicron SDK")
 endif()
 
 add_subdirectory(lib)

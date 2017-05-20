@@ -2,6 +2,8 @@ find_package(Boost REQUIRED)
 
 include_directories(${cdilib_DIR})
 
+add_subdirectory(hello_walabot)
+
 if(${BUILD_VISUALIZATION_TOOLS})
     function(build_viz_demo demo_name)
         add_executable(${demo_name} ${demo_name}.cpp)
@@ -13,4 +15,6 @@ if(${BUILD_VISUALIZATION_TOOLS})
     add_subdirectory(vtk)
 endif()
 
-add_subdirectory(hello_walabot)
+if(${BUILD_VICON_CODE})
+    add_subdirectory(omicron)
+endif()
