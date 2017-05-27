@@ -16,7 +16,7 @@ set(lib_SOURCES utils/logger.cpp utils/string_utils.cpp)
 
 add_custom_target(lib_HEADERS ${lib_HEADERS})
 
-add_library(cdi ${lib_SOURCES} ${Boost_LIBRARIES})
+add_library(ipme ${lib_SOURCES} ${Boost_LIBRARIES})
 
 add_subdirectory(sensor)
 

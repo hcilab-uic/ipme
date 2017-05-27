@@ -1,4 +1,4 @@
-include_directories(${cdilib_DIR})
+include_directories(${ipmelib_DIR})
 
 add_subdirectory(hello_walabot)
 

@@ -12,7 +12,7 @@ set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")
 set(BUILD_VICON_CODE false CACHE BOOL "Build code using VICON motion capture")
 
-set(cdilib_DIR ${CMAKE_SOURCE_DIR}/lib)
+set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)

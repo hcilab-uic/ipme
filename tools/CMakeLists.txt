@@ -1,4 +1,4 @@
-include_directories(${cdilib_DIR})
+include_directories(${ipmelib_DIR})
 
 if(${BUILD_VISUALIZATION_TOOLS})
     add_subdirectory(debug_tool)

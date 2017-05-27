@@ -1,6 +1,6 @@
 set(SRCS hello_walabot.cpp)
 
-include_directories(${cdilib_DIR})
+include_directories(${ipmelib_DIR})
 
 add_executable(hello_walabot ${SRCS})
 

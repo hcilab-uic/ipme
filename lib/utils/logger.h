@@ -24,7 +24,7 @@ namespace utils {
 namespace logging = boost::log;
 class Logger {
   public:
-    static void init(const std::string& file_prefix = "cdi");
+    static void init(const std::string& file_prefix = "ipme");
     static logging::sources::severity_logger<logging::trivial::severity_level>
         log;
 
