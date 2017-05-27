@@ -1,4 +1,4 @@
-namespace cdi {
+namespace ipme {
 namespace data {
 template <typename TCoordinate>
 Point3D<TCoordinate>::Point3D(const TCoordinate x_, const TCoordinate y_,
@@ -8,4 +8,4 @@ Point3D<TCoordinate>::Point3D(const TCoordinate x_, const TCoordinate y_,
 {
 }
 } // namespace data
-} // namespace cdi
+} // namespace ipme

@@ -67,7 +67,7 @@ class Connector_listener : public IOmicronConnectorClientListener {
 
 int main(int /* argc */, char* argv[])
 {
-    cdi::utils::Logger::init(argv[0]);
+    ipme::utils::Logger::init(argv[0]);
 
     INFO() << "Starting listener";
 

@@ -3,7 +3,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
-namespace cdi {
+namespace ipme {
 namespace utils {
 std::vector<std::string> split_string(const std::string& str,
                                       const std::string& delim)
@@ -20,4 +20,4 @@ double to_double(const std::string& str)
     return std::strtod(str.c_str(), &end);
 }
 } // namespace utils
-} // namespace cdi
+} // namespace ipme

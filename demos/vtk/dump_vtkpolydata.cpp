@@ -6,8 +6,8 @@
 
 int main()
 {
-    namespace viz = cdi::visualization;
-    namespace util = cdi::utils;
+    namespace viz = ipme::visualization;
+    namespace util = ipme::utils;
 
     util::Random<double> xrand{0, 100};
     util::Random<double> yrand{0, 100};
@@ -15,10 +15,10 @@ int main()
     util::Random<int> raster{0, 255};
     util::Random<double> power{0, 50};
 
-    viz::Polydata<cdi::data::Point3D<double>> data;
+    viz::Polydata<ipme::data::Point3D<double>> data;
 
     for(unsigned int i = 0; i < 10000; ++i) {
-        data.add_point(cdi::data::Point3D<double>(xrand.next(), yrand.next(),
+        data.add_point(ipme::data::Point3D<double>(xrand.next(), yrand.next(),
                                                   zrand.next(), raster.next(),
                                                   power.next()));
     }

@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-namespace cdi {
+namespace ipme {
 namespace visualization {
 template <typename TPoint>
 Polydata<TPoint>::Polydata()
@@ -52,4 +52,4 @@ void Polydata<TPoint>::add_point(const TPoint& point)
 }
 
 } // namespace visualizaton
-} // namespace cdi
+} // namespace ipme

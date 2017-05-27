@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace cdi {
+namespace ipme {
 namespace sensor {
 
 using TargetId = int;
@@ -77,5 +77,5 @@ class Sensor {
 };
 
 } // namespace sensor
-} // namespace cdi
+} // namespace ipme
 #endif // CDI_LIB_SENSOR_SENSOR_H

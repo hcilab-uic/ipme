@@ -4,7 +4,7 @@
 
 #include <WalabotAPI.h>
 
-namespace cdi {
+namespace ipme {
 namespace sensor {
 const std::string Walabot::settings_folder{"/var/lib/walabot"};
 
@@ -90,4 +90,4 @@ void Walabot::record_targets(const int iterations) const
 }
 
 } // namespace sensor
-} // namespace cdi
+} // namespace ipme

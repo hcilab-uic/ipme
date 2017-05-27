@@ -10,7 +10,7 @@
 
 int main(int argc, char* argv[])
 {
-    cdi::utils::Logger::init(argv[0]);
+    ipme::utils::Logger::init(argv[0]);
 
     namespace po = boost::program_options;
     po::options_description desc("Options");
@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
     po::notify(vm);
 
     ///// Setup R-Theta-Phi from command line arguments
-    cdi::sensor::Settings::Radial radial{vm["radial"].as<std::string>(), ":"};
-    cdi::sensor::Settings::Theta theta{vm["theta"].as<std::string>(), ":"};
-    cdi::sensor::Settings::Phi phi{vm["phi"].as<std::string>(), ":"};
+    ipme::sensor::Settings::Radial radial{vm["radial"].as<std::string>(), ":"};
+    ipme::sensor::Settings::Theta theta{vm["theta"].as<std::string>(), ":"};
+    ipme::sensor::Settings::Phi phi{vm["phi"].as<std::string>(), ":"};
     ///////////////////////
 
     INFO() << "Settings";
@@ -50,14 +50,14 @@ int main(int argc, char* argv[])
     INFO() << "Phi: [" << phi.min << ", " << phi.max << ", " << phi.resolution
            << "]";
 
-    cdi::sensor::Settings settings{radial, theta, phi};
+    ipme::sensor::Settings settings{radial, theta, phi};
 
-    using Point_t = cdi::data::Point3D<double>;
+    using Point_t = ipme::data::Point3D<double>;
 
     INFO() << "Starting receiver";
     auto receiver =
-        std::make_shared<cdi::sensor::Walabot_receiver_writer<Point_t>>();
-    cdi::sensor::Walabot3d<Point_t> walabot{receiver, settings, false};
+        std::make_shared<ipme::sensor::Walabot_receiver_writer<Point_t>>();
+    ipme::sensor::Walabot3d<Point_t> walabot{receiver, settings, false};
     walabot.record(1);
 
     INFO() << "Finished recording, writing to file";

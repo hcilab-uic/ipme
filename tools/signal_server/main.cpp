@@ -11,13 +11,13 @@
 
 #define UNUSED(var)
 
-class Server_receiver : public cdi::sensor::Receiver {
+class Server_receiver : public ipme::sensor::Receiver {
   public:
     explicit Server_receiver(double& depth);
     virtual ~Server_receiver();
 
-    virtual void process(const cdi::sensor::TargetId sensor_id,
-                         const cdi::sensor::Reading& reading) override;
+    virtual void process(const ipme::sensor::TargetId sensor_id,
+                         const ipme::sensor::Reading& reading) override;
 
     virtual void process_image_slice(int* raster_image, int size_x, int size_y,
                                      double depth, double power) override;
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     if(argc && argv) {
     }
 
-    using Settings = cdi::sensor::Walabot::Settings;
+    using Settings = ipme::sensor::Walabot::Settings;
     Settings::Radial radial{20, 600, 1};
     Settings::Theta theta{-15, 15, 1};
     Settings::Phi phi{-25, 25, 3};
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     double depth{100.0};
     auto receiver = std::make_shared<Server_receiver>(depth);
 
-    cdi::sensor::Walabot walabot{receiver, settings, true};
+    ipme::sensor::Walabot walabot{receiver, settings, true};
     walabot.record_targets(1000);
 }
 
@@ -62,8 +62,8 @@ Server_receiver::~Server_receiver()
     camera_thread_.join();
 }
 
-void Server_receiver::process(const cdi::sensor::TargetId sensor_id,
-                              const cdi::sensor::Reading& reading)
+void Server_receiver::process(const ipme::sensor::TargetId sensor_id,
+                              const ipme::sensor::Reading& reading)
 {
     if(sensor_id == 0) {
         std::lock_guard<std::mutex> lock{mutex_};

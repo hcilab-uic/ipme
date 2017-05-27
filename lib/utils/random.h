@@ -4,7 +4,7 @@
 #include <random>
 #include <type_traits>
 
-namespace cdi {
+namespace ipme {
 namespace utils {
 template <typename T>
 class Random {
@@ -35,7 +35,7 @@ class Random {
     Distribution_t distribution_;
 };
 } // namespace utils
-} // namespace cdi
+} // namespace ipme
 
 #include "random.ipp"
 

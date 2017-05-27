@@ -1,7 +1,7 @@
 #ifndef CDI_LIB_SENSOR_RECEIVER3D_H
 #define CDI_LIB_SENSOR_RECEIVER3D_H
 
-namespace cdi {
+namespace ipme {
 namespace sensor {
 template <typename TPoint>
 class Receiver3d {
@@ -15,5 +15,5 @@ class Receiver3d {
     virtual void process(const TPoint& point) = 0;
 };
 } // namespace sensor
-} // namespace cdi
+} // namespace ipme
 #endif // CDI_LIB_SENSOR_RECEIVER3D_H

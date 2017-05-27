@@ -15,12 +15,12 @@
 
 #define UNUSED(variable)
 
-class Server_receiver : public cdi::sensor::Receiver {
+class Server_receiver : public ipme::sensor::Receiver {
   public:
     Server_receiver(short port);
     virtual ~Server_receiver() = default;
-    virtual void process(const cdi::sensor::TargetId target_id,
-                         const cdi::sensor::Reading& reading) override;
+    virtual void process(const ipme::sensor::TargetId target_id,
+                         const ipme::sensor::Reading& reading) override;
 
     virtual void process_image_slice(int* raster_image, int size_x, int size_y,
                                      double depth, double power) override;
@@ -32,7 +32,7 @@ class Server_receiver : public cdi::sensor::Receiver {
     boost::asio::io_service io_service_;
     std::mutex mutex_;
     const short port_;
-    cdi::sensor::Reading reading_;
+    ipme::sensor::Reading reading_;
 };
 
 int main(int argc, char* argv[])
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     if(argc && argv) {
     }
 
-    using Settings = cdi::sensor::Walabot::Settings;
+    using Settings = ipme::sensor::Walabot::Settings;
     Settings::Radial radial{20, 600, 1};
     Settings::Theta theta{-15, 15, 1};
     Settings::Phi phi{-25, 25, 3};
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 
     auto receiver = std::make_shared<Server_receiver>(5123);
 
-    cdi::sensor::Walabot walabot{receiver, settings, true};
+    ipme::sensor::Walabot walabot{receiver, settings, true};
     walabot.record_targets(1000);
 }
 
@@ -57,8 +57,8 @@ Server_receiver::Server_receiver(short port)
 {
 }
 
-void Server_receiver::process(const cdi::sensor::TargetId sensor_id,
-                              const cdi::sensor::Reading& reading)
+void Server_receiver::process(const ipme::sensor::TargetId sensor_id,
+                              const ipme::sensor::Reading& reading)
 {
     if(sensor_id == 0) {
         std::cout << reading.x << ", " << reading.y << ", " << reading.z
@@ -93,7 +93,7 @@ void Server_receiver::session(
 {
     try {
         for(;;) {
-            char data[sizeof(cdi::sensor::Reading)];
+            char data[sizeof(ipme::sensor::Reading)];
             boost::system::error_code error;
 
             std::lock_guard<std::mutex> lock{mutex_};

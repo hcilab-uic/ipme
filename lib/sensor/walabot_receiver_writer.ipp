@@ -1,10 +1,12 @@
-namespace cdi {
+#include <memory>
+
+namespace ipme {
 namespace sensor {
-template <typename Point_t>
-Walabot_receiver_writer<Point_t>::Walabot_receiver_writer()
-    : data_{std::make_unique<visualization::Polydata<Point_t>>()}
-{
-}
+//template <typename Point_t>
+//Walabot_receiver_writer<Point_t>::Walabot_receiver_writer()
+//    : data_{std::make_unique<visualization::Polydata<Point_t>>()}
+//{
+//}
 
 template <typename Point_t>
 void Walabot_receiver_writer<Point_t>::process(const Point_t& point)
@@ -20,4 +22,4 @@ void Walabot_receiver_writer<Point_t>::write(
 }
 
 } // namespace sensor
-} // namespace cdi
+} // namespace ipme

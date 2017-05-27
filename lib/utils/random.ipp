@@ -1,4 +1,4 @@
-namespace cdi {
+namespace ipme {
 namespace utils {
 template <typename T>
 Random<T>::Random(const T begin, const T end)
@@ -7,4 +7,4 @@ Random<T>::Random(const T begin, const T end)
 }
 
 } // namespace utils
-} // namespace cdi
+} // namespace ipme

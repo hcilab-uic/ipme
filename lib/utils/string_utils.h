@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace cdi {
+namespace ipme {
 namespace utils {
 /**
  * @brief split_string a string into vector by delimiter
@@ -22,6 +22,6 @@ std::vector<std::string> split_string(const std::string& str,
  */
 double to_double(const std::string& str);
 } // namespace utils
-} // namespace cdi
+} // namespace ipme
 
 #endif // CDI_LIB_UTILS_STRING_UTILS_H

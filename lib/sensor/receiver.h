@@ -3,7 +3,7 @@
 
 #include "sensor.h"
 
-namespace cdi {
+namespace ipme {
 namespace sensor {
 class Receiver {
   public:
@@ -13,5 +13,5 @@ class Receiver {
                                      double depth, double power) = 0;
 };
 }
-} // namespace cdi
+} // namespace ipme
 #endif // CDI_SENSOR_RECEIVER_H

@@ -11,7 +11,7 @@
 
 #include "data/point3d.h"
 
-namespace cdi {
+namespace ipme {
 namespace visualization {
 template <typename TPoint>
 class Polydata {
@@ -39,7 +39,7 @@ class Polydata {
     vtkSmartPointer<vtkIntArray> point_rasters_;
 };
 } // namespace visualization
-} // namespace cdi
+} // namespace ipme
 
 #include "polydata.ipp"
 

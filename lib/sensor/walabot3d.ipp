@@ -4,7 +4,7 @@
 
 #include "utils/logger.h"
 
-namespace cdi {
+namespace ipme {
 namespace sensor {
 
 constexpr double PI = 3.1415926535897;
@@ -83,7 +83,7 @@ static double degrees_to_radians(double degrees)
 }
 
 template <typename Point_t>
-void cdi::sensor::Walabot3d<Point_t>::process_snapshot(int* raster_image,
+void Walabot3d<Point_t>::process_snapshot(int* raster_image,
                                                        int size_x, int size_y,
                                                        int size_z, double power)
 {
@@ -121,4 +121,4 @@ void cdi::sensor::Walabot3d<Point_t>::process_snapshot(int* raster_image,
 }
 
 } // namespace sensor
-} // namespace cdi
+} // namespace ipme

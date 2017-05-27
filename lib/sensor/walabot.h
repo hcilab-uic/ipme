@@ -6,7 +6,7 @@
 
 #include "receiver.h"
 
-namespace cdi {
+namespace ipme {
 namespace sensor {
 class Walabot {
   public:
@@ -53,6 +53,6 @@ class Walabot {
 }; // class Walabot
 
 } // namespace sensor
-} // namespace cdi
+} // namespace ipme
 
 #endif // CDI_SENSOR_WALABOT_H

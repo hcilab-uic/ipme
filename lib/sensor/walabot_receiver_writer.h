@@ -6,15 +6,19 @@
 #include "receiver3d.h"
 #include "visualization/polydata.h"
 
-namespace cdi {
+namespace ipme {
 namespace sensor {
 template <typename Point_t>
 class Walabot_receiver_writer : public Receiver3d<Point_t> {
   public:
+    using Data_t = visualization::Polydata<Point_t>;
     /**
      * @brief Walabot_receiver_writer constructor
      */
-    Walabot_receiver_writer();
+    Walabot_receiver_writer()
+        : data_{std::make_unique<Data_t>()}
+    {
+    }
 
     /**
      * virtual destructor
@@ -32,11 +36,11 @@ class Walabot_receiver_writer : public Receiver3d<Point_t> {
     void write(const boost::filesystem::path& output_filename);
 
   private:
-    std::unique_ptr<visualization::Polydata<Point_t>> data_;
+    std::unique_ptr<Data_t> data_;
 };
 
 } // namespace sensor
-} // namespace cdi
+} // namespace ipme
 
 #include "walabot_receiver_writer.ipp"
 

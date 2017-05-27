@@ -5,16 +5,16 @@
 #include "sensor/sensor.h"
 #include "sensor/walabot.h"
 
-class MyReceiver : public cdi::sensor::Receiver {
+class MyReceiver : public ipme::sensor::Receiver {
   public:
-    virtual void process(const cdi::sensor::TargetId sensor_id,
-                         const cdi::sensor::Reading& reading) override;
+    virtual void process(const ipme::sensor::TargetId sensor_id,
+                         const ipme::sensor::Reading& reading) override;
     virtual void process_image_slice(int* raster_image, int size_x, int size_y,
                                      double depth, double power) override;
 };
 
-void MyReceiver::process(const cdi::sensor::TargetId sensor_id,
-                         const cdi::sensor::Reading& reading)
+void MyReceiver::process(const ipme::sensor::TargetId sensor_id,
+                         const ipme::sensor::Reading& reading)
 {
     std::cout << "target: " << sensor_id << ", [X: " << reading.x
               << "], [Y: " << reading.y << "], [Z: " << reading.z
@@ -36,13 +36,13 @@ void MyReceiver::process_image_slice(int* raster_image, int size_x, int size_y,
 
 int main()
 {
-    using Settings = cdi::sensor::Walabot::Settings;
+    using Settings = ipme::sensor::Walabot::Settings;
     Settings settings{Settings::Radial{30, 200, 3},
                       Settings::Radial{-15, 15, 5},
                       Settings::Radial{-60, 60, 5}};
 
     auto receiver = std::make_shared<MyReceiver>();
 
-    cdi::sensor::Walabot walabot{receiver, settings, true};
+    ipme::sensor::Walabot walabot{receiver, settings, true};
     walabot.record_image_slice(100);
 }

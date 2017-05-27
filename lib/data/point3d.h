@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 
-namespace cdi {
+namespace ipme {
 namespace data {
 /**
  * @brief The Point3D class for storing 3-dimensional point
@@ -31,7 +31,7 @@ struct Point3D {
 };
 
 } // namespace data
-} // namespace cdi
+} // namespace ipme
 
 #include "point3d.ipp"
 

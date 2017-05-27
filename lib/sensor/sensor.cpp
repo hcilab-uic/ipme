@@ -2,7 +2,7 @@
 
 #include "utils/string_utils.h"
 
-namespace cdi {
+namespace ipme {
 namespace sensor {
 
 Spec_range::Spec_range(const Spec_range::Min min_, const Spec_range::Max max_,
@@ -32,4 +32,4 @@ Settings::Settings(const Settings::Radial& radial_cm_,
 }
 
 } // namespace sensor
-} // namespace cdi
+} // namespace ipme

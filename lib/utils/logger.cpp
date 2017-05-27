@@ -3,7 +3,7 @@
 #include <cstring>
 #include <ctime>
 
-namespace cdi {
+namespace ipme {
 namespace utils {
 
 logging::sources::severity_logger<logging::trivial::severity_level> Logger::log;
@@ -32,4 +32,4 @@ logging::sources::severity_logger<logging::trivial::severity_level> Logger::log;
     logging::add_common_attributes();
 }
 } // namespace utils
-} // namespace cdi
+} // namespace ipme

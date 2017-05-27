@@ -7,7 +7,7 @@
 #include "receiver3d.h"
 #include "sensor.h"
 
-namespace cdi {
+namespace ipme {
 namespace sensor {
 template <typename Point_t>
 class Walabot3d : public Sensor {
@@ -41,7 +41,7 @@ class Walabot3d : public Sensor {
     static const boost::filesystem::path settings_folder;
 };
 } // namespace sensor
-} // namespace cdi
+} // namespace ipme
 
 #include "walabot3d.ipp"
 #endif // CDI_LIB_SENSOR_WALABOT3D_H
