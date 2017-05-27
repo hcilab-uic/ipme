@@ -3,7 +3,8 @@ project(ipme)
 
 # Unfortunately VTK headers have a lot of errors with -pedantic flag. So
 # removing -pedantic for now
-set(CMAKE_CXX_FLAGS "-std=c++14 -D__LINUX__ -DBOOST_LOG_DYN_LINK -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS "-std=c++14 -D__LINUX__ -DBOOST_LOG_DYN_LINK -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Werror")
 
 set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")

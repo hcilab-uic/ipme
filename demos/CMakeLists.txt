@@ -1,5 +1,3 @@
-find_package(Boost REQUIRED)
-
 include_directories(${cdilib_DIR})
 
 add_subdirectory(hello_walabot)
