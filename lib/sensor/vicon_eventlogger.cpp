@@ -4,17 +4,17 @@
 
 namespace ipme {
 namespace sensor {
-void Vicon_eventlogger::handle_trace(const oc::EventData& event) const
+void Vicon_eventlogger::handle_trace(const oc::EventData& event)
 {
     INFO() << "[TRACE] source id: " << event.sourceId;
 }
 
-void Vicon_eventlogger::handle_untrace(const oc::EventData& event) const
+void Vicon_eventlogger::handle_untrace(const oc::EventData& event)
 {
     INFO() << "[UNTRACE] source id: " << event.sourceId;
 }
 
-void Vicon_eventlogger::handle_update(const oc::EventData& event) const
+void Vicon_eventlogger::handle_update(const oc::EventData& event)
 {
     INFO() << "[UPDATE]";
     INFO() << "Motion capture source id: " << event.sourceId;
@@ -48,7 +48,7 @@ void Vicon_eventlogger::handle_update(const oc::EventData& event) const
     }
 }
 
-void Vicon_eventlogger::handle_up(const oc::EventData& event) const
+void Vicon_eventlogger::handle_up(const oc::EventData& event)
 {
     INFO() << "[UP] source id: " << event.sourceId << ", type: " << event.type;
     INFO() << "Flag: " << event.flags
@@ -56,7 +56,7 @@ void Vicon_eventlogger::handle_up(const oc::EventData& event) const
            << event.extraDataItems << ", extra mask: " << event.extraDataMask;
 }
 
-void Vicon_eventlogger::handle_down(const oc::EventData& event) const
+void Vicon_eventlogger::handle_down(const oc::EventData& event)
 {
     INFO() << "[DOWN] source id: " << event.sourceId
            << ", type: " << event.type;

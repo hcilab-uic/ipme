@@ -12,13 +12,17 @@ template <typename TPoint>
 Polydata<TPoint>::Polydata()
     : points_{vtkSmartPointer<vtkPoints>::New()},
       point_powers_{vtkSmartPointer<vtkDoubleArray>::New()},
-      point_rasters_{vtkSmartPointer<vtkIntArray>::New()}
+      point_rasters_{vtkSmartPointer<vtkIntArray>::New()},
+      indices_{vtkSmartPointer<vtkIntArray>::New()}
 {
     point_powers_->SetNumberOfComponents(1);
     point_powers_->SetName("Power");
 
     point_rasters_->SetNumberOfComponents(1);
     point_rasters_->SetName("Raster");
+
+    indices_->SetNumberOfComponents(1);
+    indices_->SetName("Index");
 }
 
 template <typename TPoint>
@@ -35,6 +39,7 @@ void Polydata<TPoint>::write_file(
 
     polydata->GetPointData()->AddArray(point_powers_);
     polydata->GetPointData()->AddArray(point_rasters_);
+    polydata->GetPointData()->AddArray(indices_);
 
     auto writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
     writer->SetFileName(output_filename.string().c_str());
@@ -49,6 +54,7 @@ void Polydata<TPoint>::add_point(const TPoint& point)
     points_->InsertNextPoint(point.x, point.y, point.z);
     point_rasters_->InsertNextValue(point.raster);
     point_powers_->InsertNextValue(point.power);
+    indices_->InsertNextValue(index_++);
 }
 
 } // namespace visualizaton

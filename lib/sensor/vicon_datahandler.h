@@ -21,31 +21,31 @@ class Vicon_datahandler {
      * Handle trace event
      * @param[in] event data
      */
-    virtual void handle_trace(const oc::EventData& event) const = 0;
+    virtual void handle_trace(const oc::EventData& event) = 0;
 
     /**
      * Handle untrace event
      * @param[in] event data
      */
-    virtual void handle_untrace(const oc::EventData& event) const = 0;
+    virtual void handle_untrace(const oc::EventData& event) = 0;
 
     /**
      * Handle update event
      * @param[in] event data
      */
-    virtual void handle_update(const oc::EventData& event) const = 0;
+    virtual void handle_update(const oc::EventData& event) = 0;
 
     /**
      * Handle down event
      * @param[in] event data
      */
-    virtual void handle_up(const oc::EventData& event) const = 0;
+    virtual void handle_up(const oc::EventData& event) = 0;
 
     /**
      * Handle u event
      * @param[in] event data
      */
-    virtual void handle_down(const oc::EventData& event) const = 0;
+    virtual void handle_down(const oc::EventData& event) = 0;
 };
 } // namespace sensor
 } // namespace ipme

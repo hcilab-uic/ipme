@@ -16,14 +16,29 @@ class Vicon_listener : public oc::IOmicronConnectorClientListener {
     /**
      * Constructor
      */
-    Vicon_listener(const Vicon_datahandler& handler);
+    Vicon_listener(std::unique_ptr<Vicon_datahandler> handler);
+
+    /**
+     * virtual destructor
+     */
+    virtual ~Vicon_listener() = default;
+
+    /**
+     * Accessor function for number of handled events
+     * @return event count
+     */
+    inline unsigned int event_count() const
+    {
+        return event_count_;
+    }
 
     /*! @copydoc oc::IOmicronConnectorClientListener::onEvent
      */
     virtual void onEvent(const oc::EventData& event) override;
 
   private:
-    const Vicon_datahandler& handler_;
+    unsigned int event_count_ = 0;
+    std::unique_ptr<Vicon_datahandler> handler_;
 };
 
 } // namespace sensor

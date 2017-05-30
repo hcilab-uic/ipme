@@ -5,6 +5,7 @@ get_directory_property(incdir INCLUDE_DIRECTORIES)
 
 set(SRCS
     sensor.cpp
+    vicon_3dwriter.cpp
     vicon_listener.cpp
     vicon_eventlogger.cpp
     walabot.cpp
@@ -14,6 +15,7 @@ set(SRCS
     receiver.h
     receiver3d.h receiver3d.ipp
     sensor.h
+    vicon_3dwriter.h
     vicon_datahandler.h
     vicon_eventlogger.h
     vicon_listener.h

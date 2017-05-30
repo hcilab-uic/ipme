@@ -34,9 +34,12 @@ class Polydata {
     void write_file(const boost::filesystem::path& output_filename);
 
   private:
+    size_t index_ = 0;
+
     vtkSmartPointer<vtkPoints> points_;
     vtkSmartPointer<vtkDoubleArray> point_powers_;
     vtkSmartPointer<vtkIntArray> point_rasters_;
+    vtkSmartPointer<vtkIntArray> indices_;
 };
 } // namespace visualization
 } // namespace ipme
