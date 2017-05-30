@@ -33,6 +33,5 @@ class Logger {
 
 } // namespace utils
 } // namespace ipme
-} // namespace ipme
 
 #endif // CDI_LIB_UTILS_LOGGER_H
