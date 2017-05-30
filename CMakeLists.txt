@@ -11,6 +11,7 @@ set(CMAKE_CXX_FLAGS "-D__LINUX__ -DBOOST_LOG_DYN_LINK -Wall -Wextra -Werror")
 set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")
 set(BUILD_VICON_CODE false CACHE BOOL "Build code using VICON motion capture")
+set(BUILD_TESTS false CACHE BOOL "Build unittests")
 
 set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
 
@@ -40,3 +41,8 @@ add_subdirectory(lib)
 
 add_subdirectory(demos)
 add_subdirectory(tools)
+
+if(${BUILD_TESTS})
+    set(GTEST_BUILD_DIR CACHE PATH "Path to GTest Libraries")
+    add_subdirectory(tests)
+endif()
