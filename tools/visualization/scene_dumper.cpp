@@ -52,7 +52,8 @@ int main(int argc, char* argv[])
 
     ipme::sensor::Settings settings{radial, theta, phi};
 
-    using Point_t = ipme::data::Point3D<double>;
+    using Point_t =
+        ipme::data::Raster<ipme::data::Power<ipme::data::Point3d<double>>>;
 
     INFO() << "Starting receiver";
     auto receiver =

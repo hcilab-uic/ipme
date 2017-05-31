@@ -50,7 +50,7 @@ class Vicon_3dwriter : public Vicon_datahandler {
 
   public:
     boost::filesystem::path outfile_name_;
-    visualization::Polydata<data::Point3D<double>> polydata_writer_;
+    visualization::Polydata<data::Point3d<double>> polydata_writer_;
 };
 
 } // namespace sensor

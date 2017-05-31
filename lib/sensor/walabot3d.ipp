@@ -83,9 +83,8 @@ static double degrees_to_radians(double degrees)
 }
 
 template <typename Point_t>
-void Walabot3d<Point_t>::process_snapshot(int* raster_image,
-                                                       int size_x, int size_y,
-                                                       int size_z, double power)
+void Walabot3d<Point_t>::process_snapshot(int* raster_image, int size_x,
+                                          int size_y, int size_z, double power)
 {
     for(int i = 0; i < size_x; ++i) {
         for(int j = 0; j < size_y; ++j) {
@@ -110,7 +109,9 @@ void Walabot3d<Point_t>::process_snapshot(int* raster_image,
                 }
 
                 Point_t point{r * sin_theta * cos_phi, r * sin_theta * sin_phi,
-                              r * cos_theta, raster, power};
+                              r * cos_theta};
+                data::set_raster(point, raster);
+                data::set_power(point, power);
                 receiver_->process(point);
                 DEBUG() << "x: " << point.x << ", y: " << point.y
                         << ", z: " << point.z << ", raster: " << point.raster

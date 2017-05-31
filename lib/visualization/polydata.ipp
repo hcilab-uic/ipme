@@ -15,11 +15,15 @@ Polydata<TPoint>::Polydata()
       point_rasters_{vtkSmartPointer<vtkIntArray>::New()},
       indices_{vtkSmartPointer<vtkIntArray>::New()}
 {
-    point_powers_->SetNumberOfComponents(1);
-    point_powers_->SetName("Power");
+    if(data::Has_power<TPoint>::value) {
+        point_powers_->SetNumberOfComponents(1);
+        point_powers_->SetName("Power");
+    }
 
-    point_rasters_->SetNumberOfComponents(1);
-    point_rasters_->SetName("Raster");
+    if(data::Has_raster<TPoint>::value) {
+        point_rasters_->SetNumberOfComponents(1);
+        point_rasters_->SetName("Raster");
+    }
 
     indices_->SetNumberOfComponents(1);
     indices_->SetName("Index");
@@ -52,9 +56,19 @@ template <typename TPoint>
 void Polydata<TPoint>::add_point(const TPoint& point)
 {
     points_->InsertNextPoint(point.x, point.y, point.z);
-    point_rasters_->InsertNextValue(point.raster);
-    point_powers_->InsertNextValue(point.power);
     indices_->InsertNextValue(index_++);
+
+    if(data::Has_raster<TPoint>::value) {
+        // point_rasters_->InsertNextValue(point.raster);
+    }
+
+    if(data::Has_power<TPoint>::value) {
+        // point_powers_->InsertNextValue(point.power);
+    }
+
+    if(data::Has_sourceid<TPoint>::value) {
+        // point_sourceids_-InsertNextValue(point.power);
+    }
 }
 
 } // namespace visualizaton
