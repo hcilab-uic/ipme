@@ -15,12 +15,16 @@ int main()
     util::Random<int> raster{0, 255};
     util::Random<double> power{0, 50};
 
-    viz::Polydata<ipme::data::Point3D<double>> data;
+    using Point_type =
+        ipme::data::Raster<ipme::data::Power<ipme::data::Point3d<double>>>;
+    viz::Polydata<Point_type> data;
 
     for(unsigned int i = 0; i < 10000; ++i) {
-        data.add_point(ipme::data::Point3D<double>(xrand.next(), yrand.next(),
-                                                  zrand.next(), raster.next(),
-                                                  power.next()));
+        auto point = Point_type(xrand.next(), yrand.next(), zrand.next());
+        ipme::data::set_raster(point, raster.next());
+        ipme::data::set_power(point, power.next());
+
+        data.add_point(point);
     }
 
     data.write_file("random_points.vtp");
