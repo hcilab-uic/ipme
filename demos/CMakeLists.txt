@@ -1,6 +1,8 @@
 include_directories(${ipmelib_DIR})
 
-add_subdirectory(hello_walabot)
+if(${BUILD_SENSOR_WALABOT})
+    add_subdirectory(hello_walabot)
+endif()
 
 if(${BUILD_VISUALIZATION_TOOLS})
     function(build_viz_demo demo_name)

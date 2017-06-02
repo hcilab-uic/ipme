@@ -32,8 +32,8 @@ if(${BUILD_SENSOR_WALABOT})
     list(APPEND SRCS
         walabot.cpp
     )
-
 endif()
+
 
 
 add_library(sensor ${SRCS})
