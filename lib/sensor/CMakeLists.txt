@@ -5,9 +5,6 @@ get_directory_property(incdir INCLUDE_DIRECTORIES)
 
 set(SRCS
     sensor.cpp
-    vicon_3dwriter.cpp
-    vicon_listener.cpp
-    vicon_eventlogger.cpp
     walabot.cpp
 
     # Adding these headers so that QtCreator IDE can show them in projects view
@@ -15,14 +12,22 @@ set(SRCS
     receiver.h
     receiver3d.h receiver3d.ipp
     sensor.h
-    vicon_3dwriter.h
-    vicon_datahandler.h
-    vicon_eventlogger.h
-    vicon_listener.h
     walabot.h
     walabot3d.h walabot3d.ipp
     walabot_receiver_writer.h walabot_receiver_writer.ipp
 )
+
+if(${BUILD_VICON_CODE})
+    list(APPEND SRCS
+        vicon_3dwriter.cpp
+        vicon_listener.cpp
+        vicon_eventlogger.cpp
+        vicon_3dwriter.h
+        vicon_datahandler.h
+        vicon_eventlogger.h
+        vicon_listener.h
+    )
+endif()
 
 add_library(sensor ${SRCS})
 
