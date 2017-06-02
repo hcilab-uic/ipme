@@ -6,4 +6,6 @@ if(${BUILD_VISUALIZATION_TOOLS})
     add_subdirectory(visualization)
 endif()
 
-add_subdirectory(streaming_server)
+if(${BUILD_SENSOR_WALABOT})
+    add_subdirectory(streaming_server)
+endif()
