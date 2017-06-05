@@ -1,8 +1,10 @@
 include_directories(${ipmelib_DIR})
 
 if(${BUILD_VISUALIZATION_TOOLS})
-    add_subdirectory(debug_tool)
-    add_subdirectory(signal_server)
+    if(${BUILD_SENSOR_WALABOT})
+        add_subdirectory(debug_tool)
+        add_subdirectory(signal_server)
+    endif()
     add_subdirectory(visualization)
 endif()
 
