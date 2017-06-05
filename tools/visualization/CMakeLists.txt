@@ -4,4 +4,6 @@ function(build_tool toolname)
         ipme WalabotAPI ${Boost_LIBRARIES} pthread)
 endfunction(build_tool)
 
-build_tool(scene_dumper)
+if(${BUILD_SENSOR_WALABOT})
+    build_tool(scene_dumper)
+endif()
