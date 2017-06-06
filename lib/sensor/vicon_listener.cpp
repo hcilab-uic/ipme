@@ -1,6 +1,6 @@
 #include "vicon_listener.h"
 
-#include "utils/logger.h"
+#include <sstream>
 
 namespace ipme {
 namespace sensor {
@@ -33,8 +33,9 @@ void Vicon_listener::onEvent(const omicronConnector::EventData& event)
         break;
 
     default:
-        ERROR() << "Unknown event of type: " << event.type << " received";
-        return;
+        std::stringstream ss;
+        ss << "Unknown event of type: " << event.type << " received";
+        throw std::runtime_error(ss.str());
     }
 
     ++event_count_;

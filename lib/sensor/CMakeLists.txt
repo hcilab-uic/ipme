@@ -18,13 +18,11 @@ set(SRCS
 
 if(${BUILD_VICON_CODE})
     list(APPEND SRCS
-        vicon_3dwriter.cpp
-        vicon_listener.cpp
-        vicon_eventlogger.cpp
-        vicon_3dwriter.h
+        vicon_3dwriter.h vicon_3dwriter.cpp
+        vicon_csvwriter.h vicon_csvwriter.cpp
         vicon_datahandler.h
-        vicon_eventlogger.h
-        vicon_listener.h
+        vicon_eventlogger.h vicon_eventlogger.cpp
+        vicon_listener.h vicon_listener.cpp
     )
 endif()
 

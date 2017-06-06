@@ -1,25 +1,24 @@
-#ifndef IPME_SENSOR_VICON_3DWRITER_H
-#define IPME_SENSOR_VICON_3DWRITER_H
+#ifndef IPME_IO_VICONCSVWRITER_H
+#define IPME_IO_VICONCSVWRITER_H
 
-#include <boost/filesystem.hpp>
+#include <experimental/filesystem>
+#include <fstream>
 
-#include "data/point3d.h"
+#include "data/vicon_point.h"
 #include "vicon_datahandler.h"
-#include "visualization/polydata.h"
 
 namespace ipme {
 namespace sensor {
-class Vicon_3dwriter : public Vicon_datahandler {
+namespace oc = omicronConnector;
+
+class Vicon_csvwriter : public Vicon_datahandler {
   public:
-    Vicon_3dwriter(const boost::filesystem::path& outfile_name)
-        : outfile_name_{outfile_name}
-    {
-    }
+    Vicon_csvwriter(const std::string& outfilename);
 
     /**
      * virtual destructor
      */
-    virtual ~Vicon_3dwriter();
+    virtual ~Vicon_csvwriter();
 
     /*! @copydoc Vicon_datahandler::handle_trace(const oc::EventData&)
      */
@@ -41,12 +40,10 @@ class Vicon_3dwriter : public Vicon_datahandler {
      */
     virtual void handle_down(const oc::EventData& event) override;
 
-  public:
-    boost::filesystem::path outfile_name_;
-    visualization::Polydata<data::Point3d<double>> polydata_writer_;
+  private:
+    std::ofstream ofs_;
 };
-
 } // namespace sensor
 } // namespace ipme
 
-#endif // IPME_SENSOR_VICON_3DWRITER_H
+#endif //  IPME_IO_VICONCSVWRITER_H

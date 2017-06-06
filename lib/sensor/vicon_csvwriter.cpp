@@ -1,0 +1,40 @@
+#include "vicon_csvwriter.h"
+
+namespace ipme {
+namespace sensor {
+Vicon_csvwriter::Vicon_csvwriter(const std::string& outfilename)
+    : ofs_{outfilename, std::ios::out}
+{
+    ofs_ << "id,x,y,z,rx,ry,rz,rw" << std::endl;
+}
+
+Vicon_csvwriter::~Vicon_csvwriter()
+{
+    ofs_.close();
+}
+
+void Vicon_csvwriter::handle_trace(const oc::EventData& /* event */)
+{
+}
+
+void Vicon_csvwriter::handle_untrace(const oc::EventData& /* event */)
+{
+}
+
+void Vicon_csvwriter::handle_update(const omicronConnector::EventData& event)
+{
+    ofs_ << event.sourceId << "," << event.posx << "," << event.posy << ","
+         << event.posz << "," << event.orx << "," << event.ory << ","
+         << event.orz << "," << event.orw << "\n";
+}
+
+void Vicon_csvwriter::handle_up(const oc::EventData& /* event */)
+{
+}
+
+void Vicon_csvwriter::handle_down(const oc::EventData& /* event */)
+{
+}
+
+} // sensor
+} // ipme

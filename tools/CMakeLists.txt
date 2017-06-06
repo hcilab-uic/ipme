@@ -11,3 +11,5 @@ endif()
 if(${BUILD_SENSOR_WALABOT})
     add_subdirectory(streaming_server)
 endif()
+
+add_subdirectory(data_collection)
