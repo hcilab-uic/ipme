@@ -6,7 +6,7 @@ function(build_vicon_demo demo)
         ${Boost_LIBRARIES} pthread)
 endfunction(build_vicon_demo)
 
-if(${Boost_FOUND})
+if(${DISABLED})
     build_vicon_demo(client_connect)
     build_vicon_demo(vicon_visualizer)
 endif()

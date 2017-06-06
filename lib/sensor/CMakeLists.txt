@@ -18,12 +18,15 @@ set(SRCS
 
 if(${BUILD_VICON_CODE})
     list(APPEND SRCS
-        vicon_3dwriter.h vicon_3dwriter.cpp
         vicon_csvwriter.h vicon_csvwriter.cpp
         vicon_datahandler.h
         vicon_eventlogger.h vicon_eventlogger.cpp
         vicon_listener.h vicon_listener.cpp
     )
+
+    if(${BUILD_VISUALIZATION_TOOLS})
+        list(APPEND SRCS vicon_3dwriter.h vicon_3dwriter.cpp)
+    endif()
 endif()
 
 if(${BUILD_SENSOR_WALABOT})
