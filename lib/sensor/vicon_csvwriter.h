@@ -1,7 +1,6 @@
 #ifndef IPME_IO_VICONCSVWRITER_H
 #define IPME_IO_VICONCSVWRITER_H
 
-#include <experimental/filesystem>
 #include <fstream>
 
 #include "data/vicon_point.h"
