@@ -5,6 +5,7 @@
 # adding the relevant header files
 
 set(lib_HEADERS SOURCES
+    data/vicon_point.h
     utils/logger.h
     utils/random.h utils/random.ipp
     utils/string_utils.h

@@ -59,8 +59,8 @@ struct Point3d {
 
 DECLARE_MIXIN(Raster, raster, int, 0)
 DECLARE_MIXIN(Power, power, double, 0.0)
-DECLARE_MIXIN(Sourceid, sourceid, unsigned int,
-              std::numeric_limits<unsigned int>::max())
+// DECLARE_MIXIN(Sourceid, sourceid, unsigned int,
+//              std::numeric_limits<unsigned int>::max())
 
 } // namespace data
 } // namespace ipme

@@ -58,17 +58,17 @@ void Polydata<TPoint>::add_point(const TPoint& point)
     points_->InsertNextPoint(point.x, point.y, point.z);
     indices_->InsertNextValue(index_++);
 
-    if(data::Has_raster<TPoint>::value) {
-        // point_rasters_->InsertNextValue(point.raster);
-    }
+    //    if(data::Has_raster<TPoint>::value) {
+    //        // point_rasters_->InsertNextValue(point.raster);
+    //    }
 
-    if(data::Has_power<TPoint>::value) {
-        // point_powers_->InsertNextValue(point.power);
-    }
+    //    if(data::Has_power<TPoint>::value) {
+    //        // point_powers_->InsertNextValue(point.power);
+    //    }
 
-    if(data::Has_sourceid<TPoint>::value) {
-        // point_sourceids_-InsertNextValue(point.power);
-    }
+    //    if(data::Has_sourceid<TPoint>::value) {
+    //        // point_sourceids_-InsertNextValue(point.power);
+    //    }
 }
 
 } // namespace visualizaton
