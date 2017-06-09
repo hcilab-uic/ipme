@@ -3,16 +3,13 @@
 #include "connector/omicronConnectorClient.h"
 #include "sensor/vicon_csvwriter.h"
 #include "sensor/vicon_listener.h"
+#include "utils/utils.h"
 
 int main()
 {
-    char buffer[16];
-    memset(buffer, 0, sizeof(buffer));
-    std::time_t time = std::time(nullptr);
-    std::strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S",
-                  std::localtime(&time));
-
-    std::string filename{"vicon_record_" + std::string(buffer) + ".csv"};
+    std::string filename{"vicon_record_" +
+                         ipme::utils::create_timestamp_string("%Y%m%d_%H%M%S") +
+                         ".csv"};
 
     ipme::sensor::Vicon_listener listener{
         std::make_unique<ipme::sensor::Vicon_csvwriter>(filename)};

@@ -3,6 +3,8 @@
 #include <cstring>
 #include <ctime>
 
+#include "utils.h"
+
 namespace ipme {
 namespace utils {
 
@@ -10,18 +12,13 @@ logging::sources::severity_logger<logging::trivial::severity_level> Logger::log;
 
 /* static */ void Logger::init(const std::string& file_prefix)
 {
-    char buffer[16];
-    memset(buffer, 0, sizeof(buffer));
-    std::time_t time = std::time(nullptr);
-    std::strftime(buffer, sizeof(buffer), "%Y%m%d_%H%M%S",
-                  std::localtime(&time));
-
     namespace src = logging::sources;
     namespace expr = logging::expressions;
     namespace kw = logging::keywords;
 
     logging::add_file_log(
-        kw::file_name = file_prefix + "_" + std::string(buffer) + "_%N.log",
+        kw::file_name = file_prefix + "_" +
+                        create_timestamp_string("%Y%m%d_%H%M%S") + "_%N.log",
         kw::format =
             (expr::stream << expr::format_date_time<boost::posix_time::ptime>(
                                  "TimeStamp", "%Y%m%d %H:%M:%S")

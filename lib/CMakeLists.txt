@@ -9,11 +9,15 @@ set(lib_HEADERS SOURCES
     utils/logger.h
     utils/random.h utils/random.ipp
     utils/string_utils.h
+    utils/utils.h
     data/point3d.h data/point3d.ipp
     visualization/polydata.h visualization/polydata.ipp
 )
 
-set(lib_SOURCES utils/logger.cpp utils/string_utils.cpp)
+set(lib_SOURCES
+    utils/logger.cpp
+    utils/string_utils.cpp
+    utils/utils.cpp)
 
 add_custom_target(lib_HEADERS ${lib_HEADERS})
 
