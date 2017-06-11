@@ -17,7 +17,7 @@ int main()
 
     client.connect("131.193.77.108", 28000);
 
-    while(true) {
+    while(listener.event_count() < 5000) {
         client.poll();
     }
 }
