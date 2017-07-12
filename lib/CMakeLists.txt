@@ -5,7 +5,14 @@
 # adding the relevant header files
 
 set(lib_HEADERS SOURCES
+    data/person.h
+    data/trackable_factory.h
+    data/trackable_object.h
     data/vicon_point.h
+    io/json_parser.h
+    io/parser.h
+    utils/config.h
+    utils/omicron_config.h
     utils/logger.h
     utils/random.h utils/random.ipp
     utils/string_utils.h
@@ -15,6 +22,13 @@ set(lib_HEADERS SOURCES
 )
 
 set(lib_SOURCES
+    data/person.cpp
+    data/trackable_factory.cpp
+    data/trackable_object.cpp
+    io/json_parser.cpp
+    io/parser.cpp
+    utils/config.cpp
+    utils/omicron_config.cpp
     utils/logger.cpp
     utils/string_utils.cpp
     utils/utils.cpp)

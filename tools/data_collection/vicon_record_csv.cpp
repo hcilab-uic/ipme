@@ -4,10 +4,12 @@
 #include <boost/program_options.hpp>
 
 #include "connector/omicronConnectorClient.h"
+#include "io/json_parser.h"
 #include "sensor/vicon_csvwriter.h"
 #include "sensor/vicon_listener.h"
-#include "utils/utils.h"
 #include "utils/logger.h"
+#include "utils/omicron_config.h"
+#include "utils/utils.h"
 
 namespace po = boost::program_options;
 
@@ -18,15 +20,12 @@ int main(int argc, char* argv[])
     // clang-format off
     po::options_description config("Configuration");
     config.add_options()
-        ("help", "Help Message")
-        ("host,h",
-         po::value<std::string>()->default_value("cave2tracker.evl.uic.edu"),
-        "Host Address")
-        ("port,p", po::value<short>()->default_value(28000), "Port")
-        ("outputfile,o", po::value<std::string>(), "Output file")
-        ("numpoints,n", po::value<unsigned int>()->default_value(0),
-         "Number of points to collect")
-    ;
+            ("help", "Help Message")
+            ("outputfile,o", po::value<std::string>(), "Output file")
+            ("config,c",
+             po::value<boost::filesystem::path>()->default_value("config.json"),
+             "Path to config file")
+        ;
     // clang-format on
 
     try {
@@ -39,11 +38,14 @@ int main(int argc, char* argv[])
             return 0;
         }
 
-        std::string host = vm["host"].as<std::string>();
-        const short port = vm["port"].as<short>();
-        const unsigned int num_points = vm["numpoints"].as<unsigned int>();
+        const auto configfile = vm["config"].as<boost::filesystem::path>();
+        ipme::io::Json_parser parser{configfile};
+        ipme::utils::Omicron_config config{parser};
 
-        INFO() << "Connecting to: " << host << ":" << port;
+        ipme::utils::Logger::set_severity(config.log_severity());
+
+        INFO() << "Starting" << argv[0];
+        INFO() << config.to_string();
 
         std::string filename;
         if(vm.count("outputfile")) {
@@ -55,14 +57,14 @@ int main(int argc, char* argv[])
         }
 
         DEBUG() << "Output file name: " << filename;
-        DEBUG() << "Number of points: " << num_points;
 
         ipme::sensor::Vicon_listener listener{
             std::make_unique<ipme::sensor::Vicon_csvwriter>(filename)};
         omicronConnector::OmicronConnectorClient client(&listener);
 
-        client.connect(host.c_str(), port);
-        while(!num_points || listener.event_count() < num_points) {
+        client.connect(config.hostname().c_str(), config.port());
+        while(!config.data_points() ||
+              listener.event_count() < config.data_points()) {
             client.poll();
         }
     } catch(const std::exception& e) {

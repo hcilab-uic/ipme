@@ -18,6 +18,7 @@ logging::sources::severity_logger<logging::trivial::severity_level> Logger::log;
     namespace kw = logging::keywords;
 
     logging::add_file_log(
+        kw::auto_flush = true,
         kw::file_name = file_prefix + "_" +
                         create_timestamp_string("%Y%m%d_%H%M%S") + "_%N.log",
         kw::format = (expr::stream
@@ -28,5 +29,11 @@ logging::sources::severity_logger<logging::trivial::severity_level> Logger::log;
 
     logging::add_common_attributes();
 }
+
+void Logger::set_severity(const trivial::severity_level severity)
+{
+    logging::core::get()->set_filter(trivial::severity >= severity);
+}
+
 } // namespace utils
 } // namespace ipme

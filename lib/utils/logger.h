@@ -2,6 +2,7 @@
 #define CDI_LIB_UTILS_LOGGER_H
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/log/attributes.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/sources/severity_logger.hpp>
@@ -9,7 +10,6 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/utility/setup/file.hpp>
-#include <boost/log/attributes.hpp>
 
 #define DO_LOG(level) BOOST_LOG_SEV(ipme::utils::Logger::log, level)
 
@@ -22,12 +22,21 @@
 
 namespace ipme {
 namespace utils {
+
 namespace logging = boost::log;
+namespace trivial = logging::trivial;
+
 class Logger {
   public:
+    /**
+     * @brief init initialize logging
+     * @param file_prefix prefix of the log file name
+     */
     static void init(const std::string& file_prefix = "ipme");
-    static logging::sources::severity_logger<logging::trivial::severity_level>
-        log;
+
+    static void set_severity(const trivial::severity_level severity);
+
+    static logging::sources::severity_logger<trivial::severity_level> log;
 
   private:
 };
