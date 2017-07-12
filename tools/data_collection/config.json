@@ -1,0 +1,31 @@
+{
+    "loglevel": "debug",
+    "servername": "cave2tracker.evl.uic.edu",
+    "port": 28000,
+    "data_points": 100,
+
+    "trackable_objects": [
+	{
+            "type_desc": "person",
+            "object_id": 0,
+            "vicon_source_ids": {
+		"head": 101,
+		"left_shoulder": 102,
+		"right_shoulder": 103,
+		"left_hip": 104,
+		"right_hip": 105        
+            }
+	},
+	{
+            "type_desc": "person",      
+            "object_id": 1,
+            "vicon_source_ids": {
+		"head": 106,
+		"left_shoulder": 107,
+		"right_shoulder": 108,
+		"left_hip": 109,
+		"right_hip": 110        
+            }
+	}   
+    ]
+}
