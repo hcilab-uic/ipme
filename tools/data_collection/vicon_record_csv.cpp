@@ -19,11 +19,12 @@ int main(int argc, char* argv[])
     po::options_description config("Configuration");
     config.add_options()
         ("help", "Help Message")
-        ("host,h", po::value<std::string>()->default_value("131.193.77.108"),
+        ("host,h",
+         po::value<std::string>()->default_value("cave2tracker.evl.uic.edu"),
         "Host Address")
         ("port,p", po::value<short>()->default_value(28000), "Port")
         ("outputfile,o", po::value<std::string>(), "Output file")
-        ("numpoints,n", po::value<unsigned int>()->required(),
+        ("numpoints,n", po::value<unsigned int>()->default_value(0),
          "Number of points to collect")
     ;
     // clang-format on
@@ -61,7 +62,7 @@ int main(int argc, char* argv[])
         omicronConnector::OmicronConnectorClient client(&listener);
 
         client.connect(host.c_str(), port);
-        while(listener.event_count() < num_points) {
+        while(!num_points || listener.event_count() < num_points) {
             client.poll();
         }
     } catch(const std::exception& e) {
