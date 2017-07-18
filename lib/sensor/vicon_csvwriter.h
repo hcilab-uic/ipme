@@ -12,7 +12,7 @@ namespace oc = omicronConnector;
 
 class Vicon_csvwriter : public Vicon_datahandler {
   public:
-    Vicon_csvwriter(const std::string& outfilename);
+    Vicon_csvwriter(const std::string& outfilename, const bool kinect_only);
 
     /**
      * virtual destructor
@@ -41,6 +41,9 @@ class Vicon_csvwriter : public Vicon_datahandler {
 
   private:
     std::ofstream ofs_;
+    const bool kinect_only_;
+
+    unsigned int frame_id_ = 0;
 };
 } // namespace sensor
 } // namespace ipme

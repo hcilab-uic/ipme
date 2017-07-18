@@ -59,7 +59,8 @@ int main(int argc, char* argv[])
         DEBUG() << "Output file name: " << filename;
 
         ipme::sensor::Vicon_listener listener{
-            std::make_unique<ipme::sensor::Vicon_csvwriter>(filename)};
+            std::make_unique<ipme::sensor::Vicon_csvwriter>(
+                filename, config.kinect_only_mode())};
         omicronConnector::OmicronConnectorClient client(&listener);
 
         client.connect(config.hostname().c_str(), config.port());

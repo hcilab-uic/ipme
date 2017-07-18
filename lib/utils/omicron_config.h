@@ -62,10 +62,20 @@ class Omicron_config : public Config {
      */
     virtual boost::log::trivial::severity_level log_severity() const override;
 
+    /**
+     * @brief kinect_only_mode mode for ignoring VICON data
+     * @return true if kinect only mode is enabled
+     */
+    inline bool kinect_only_mode() const
+    {
+        return kinect_only_mode_;
+    }
+
   private:
     io::Parser& parser_;
     std::string loglevel_;
     std::string hostname_;
+    bool kinect_only_mode_ = false;
     short port_ = 0;
     size_t data_points_ = 0;
     std::vector<std::shared_ptr<data::Trackable_object>> objects_;

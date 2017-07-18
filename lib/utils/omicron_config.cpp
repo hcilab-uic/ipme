@@ -13,6 +13,7 @@ Omicron_config::Omicron_config(io::Parser& parser) : parser_{parser}
 
     loglevel_ = ptree.get<std::string>("loglevel");
     hostname_ = ptree.get<std::string>("servername");
+    kinect_only_mode_ = ptree.get<bool>("kinect_only_mode");
     port_ = ptree.get<short>("port");
     data_points_ = ptree.get<size_t>("data_points");
 
