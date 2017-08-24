@@ -11,4 +11,7 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - apt-get update
           - apt-get install -y cmake libboost-all-dev
-          - cmake .
+          - mkdir build
+          - cd build
+          - cmake .. -DBUILD_VICON_CODE=ON
+          - make -j4
