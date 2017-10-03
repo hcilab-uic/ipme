@@ -15,10 +15,11 @@ def read_config():
     parser.add_argument('-f', '--file')
     parser.add_argument('-p', '--points-in-frame', default=20)
     parser.add_argument('-o', '--out-file', default='output.csv')
+    parser.add_argument('-d', '--dense', action='store_true', default=False)
     return parser.parse_args()
 
 
-def process(filename, points_in_frame):
+def process(filename, points_in_frame, dense):
     number_of_fields = (fields_per_point * points_in_frame)
     csv_rows = []
     with open(filename) as f:
@@ -42,12 +43,19 @@ def process(filename, points_in_frame):
                         len(expanded_row), start_column + field_index,
                         start_column, field_index))
 
-            if device_id in frame_ids:
-                csv_rows.append([str(timestamp)] + expanded_row)
-                expanded_row = ['0.0'] * number_of_fields
-                frame_ids.clear()
-            else:
+            if dense:
                 frame_ids.add(device_id)
+                if len(frame_ids) >= points_in_frame:
+                    csv_rows.append([str(timestamp)] + expanded_row)
+                    expanded_row = ['0.0'] * number_of_fields
+                    frame_ids.clear()
+            else:
+                if device_id in frame_ids:
+                    csv_rows.append([str(timestamp)] + expanded_row)
+                    expanded_row = ['0.0'] * number_of_fields
+                    frame_ids.clear()
+                else:
+                    frame_ids.add(device_id)
     return csv_rows
 
 
@@ -61,7 +69,8 @@ def write_to_file(csv_rows, filename):
 
 def main():
     options = read_config()
-    csv_rows = process(options.file, int(options.points_in_frame))
+    csv_rows = process(options.file, int(options.points_in_frame),
+                       options.dense)
     write_to_file(csv_rows, options.out_file)
 
 
