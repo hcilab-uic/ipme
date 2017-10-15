@@ -4,7 +4,7 @@
 # 'Projects' view navigation window. So making a pseudo target here and
 # adding the relevant header files
 
-set(lib_HEADERS SOURCES
+set(lib_HEADERS
     data/person.h
     data/trackable_factory.h
     data/trackable_object.h
@@ -31,9 +31,10 @@ set(lib_SOURCES
     utils/omicron_config.cpp
     utils/logger.cpp
     utils/string_utils.cpp
-    utils/utils.cpp)
+    utils/utils.cpp
 
-add_custom_target(lib_HEADERS ${lib_HEADERS})
+    ${lib_HEADERS}
+)
 
 add_library(ipme ${lib_SOURCES} ${Boost_LIBRARIES})
 
