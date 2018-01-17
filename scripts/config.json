@@ -1,0 +1,28 @@
+{
+  "input_file": "/home/harish/Downloads/vicon_record_20171011_184844.csv",
+  "output_file": "/home/harish/data/ipme/study_1/extracted_2/frames.csv",
+  "fields_per_rigid_body": 7,
+  "entities": [
+    {
+      "head": "1001",
+      "solar_plexus": "1002",
+      "right_arm": "1003",
+      "left_arm": "1004",
+      "device": "1005"
+    },
+    {
+      "head": "1006",
+      "solar_plexus": "1007",
+      "right_arm": "1008",
+      "left_arm": "1009",
+      "device": "1020"
+    },
+    {
+      "head": "1011",
+      "solar_plexus": "1012",
+      "right_arm": "1013",
+      "left_arm": "1014",
+      "device": "1015"
+    }
+  ]
+}

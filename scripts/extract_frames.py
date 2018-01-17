@@ -94,6 +94,7 @@ def process(config):
         reader = csv.reader(f)
         next(reader, None) # Skip header
         table_row = [0.0] * compute_field_count(config)
+        previous_row = table_row
 
         entity_marker_count = [0] * len(config['entities'])
         timestamp = None
@@ -134,8 +135,13 @@ def process(config):
             for entity in entity_marker_count:
                 # Record frame even if one entity has all the markers
                 if entity == markers_per_entity:
+                    # logging.info('entity = {}'.format(entity))
                     entity_marker_count = [0] * len(config['entities'])
+                    for col in range(len(table_row)):
+                        if table_row[col] == 0.0:
+                            table_row[col] = previous_row[col]
                     table.append([timestamp] + table_row)
+                    previous_row = table_row
                     table_row = [0.0] * compute_field_count(config)
                     timestamp = None
 
