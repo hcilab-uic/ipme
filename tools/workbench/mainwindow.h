@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <type_traits>
+
 #include <QDateTime>
 #include <QMainWindow>
 #include <QTableWidgetItem>
@@ -71,6 +73,10 @@ private slots:
 
     void on_video_slider_sliderMoved(int position);
 
+    void on_visualized_frame_selectionChanged();
+
+    void on_visualized_frame_returnPressed();
+
 private:
     void show_html_log(const QString& message, const QString& color);
 
@@ -80,11 +86,32 @@ private:
 
     void load_table(const QString& line);
 
-    void show_row(int current_row);
+    bool show_row(int current_row);
 
     void clear_scene();
 
     void process_video();
+
+    template <typename Value>
+    void show_value_message(const QString& message, Value&& value,
+                            const QString& color = "cyan")
+    {
+        QString display{
+            "<span style=\"font-style: italic; font-weight: bold;\">" +
+            to_string(std::forward<Value>(value)) + QString{"</span>"}};
+        show_html_log(message + ": " + display, color);
+    }
+
+    template <typename Value>
+    QString to_string(Value&& value) const
+    {
+        //        static_assert(std::is_arithmetic<Value>(value),
+        //                      "value is not a number");
+
+        return QString::number(value);
+    }
+
+    QString to_string(bool value) const;
 
     Ui::MainWindow* ui;
     const std::vector<ipme::wb::Color> colors_;

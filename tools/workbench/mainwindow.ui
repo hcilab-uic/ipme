@@ -46,6 +46,9 @@
          <property name="title">
           <string>Dashboard</string>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
          <widget class="QPushButton" name="previous_frame_button">
           <property name="geometry">
            <rect>
@@ -338,6 +341,9 @@ background-color: rgb(255, 255, 255);</string>
              <property name="title">
               <string>Visualization Controls</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
              <widget class="QCheckBox" name="tsegment_checkbox">
               <property name="geometry">
                <rect>
@@ -357,7 +363,7 @@ background-color: rgb(255, 255, 255);</string>
              <widget class="QCheckBox" name="centerline_checkbox">
               <property name="geometry">
                <rect>
-                <x>212</x>
+                <x>188</x>
                 <y>24</y>
                 <width>141</width>
                 <height>22</height>
@@ -368,6 +374,19 @@ background-color: rgb(255, 255, 255);</string>
               </property>
               <property name="checked">
                <bool>false</bool>
+              </property>
+             </widget>
+             <widget class="QLineEdit" name="visualized_frame">
+              <property name="geometry">
+               <rect>
+                <x>332</x>
+                <y>24</y>
+                <width>113</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Frame Number</string>
               </property>
              </widget>
             </widget>
@@ -414,6 +433,9 @@ background-color: rgb(255, 255, 255);</string>
              </property>
              <property name="title">
               <string>Video Controls</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
              <widget class="QPushButton" name="playpause_button">
               <property name="geometry">

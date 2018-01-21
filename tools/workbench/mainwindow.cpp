@@ -132,8 +132,21 @@ void MainWindow::load_table(const QString& line)
     //    emit show_log("Table loaded");
 }
 
-void MainWindow::show_row(int current_row)
+bool MainWindow::show_row(int current_row)
 {
+    const int total_items = ui->frame_table_widget->rowCount();
+    if(total_items == 0) {
+        emit show_error_log("No table loaded, nothing to show");
+        return false;
+    }
+
+    int last_valid_row = total_items - 1;
+    if(current_row > last_valid_row || current_row < 0) {
+        emit show_error_log("Invalid row value, enter a value between 0 and " +
+                            QString::number(last_valid_row));
+        return false;
+    }
+
     int col_count = ui->frame_table_widget->columnCount();
     QStringList row;
     for(int i = 0; i < col_count; ++i) {
@@ -142,8 +155,9 @@ void MainWindow::show_row(int current_row)
     }
 
     show_scene(row);
+    show_value_message("Showing frame", current_row, "magenta");
 
-    emit show_log("Showing current row " + QString::number(current_row));
+    return true;
 }
 
 void MainWindow::clear_scene()
@@ -243,14 +257,21 @@ void MainWindow::on_previous_frame_button_clicked()
 
 void MainWindow::on_centerline_checkbox_stateChanged(int arg1)
 {
-    ui->opengl_widget->set_show_centerline(arg1 != 0);
+    bool show_center_line = arg1 != 0;
+    ui->opengl_widget->set_show_centerline(show_center_line);
     ui->opengl_widget->update();
+
+    show_value_message("Showing center line", show_center_line);
 }
 
 void MainWindow::on_tsegment_checkbox_stateChanged(int arg1)
 {
-    ui->opengl_widget->set_show_tsegment(arg1 != 0);
+    bool show_tsegment = arg1 != 0;
+
+    ui->opengl_widget->set_show_tsegment(show_tsegment);
     ui->opengl_widget->update();
+
+    show_value_message("Showing transaction segment", show_tsegment);
 }
 
 void MainWindow::on_actionExport_triggered()
@@ -390,6 +411,11 @@ void MainWindow::process_video()
     }
 }
 
+QString MainWindow::to_string(bool value) const
+{
+    return value ? "true" : "false";
+}
+
 void MainWindow::on_playpause_button_clicked()
 {
     auto text = ui->playpause_button->text();
@@ -405,4 +431,17 @@ void MainWindow::on_video_slider_sliderMoved(int position)
     emit show_log("Slider moved to position " + QString::number(position) +
                   ", jumping to frame " +
                   QString::number(static_cast<int>(frame_to_advance)));
+}
+
+void MainWindow::on_visualized_frame_selectionChanged()
+{
+    ui->visualized_frame->clear();
+}
+
+void MainWindow::on_visualized_frame_returnPressed()
+{
+    int frame_number = ui->visualized_frame->text().toInt();
+    if(show_row(frame_number)) {
+        emit show_value_message("Showing requested frame", frame_number);
+    }
 }
