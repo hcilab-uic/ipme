@@ -40,4 +40,4 @@ qt5_use_modules(MainWindow ${QT5_LIBRARIES})
 
 add_executable(${TARGET} ${SOURCES} ${UI_GENERATED_HEADERS})
 qt5_use_modules(${TARGET} ${QT5_LIBRARIES})
-target_link_libraries(${TARGET} GL)
+target_link_libraries(${TARGET} GL ${OpenCV_LIBS})

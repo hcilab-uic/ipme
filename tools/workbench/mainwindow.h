@@ -1,8 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QDateTime>
 #include <QMainWindow>
 #include <QTableWidgetItem>
+#include <QTimer>
+
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "color.h"
 #include "scene_object.h"
@@ -60,6 +65,12 @@ private slots:
     void on_show_warn_log(const QString& message);
     void on_show_error_log(const QString& message);
 
+    void on_action_load_video_triggered();
+
+    void on_playpause_button_clicked();
+
+    void on_video_slider_sliderMoved(int position);
+
 private:
     void show_html_log(const QString& message, const QString& color);
 
@@ -73,8 +84,18 @@ private:
 
     void clear_scene();
 
+    void process_video();
+
     Ui::MainWindow* ui;
     const std::vector<ipme::wb::Color> colors_;
+
+    int video_total_frames_{0};
+    int last_video_frame_{0};
+
+    QDateTime time_keeper_;
+    cv::VideoCapture capture_;
+    bool video_play_ = false;
+    QTimer* video_timer_{nullptr};
 };
 
 #endif // MAINWINDOW_H

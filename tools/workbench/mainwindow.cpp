@@ -4,12 +4,15 @@
 #include <fstream>
 #include <memory>
 
+#include <QDateTime>
 #include <QDebug>
 #include <QDir>
 #include <QErrorMessage>
 #include <QFile>
 #include <QFileDialog>
+#include <QScrollBar>
 #include <QTextStream>
+#include <QTimer>
 
 #include "color.h"
 #include "scene_object.h"
@@ -36,11 +39,19 @@ MainWindow::MainWindow(QWidget* parent)
     ui->opengl_widget->set_show_centerline(
         ui->centerline_checkbox->isChecked());
 
+    video_timer_ = new QTimer{this};
+    connect(video_timer_, &QTimer::timeout, this, &MainWindow::process_video);
+    video_timer_->start(1000 / 24);
+
     emit show_log("Application started");
 }
 
 MainWindow::~MainWindow()
 {
+    if(video_timer_) {
+        delete video_timer_;
+    }
+
     delete ui;
 }
 
@@ -283,7 +294,8 @@ void MainWindow::on_actionExport_triggered()
 
 void MainWindow::on_show_log(const QString& message)
 {
-    ui->log_view_browser->insertPlainText(message + "\n");
+    //    ui->log_view_browser->insertPlainText(message + "\n");
+    show_html_log(message, "cyan");
 }
 
 void MainWindow::on_show_success_log(const QString& message)
@@ -303,7 +315,94 @@ void MainWindow::on_show_error_log(const QString& message)
 
 void MainWindow::show_html_log(const QString& message, const QString& color)
 {
-    QString display_message =
-        "<div style=\"color:" + color + "\";>" + message + "</div><br />";
+    auto time = "[" + QTime::currentTime().toString("hh:mm.ss.zzz") + "] ";
+    QString display_message = time + "<span style=\"color:" + color + "\";>" +
+                              message + "</span><br />";
     ui->log_view_browser->insertHtml(display_message);
+
+    auto scroll_bar = ui->log_view_browser->verticalScrollBar();
+    scroll_bar->setValue(scroll_bar->maximum());
+}
+
+void MainWindow::on_action_load_video_triggered()
+{
+    const QString filters{"AVI files (*.avi);;MP4 files (*.mp4);;MOV files "
+                          "(*.mov);;All Files(*.*)"};
+    const auto file_name = QFileDialog::getOpenFileName(
+        this, tr("Open CSV file"), QDir::homePath(), filters);
+
+    capture_.open(file_name.toStdString());
+    video_total_frames_ =
+        static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_COUNT));
+    last_video_frame_ = video_total_frames_ - 1;
+
+    int frame_width = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_WIDTH));
+    int frame_height = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
+    ui->video_label->resize(frame_width, frame_height);
+
+    emit show_success_log(
+        "Opened video file " + file_name +
+        ", frames loaded: " + QString::number(video_total_frames_) +
+        ", frame width: " + QString::number(frame_width) +
+        ", height: " + QString::number(frame_height));
+}
+
+void MainWindow::process_video()
+{
+    if(!capture_.isOpened()) {
+        return;
+    }
+
+    if(capture_.isOpened() && video_play_) {
+        cv::Mat frame;
+        capture_ >> frame;
+
+        if(frame.empty()) {
+            return;
+        }
+
+        cv::cvtColor(frame, frame, CV_BGR2RGB);
+        cv::resize(frame, frame, cv::Size(640, 360), 0, 0, cv::INTER_CUBIC);
+        QImage widget_image(static_cast<uchar*>(frame.data), frame.cols,
+                            frame.rows, frame.step, QImage::Format_RGB888);
+
+        ui->video_label->setPixmap(QPixmap::fromImage(widget_image));
+
+        int frame_number =
+            static_cast<int>(capture_.get(CV_CAP_PROP_POS_FRAMES));
+        ui->video_frame_number->display(frame_number);
+
+        if(video_total_frames_ > 0) {
+            int progress = static_cast<int>(
+                static_cast<double>(frame_number) /
+                static_cast<double>(video_total_frames_) * 100.0);
+            ui->video_slider->setValue(progress);
+        }
+
+        if(frame_number == last_video_frame_) {
+            video_play_ = false;
+            capture_.set(CV_CAP_PROP_POS_FRAMES, 0);
+            ui->playpause_button->setText("Play");
+            ui->video_slider->setValue(0);
+
+            emit show_log("Reached the end of video");
+        }
+    }
+}
+
+void MainWindow::on_playpause_button_clicked()
+{
+    auto text = ui->playpause_button->text();
+    video_play_ = text == "Play";
+    ui->playpause_button->setText(video_play_ ? "Pause" : "Play");
+}
+
+void MainWindow::on_video_slider_sliderMoved(int position)
+{
+    double frame_to_advance = static_cast<double>(position) / 100.00 *
+                              static_cast<double>(video_total_frames_);
+    capture_.set(CV_CAP_PROP_POS_FRAMES, frame_to_advance);
+    emit show_log("Slider moved to position " + QString::number(position) +
+                  ", jumping to frame " +
+                  QString::number(static_cast<int>(frame_to_advance)));
 }

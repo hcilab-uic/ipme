@@ -284,38 +284,6 @@ background-color: rgb(255, 255, 255);</string>
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
-         <widget class="QCheckBox" name="centerline_checkbox">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>180</y>
-            <width>141</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Show Center Line</string>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-         </widget>
-         <widget class="QCheckBox" name="tsegment_checkbox">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>160</y>
-            <width>181</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Show Transactional Segment</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
         </widget>
        </item>
        <item>
@@ -323,13 +291,13 @@ background-color: rgb(255, 255, 255);</string>
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>675</height>
+           <height>700</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>675</height>
+           <height>1000</height>
           </size>
          </property>
          <property name="font">
@@ -358,42 +326,175 @@ background-color: rgb(255, 255, 255);</string>
        <item>
         <layout class="QHBoxLayout" name="main_component_layout">
          <item>
-          <widget class="ipme::wb::Scene_widget" name="opengl_widget">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>650</width>
-             <height>650</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>650</width>
-             <height>650</height>
-            </size>
-           </property>
-           <property name="baseSize">
-            <size>
-             <width>650</width>
-             <height>650</height>
-            </size>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="middle_layout">
+           <item>
+            <widget class="QGroupBox" name="viz_contol_box">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>50</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>Visualization Controls</string>
+             </property>
+             <widget class="QCheckBox" name="tsegment_checkbox">
+              <property name="geometry">
+               <rect>
+                <x>4</x>
+                <y>24</y>
+                <width>181</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Show Transactional Segment</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="QCheckBox" name="centerline_checkbox">
+              <property name="geometry">
+               <rect>
+                <x>212</x>
+                <y>24</y>
+                <width>141</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Show Center Line</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </widget>
+           </item>
+           <item>
+            <widget class="ipme::wb::Scene_widget" name="opengl_widget">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>650</width>
+               <height>650</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>650</width>
+               <height>650</height>
+              </size>
+             </property>
+             <property name="baseSize">
+              <size>
+               <width>650</width>
+               <height>650</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <layout class="QVBoxLayout" name="video_layout">
            <item>
-            <widget class="QWidget" name="video_widget" native="true">
+            <widget class="QGroupBox" name="video_control_box">
              <property name="minimumSize">
               <size>
-               <width>650</width>
-               <height>600</height>
+               <width>0</width>
+               <height>50</height>
               </size>
+             </property>
+             <property name="title">
+              <string>Video Controls</string>
+             </property>
+             <widget class="QPushButton" name="playpause_button">
+              <property name="geometry">
+               <rect>
+                <x>4</x>
+                <y>24</y>
+                <width>80</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Play</string>
+              </property>
+             </widget>
+             <widget class="QLCDNumber" name="video_frame_number">
+              <property name="geometry">
+               <rect>
+                <x>88</x>
+                <y>24</y>
+                <width>89</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="font">
+               <font>
+                <family>Source Code Pro</family>
+               </font>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Panel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Sunken</enum>
+              </property>
+              <property name="smallDecimalPoint">
+               <bool>false</bool>
+              </property>
+              <property name="digitCount">
+               <number>7</number>
+              </property>
+             </widget>
+             <widget class="QSlider" name="video_slider">
+              <property name="geometry">
+               <rect>
+                <x>188</x>
+                <y>24</y>
+                <width>449</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="video_label">
+             <property name="minimumSize">
+              <size>
+               <width>640</width>
+               <height>650</height>
+              </size>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background: black;</string>
+             </property>
+             <property name="text">
+              <string/>
              </property>
             </widget>
            </item>
@@ -402,7 +503,14 @@ background-color: rgb(255, 255, 255);</string>
         </layout>
        </item>
        <item>
-        <widget class="QTextBrowser" name="log_view_browser"/>
+        <widget class="QTextBrowser" name="log_view_browser">
+         <property name="font">
+          <font>
+           <family>Source Code Pro</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -415,7 +523,7 @@ background-color: rgb(255, 255, 255);</string>
      <x>0</x>
      <y>0</y>
      <width>1634</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -465,6 +573,7 @@ background-color: rgb(255, 255, 255);</string>
    <addaction name="actionSave"/>
    <addaction name="actionExport"/>
    <addaction name="actionImport"/>
+   <addaction name="action_load_video"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew">
@@ -510,6 +619,11 @@ background-color: rgb(255, 255, 255);</string>
   <action name="actionFrame_Loader">
    <property name="text">
     <string>Frame Loader</string>
+   </property>
+  </action>
+  <action name="action_load_video">
+   <property name="text">
+    <string>Load Video</string>
    </property>
   </action>
  </widget>
