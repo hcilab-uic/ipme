@@ -125,6 +125,9 @@ color: rgb(0, 0, 0);</string>
           <property name="text">
            <string>Clear Scene</string>
           </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
          </widget>
          <widget class="QLabel" name="left_arm_label">
           <property name="geometry">
@@ -449,6 +452,26 @@ background-color: rgb(255, 255, 255);</string>
               <property name="text">
                <string>Play</string>
               </property>
+              <property name="icon">
+               <iconset theme="On" resource="resources.qrc">
+                <normaloff>:/icons/icons/pause-play-button.png</normaloff>
+                <normalon>:/icons/icons/pause-play-button.png</normalon>
+                <disabledoff>:/icons/icons/pause-play-button.png</disabledoff>
+                <disabledon>:/icons/icons/pause-play-button.png</disabledon>
+                <activeoff>:/icons/icons/pause-play-button.png</activeoff>
+                <activeon>:/icons/icons/pause-play-button.png</activeon>
+                <selectedoff>:/icons/icons/pause-play-button.png</selectedoff>
+                <selectedon>:/icons/icons/pause-play-button.png</selectedon>:/icons/icons/pause-play-button.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+              <property name="flat">
+               <bool>false</bool>
+              </property>
              </widget>
              <widget class="QLCDNumber" name="video_frame_number">
               <property name="geometry">
@@ -584,6 +607,12 @@ background-color: rgb(255, 255, 255);</string>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 85, 127);</string>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -604,6 +633,10 @@ background-color: rgb(255, 255, 255);</string>
    </property>
   </action>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/open-folder.png</normaloff>:/icons/icons/open-folder.png</iconset>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
@@ -657,6 +690,8 @@ background-color: rgb(255, 255, 255);</string>
    <header>scene_widget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

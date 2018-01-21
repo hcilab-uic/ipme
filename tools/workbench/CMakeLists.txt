@@ -38,6 +38,6 @@ qt5_wrap_ui(MainWindow_hdr ${UI_SOURCES})
 add_library(MainWindow ${MainWindow_moc} ${MainWindow_hdr})
 qt5_use_modules(MainWindow ${QT5_LIBRARIES})
 
-add_executable(${TARGET} ${SOURCES} ${UI_GENERATED_HEADERS})
+add_executable(${TARGET} ${SOURCES} ${UI_GENERATED_HEADERS} resources.qrc)
 qt5_use_modules(${TARGET} ${QT5_LIBRARIES})
 target_link_libraries(${TARGET} GL ${OpenCV_LIBS})
