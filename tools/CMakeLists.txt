@@ -13,3 +13,4 @@ if(${BUILD_SENSOR_WALABOT})
 endif()
 
 add_subdirectory(data_collection)
+add_subdirectory(workbench)

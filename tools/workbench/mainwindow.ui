@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1634</width>
+    <height>960</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Proxemics Workbench - Frame Visualizer</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1631</width>
+      <height>881</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="main_layout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetNoConstraint</enum>
+     </property>
+     <item>
+      <layout class="QVBoxLayout" name="left_control_layout" stretch="100,0">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="dashboard_group_box">
+         <property name="maximumSize">
+          <size>
+           <width>16777213</width>
+           <height>16777213</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Dashboard</string>
+         </property>
+         <widget class="QPushButton" name="previous_frame_button">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>140</y>
+            <width>101</width>
+            <height>24</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 75 8pt &quot;Noto Sans&quot;;
+background-color: rgb(255, 255, 127);
+color: rgb(0, 0, 0);</string>
+          </property>
+          <property name="text">
+           <string>Previous Frame</string>
+          </property>
+         </widget>
+         <widget class="QLCDNumber" name="timestamp_lcd">
+          <property name="geometry">
+           <rect>
+            <x>150</x>
+            <y>20</y>
+            <width>161</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>false</bool>
+          </property>
+          <property name="digitCount">
+           <number>16</number>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="clear_table_button">
+          <property name="geometry">
+           <rect>
+            <x>220</x>
+            <y>140</y>
+            <width>91</width>
+            <height>24</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(255, 255, 255);
+font: 75 8pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);</string>
+          </property>
+          <property name="text">
+           <string>Clear Table</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="clear_button">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>83</y>
+            <width>141</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(255, 94, 97);
+font: 75 8pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);</string>
+          </property>
+          <property name="text">
+           <string>Clear Scene</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="left_arm_label">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>100</y>
+            <width>81</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+          </property>
+          <property name="text">
+           <string>Left Arm</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QLabel" name="object_count_lcd_label">
+          <property name="geometry">
+           <rect>
+            <x>60</x>
+            <y>50</y>
+            <width>81</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Object Count</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="solar_plexus_label">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>80</y>
+            <width>81</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+          </property>
+          <property name="text">
+           <string>Solar Plexus</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QLCDNumber" name="object_count_lcd">
+          <property name="geometry">
+           <rect>
+            <x>150</x>
+            <y>50</y>
+            <width>161</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(0, 0, 127);</string>
+          </property>
+          <property name="digitCount">
+           <number>16</number>
+          </property>
+         </widget>
+         <widget class="QLabel" name="right_arm_label">
+          <property name="geometry">
+           <rect>
+            <x>150</x>
+            <y>100</y>
+            <width>81</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+          </property>
+          <property name="text">
+           <string>Right Arm</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="next_frame_button">
+          <property name="geometry">
+           <rect>
+            <x>110</x>
+            <y>140</y>
+            <width>101</width>
+            <height>24</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(85, 170, 255);
+font: 75 8pt &quot;Noto Sans&quot;;
+color: rgb(0, 0, 0);</string>
+          </property>
+          <property name="text">
+           <string>Next Frame</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="timestamp_lcd_label">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>20</y>
+            <width>71</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Timestamp</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="head_label">
+          <property name="geometry">
+           <rect>
+            <x>150</x>
+            <y>80</y>
+            <width>81</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+          </property>
+          <property name="text">
+           <string>Head</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QLabel" name="device_label">
+          <property name="geometry">
+           <rect>
+            <x>150</x>
+            <y>120</y>
+            <width>161</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+          </property>
+          <property name="text">
+           <string>Mobile Device</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="centerline_checkbox">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>180</y>
+            <width>141</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Show Center Line</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="tsegment_checkbox">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>160</y>
+            <width>181</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Show Transactional Segment</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="frame_table_widget">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>675</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>675</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>50</number>
+         </attribute>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>12</number>
+         </attribute>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="main_widget_layout">
+       <item>
+        <layout class="QHBoxLayout" name="main_component_layout">
+         <item>
+          <widget class="ipme::wb::Scene_widget" name="opengl_widget">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>650</width>
+             <height>650</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>650</width>
+             <height>650</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>650</width>
+             <height>650</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="video_layout">
+           <item>
+            <widget class="QWidget" name="video_widget" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>650</width>
+               <height>600</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTextBrowser" name="log_view_browser"/>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1634</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionExport"/>
+    <addaction name="actionImport"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionHelp"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionFrame_Loader"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNew"/>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
+   <addaction name="actionExport"/>
+   <addaction name="actionImport"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="text">
+    <string>Help</string>
+   </property>
+  </action>
+  <action name="actionFrame_Loader">
+   <property name="text">
+    <string>Frame Loader</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ipme::wb::Scene_widget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>scene_widget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
