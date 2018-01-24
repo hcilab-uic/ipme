@@ -23,10 +23,10 @@ public:
     virtual ~Scene_object() = default;
 
     static std::vector<Scene_object>
-    create_from_csv(const QString& line, int ignore_cell_count = 1,
+    create_from_csv(const QString& line, int ignore_cell_count = 2,
                     const QString& delimiter = ",");
-    static std::vector<Scene_object> create_from_cells(const QStringList cells,
-                                                       int ignore_cell_count);
+    static std::vector<Scene_object>
+    create_from_cells(const QStringList cells, int ignore_cell_count = 2);
 
     inline const std::array<float, point_dimension>& coords() const
     {

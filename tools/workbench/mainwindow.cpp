@@ -365,7 +365,8 @@ void MainWindow::on_action_load_video_triggered()
         "Opened video file " + file_name +
         ", frames loaded: " + QString::number(video_total_frames_) +
         ", frame width: " + QString::number(frame_width) +
-        ", height: " + QString::number(frame_height));
+        ", height: " + QString::number(frame_height) +
+        ", FPS: " + QString::number(capture_.get(CV_CAP_PROP_FPS)));
 }
 
 void MainWindow::process_video()
@@ -421,6 +422,14 @@ void MainWindow::on_playpause_button_clicked()
     auto text = ui->playpause_button->text();
     video_play_ = text == "Play";
     ui->playpause_button->setText(video_play_ ? "Pause" : "Play");
+
+    if(!video_play_) {
+        emit show_log(
+            "Paused at frame " +
+            QString::number(capture_.get(CV_CAP_PROP_POS_FRAMES)) + " at " +
+            QString::number(capture_.get(CV_CAP_PROP_POS_MSEC) / 1000) +
+            " seconds");
+    }
 }
 
 void MainWindow::on_video_slider_sliderMoved(int position)
@@ -430,7 +439,9 @@ void MainWindow::on_video_slider_sliderMoved(int position)
     capture_.set(CV_CAP_PROP_POS_FRAMES, frame_to_advance);
     emit show_log("Slider moved to position " + QString::number(position) +
                   ", jumping to frame " +
-                  QString::number(static_cast<int>(frame_to_advance)));
+                  QString::number(static_cast<int>(frame_to_advance)) + ", " +
+                  QString::number(capture_.get(CV_CAP_PROP_POS_MSEC) / 1000) +
+                  " seconds");
 }
 
 void MainWindow::on_visualized_frame_selectionChanged()

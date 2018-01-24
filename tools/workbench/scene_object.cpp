@@ -55,6 +55,8 @@ Scene_object::create_from_cells(const QStringList cells, int ignore_cell_count)
 {
     std::vector<QString> object_cells(cells_per_object);
     std::vector<Scene_object> objects;
+    qInfo() << "Ignoring " << ignore_cell_count << " cells";
+    ignore_cell_count = 2;
     for(int i = 0; i < cells.size(); ++i) {
         if(i < ignore_cell_count) {
             continue;
@@ -81,9 +83,10 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
 
     const auto c = coords();
 
-    const Point p{c[0] / 3.f, c[2] / 3.f, c[1] / 3.f};
+    const Point p{c[0] / 3.f, c[2] / 3.f * -1.f, c[1] / 3.f};
+    //    const Point p{c[0] / 3.f, c[1] / 3.f, c[2] / 3.f};
 
-    auto effective_angle = angle();
+    auto effective_angle = angle() + pi;
 
     // Somewhat pessimistic view that if my co-ordinates are dead in the center,
     // then I must have invalid data
