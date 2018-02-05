@@ -21,7 +21,7 @@ static constexpr float half_segment_angle = segment_angle / 2.f;
 #endif
 
 class Geometry {
-public:
+  public:
     static void draw_circle(const core::Point3f& point, float radius,
                             const Color& color = Color{});
 
@@ -39,6 +39,9 @@ public:
 
     static void draw_polygon(const core::Polygon3f& polygon,
                              const Color& color);
+
+    static core::Polygon3f
+    construct_circle_as_polygon(const core::Point3f& center, float radius);
 };
 
 } // namespace ipme::wb

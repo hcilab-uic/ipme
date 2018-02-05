@@ -17,7 +17,7 @@ using Basic_point =
 
 template <typename CoordinateType, std::size_t DimensionCount>
 class Point : public Basic_point<CoordinateType, DimensionCount> {
-public:
+  public:
     using parent_type = Basic_point<CoordinateType, DimensionCount>;
     using coordinate_type = CoordinateType;
     static constexpr std::size_t dimension_count = DimensionCount;
@@ -94,17 +94,17 @@ template <typename CoordinateType, std::size_t DimensionCount,
           std::size_t Dimension>
 struct access<ipme::core::Point<CoordinateType, DimensionCount>, Dimension> {
     static inline CoordinateType
-    get(ipme::core::Point<CoordinateType, DimensionCount> const& p)
+    get(const ipme::core::Point<CoordinateType, DimensionCount>& p)
     {
         return p.template get<Dimension>();
     }
 
     static inline void set(ipme::core::Point<CoordinateType, DimensionCount>& p,
-                           CoordinateType const& value)
+                           const CoordinateType& value)
     {
         p.template set<Dimension>(value);
     }
 };
-}
+} // namespace boost::geometry::traits
 
 #endif // IPME_CORE_POINT_H

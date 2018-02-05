@@ -10,7 +10,7 @@
 
 namespace ipme::wb {
 class Scene_widget : public QOpenGLWidget {
-public:
+  public:
     Scene_widget(QWidget* widget);
 
     virtual void paintGL() override;
@@ -37,21 +37,28 @@ public:
         show_tsegment_ = show;
     }
 
-    inline void set_show_intersection(bool show)
+    inline void set_show_head_intersection(bool show)
     {
-        show_intersection_ = show;
+        show_head_intersection_ = show;
+    }
+
+    inline void set_show_body_intersection(bool show)
+    {
+        show_body_intersection_ = show;
     }
 
     void set_ts_angle(float angle);
 
     void show_intersections() const;
 
-private:
-    void show_intersections(size_t object_index1, size_t object_index2) const;
+  private:
+    void show_intersections(size_t object_index1, size_t object_index2,
+                            const Color& color) const;
 
     bool show_centerline_ = true;
     bool show_tsegment_ = false;
-    bool show_intersection_ = false;
+    bool show_head_intersection_ = false;
+    bool show_body_intersection_ = false;
 
     std::vector<Scene_object> objects_;
     std::vector<Color> colors_{Color{.0f, .0f, .0f}};

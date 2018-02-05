@@ -18,7 +18,7 @@ class Scene_object {
     static constexpr size_t vector_dimenstion = 3;
     static constexpr size_t cells_per_object = 7;
 
-public:
+  public:
     Scene_object(const std::vector<QString>& parameters,
                  const QString& timestamp = "not-set");
     Scene_object(const std::vector<float>& parameters,
@@ -52,15 +52,17 @@ public:
         return timestamp_;
     }
 
-    core::Polygon3f transaction_segment(float angle) const;
+    core::Polygon3f transaction_segment() const;
 
     virtual void draw(bool show_centerline, bool show_tsegment) const;
 
-    void draw_transaction_segment(float angle) const;
+    void draw_transaction_segment() const;
 
     void set_ts_angle(float angle);
 
-private:
+    void set_reverse_transaction_segment();
+
+  private:
     core::Polygon3f::ring_type
     create_polygon_ring(core::Polygon3f::point_type::coordinate_type x,
                         core::Polygon3f::point_type::coordinate_type y,

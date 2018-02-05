@@ -40,6 +40,8 @@ Scene_object::Scene_object(const std::vector<float>& parameters,
       rot_vector_{{parameters[4], parameters[5], parameters[6]}},
       angle_{parameters[3]}, timestamp_{timestamp}
 {
+    // Now reverse the angle by adding pi
+    angle_ += pi;
 }
 
 std::vector<Scene_object>
@@ -70,11 +72,18 @@ Scene_object::create_from_cells(const QStringList cells, int ignore_cell_count)
                 timestamp = cells[0];
             }
             objects.emplace_back(object_cells, timestamp);
+
+            // This part here assumes that the 5th object is the device
+            if((i - 1) % 5 == 0) {
+                objects.back().set_reverse_transaction_segment();
+            }
         }
     }
 
     return objects;
 }
+
+#include <boost/geometry.hpp>
 
 core::Polygon3f::ring_type Scene_object::create_polygon_ring(
     core::Polygon3f::point_type::coordinate_type x,
@@ -87,19 +96,22 @@ core::Polygon3f::ring_type Scene_object::create_polygon_ring(
     auto right_angle = center_angle + half_segment_angle_radian;
 
     core::Point3f p0{x, y, z};
-    core::Point3f p1{x + (max_length * std::cos(left_angle)),
-                     y + (max_length * std::sin(left_angle)), z};
-    core::Point3f p2{x + (max_length * std::cos(right_angle)),
+    core::Point3f p1{x + (max_length * std::cos(right_angle)),
                      y + (max_length * std::sin(right_angle)), z};
+    core::Point3f p2{x + (max_length * std::cos(left_angle)),
+                     y + (max_length * std::sin(left_angle)), z};
 
-    return core::Polygon3f::ring_type{p0, p1, p2};
+    //    boost::geometry::model::segment<core::Point3f> segment{p0, p1};
+    //    core::Point3f
+    //    p01{boost::geometry::return_centroid<core::Point3f>(segment)};
+    return core::Polygon3f::ring_type{p0, p1, p2, p0};
 }
 
-ipme::core::Polygon3f Scene_object::transaction_segment(float angle) const
+ipme::core::Polygon3f Scene_object::transaction_segment() const
 {
     const auto c = coords();
     core::Polygon3f polygon{
-        create_polygon_ring(c[0] / 3.f, c[2] / 3.f * -1.f, c[1] / 3.f, angle)};
+        create_polygon_ring(c[0] / 3.f, c[2] / 3.f * -1.f, c[1] / 3.f, angle_)};
 
     return polygon;
 }
@@ -113,8 +125,6 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
 
     const core::Point3f p{c[0] / 3.f, c[2] / 3.f * -1.f, c[1] / 3.f};
     //    const Point p{c[0] / 3.f, c[1] / 3.f, c[2] / 3.f};
-
-    auto effective_angle = angle() + pi;
 
     // Somewhat pessimistic view that if my co-ordinates are dead in the center,
     // then I must have invalid data
@@ -132,19 +142,19 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
         if(show_tsegment) {
             //            Geometry::draw_segment(p, 2.f, effective_angle,
             //            color_);
-            draw_transaction_segment(effective_angle);
+            draw_transaction_segment();
         }
         if(show_centerline) {
-            Geometry::draw_line(p, 2.f, effective_angle, line_color);
+            Geometry::draw_line(p, 2.f, angle_, line_color);
         }
     } else if(index_in_component == 1) {
         // torso
         Geometry::draw_square(p, radius * 1.5f, color_);
         if(show_tsegment) {
-            draw_transaction_segment(effective_angle);
+            draw_transaction_segment();
         }
         if(show_centerline) {
-            Geometry::draw_line(p, 2.f, effective_angle, line_color);
+            Geometry::draw_line(p, 2.f, angle_, line_color);
         }
     } else if(index_in_component == 2 || index_in_component == 3) {
         // arms
@@ -155,17 +165,17 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
         // For device, the segment and the line are draws in the reverse
         // direction
         if(show_tsegment) {
-            draw_transaction_segment(effective_angle + pi);
+            draw_transaction_segment();
         }
         if(show_centerline) {
-            Geometry::draw_line(p, .5f, effective_angle + pi, line_color);
+            Geometry::draw_line(p, .5f, angle_ + pi, line_color);
         }
     }
 }
 
-void Scene_object::draw_transaction_segment(float angle) const
+void Scene_object::draw_transaction_segment() const
 {
-    Geometry::draw_polygon(transaction_segment(angle), color_);
+    Geometry::draw_polygon(transaction_segment(), color_);
 }
 
 void Scene_object::set_ts_angle(float angle)
@@ -173,10 +183,14 @@ void Scene_object::set_ts_angle(float angle)
     ts_angle_ = angle / 180.f * pi;
 }
 
+void Scene_object::set_reverse_transaction_segment()
+{
+    angle_ += pi;
+}
+
 size_t Scene_object::next_index()
 {
     static size_t running_index = 0;
-    return running_index++;
     return running_index++;
 }
 

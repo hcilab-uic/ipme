@@ -21,10 +21,6 @@ using Polygon3d = Polygon<Point3d>;
 template <typename Polygon>
 std::deque<Polygon> compute_intersection(const Polygon& p0, const Polygon& p1)
 {
-    if(!boost::geometry::intersects(p0, p1)) {
-        return std::deque<Polygon>{p0};
-    }
-
     std::deque<Polygon> outputs;
     boost::geometry::intersection(p0, p1, outputs);
     return outputs;
@@ -39,6 +35,12 @@ compute_intersection(const PolygonContainer& polygons)
     return compute_intersection(polygons[0], polygons[1]);
 }
 
+template <typename Container>
+Polygon3f construct_polygon(const Container& points)
+{
+    return Polygon3f{
+        Polygon3f::ring_type{std::begin(points), std::end(points)}};
+}
 } // namespace core
 } // namespace ipme
 

@@ -74,7 +74,7 @@ core::Point2f flatten_point(const core::Point3f& point)
 core::Polygon2f flatten_polygon(const core::Polygon3f& polygon)
 {
     std::vector<core::Point2f> points;
-    for(const auto point : polygon.outer()) {
+    for(const auto& point : polygon.outer()) {
         points.push_back(flatten_point(point));
     }
 
@@ -82,34 +82,78 @@ core::Polygon2f flatten_polygon(const core::Polygon3f& polygon)
         core::Polygon2f::ring_type{std::begin(points), std::end(points)}};
 }
 
+core::Polygon3f unflatten_polygon(const core::Polygon2f& polygon)
+{
+    std::vector<core::Point3f> points;
+    for(const auto& point : polygon.outer()) {
+        points.push_back(core::Point3f{point.x(), point.y(), 0.f});
+    }
+
+    return core::Polygon3f{
+        core::Polygon3f::ring_type{std::begin(points), std::end(points)}};
+}
+
 void Scene_widget::show_intersections() const
 {
-    if(!show_intersection_ || objects_.size() < 2) {
+    if(objects_.size() < 2) {
         return;
     }
 
-    show_intersections(0, 6);
-    show_intersections(0, 11);
-    show_intersections(6, 11);
+    if(show_head_intersection_) {
+        show_intersections(0, 5, Color{.5f, .2f, .2f, .15f});
+        show_intersections(0, 10, Color{.5f, .2f, .2f, .15f});
+        show_intersections(5, 10, Color{.5f, .2f, .2f, .15f});
+    }
 
-    show_intersections(1, 7);
-    show_intersections(1, 12);
-    show_intersections(7, 12);
+    if(show_body_intersection_) {
+        show_intersections(1, 6, Color{.2f, .5f, .2f, .15f});
+        show_intersections(1, 11, Color{.2f, .5f, .2f, .15f});
+        show_intersections(6, 11, Color{.2f, .5f, .2f, .15f});
+    }
+}
+
+float compute_furthest_point_distance(const core::Polygon2f& polygon,
+                                      const core::Point2f& point)
+{
+    float max_distance = 0.f;
+
+    for(const auto& poly_point : polygon.outer()) {
+        max_distance = std::max(
+            static_cast<float>(boost::geometry::distance(point, poly_point)),
+            max_distance);
+    }
+
+    return max_distance;
 }
 
 void Scene_widget::show_intersections(size_t object_index1,
-                                      size_t object_index2) const
+                                      size_t object_index2,
+                                      const Color& color) const
 {
-    auto intersections = core::compute_intersection(
-        flatten_polygon(objects_[object_index1].transaction_segment(60)),
-        flatten_polygon(objects_[object_index2].transaction_segment(60)));
+    auto p1 = flatten_polygon(objects_[object_index1].transaction_segment());
+    auto p2 = flatten_polygon(objects_[object_index2].transaction_segment());
+    auto intersections = core::compute_intersection(p1, p2);
 
-    qInfo() << "intersection count: " << intersections.size();
+    qInfo() << "intersection count =  " << intersections.size()
+            << " for indices " << object_index1 << ", " << object_index2;
+
+    auto circle_polygon =
+        Geometry::construct_circle_as_polygon(core::Point3f{0, 0, 0}, 1.f);
 
     for(const auto& polygon : intersections) {
-        auto point2 = boost::geometry::return_centroid<core::Point2f>(polygon);
-        core::Point3f point{point2.x(), point2.y(), 0.f};
-        Geometry::draw_circle(point, .05f, Color{.3f, .3f, 0.f, .2f});
+        auto clipped_polygons = core::compute_intersection(
+            flatten_polygon(circle_polygon), polygon);
+
+        for(const auto& clipped_polygon : clipped_polygons) {
+            auto clipped_center =
+                boost::geometry::return_centroid<core::Point2f>(
+                    clipped_polygon);
+            float clipped_radius = compute_furthest_point_distance(
+                clipped_polygon, clipped_center);
+            Geometry::draw_circle(
+                core::Point3f{clipped_center.x(), clipped_center.y(), 0.f},
+                clipped_radius, color);
+        }
     }
 }
 

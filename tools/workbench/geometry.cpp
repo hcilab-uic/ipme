@@ -9,7 +9,7 @@ void Geometry::draw_circle(const core::Point3f& point, float radius,
     static constexpr int iteration_count = 40;
 
     glBegin(GL_TRIANGLE_FAN);
-    glColor3f(color.r, color.g, color.b);
+    glColor4f(color.r, color.g, color.b, color.a);
     glVertex3f(point.x(), point.y(), point.z());
 
     for(int i = 0; i <= iteration_count; ++i) {
@@ -18,6 +18,21 @@ void Geometry::draw_circle(const core::Point3f& point, float radius,
         glVertex3f(point.x() + x, point.y() + y, 0.f);
     }
     glEnd();
+}
+
+core::Polygon3f
+Geometry::construct_circle_as_polygon(const core::Point3f& center, float radius)
+{
+    std::vector<core::Point3f> points;
+    static constexpr int iteration_count = 40;
+    for(int i = 0; i < iteration_count; ++i) {
+        float angle = -1 * i * two_pi / iteration_count;
+        const float x = center.x() + radius * std::cos(angle);
+        const float y = center.y() + radius * std::sin(angle);
+        points.push_back(core::Point3f{x, y, 0});
+    }
+
+    return core::construct_polygon(points);
 }
 
 void Geometry::draw_square(const core::Point3f& point, float side,

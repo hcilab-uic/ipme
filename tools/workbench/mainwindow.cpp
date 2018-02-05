@@ -461,10 +461,10 @@ void MainWindow::on_show_intersection_checkbox_stateChanged(int arg1)
 {
     bool show_tsegment = arg1 != 0;
 
-    ui->opengl_widget->set_show_intersection(show_tsegment);
+    ui->opengl_widget->set_show_head_intersection(show_tsegment);
     ui->opengl_widget->update();
 
-    show_value_message("Showing intersecting transaction segments",
+    show_value_message("Showing intersecting head transactional segments",
                        show_tsegment);
 }
 
@@ -490,4 +490,15 @@ void MainWindow::on_transaction_segment_angle_lineedit_editingFinished()
 void MainWindow::on_transaction_segment_angle_lineedit_selectionChanged()
 {
     ui->transaction_segment_angle_lineedit->clear();
+}
+
+void MainWindow::on_body_intersection_checkbox_stateChanged(int arg1)
+{
+    bool show_tsegment = arg1 != 0;
+
+    ui->opengl_widget->set_show_body_intersection(show_tsegment);
+    ui->opengl_widget->update();
+
+    show_value_message("Showing intersecting body transactional segments",
+                       show_tsegment);
 }
