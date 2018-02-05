@@ -382,7 +382,7 @@ background-color: rgb(255, 255, 255);</string>
              <widget class="QLineEdit" name="visualized_frame">
               <property name="geometry">
                <rect>
-                <x>332</x>
+                <x>528</x>
                 <y>24</y>
                 <width>113</width>
                 <height>24</height>
@@ -390,6 +390,19 @@ background-color: rgb(255, 255, 255);</string>
               </property>
               <property name="text">
                <string>Frame Number</string>
+              </property>
+             </widget>
+             <widget class="QCheckBox" name="show_intersection_checkbox">
+              <property name="geometry">
+               <rect>
+                <x>308</x>
+                <y>24</y>
+                <width>129</width>
+                <height>22</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Show Intersection</string>
               </property>
              </widget>
             </widget>

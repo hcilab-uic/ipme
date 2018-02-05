@@ -456,3 +456,14 @@ void MainWindow::on_visualized_frame_returnPressed()
         emit show_value_message("Showing requested frame", frame_number);
     }
 }
+
+void MainWindow::on_show_intersection_checkbox_stateChanged(int arg1)
+{
+    bool show_tsegment = arg1 != 0;
+
+    ui->opengl_widget->set_show_intersection(show_tsegment);
+    ui->opengl_widget->update();
+
+    show_value_message("Showing intersecting transaction segments",
+                       show_tsegment);
+}

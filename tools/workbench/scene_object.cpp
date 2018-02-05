@@ -99,6 +99,7 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
 
     // FIXME: This is very ugly. Please subclass Scene_object and override draw
     if(index_in_component == 0) {
+        // head
         Geometry::draw_circle(p, radius * 1.f, color_);
         if(show_tsegment) {
             Geometry::draw_segment(p, 2.f, effective_angle, color_);
@@ -107,6 +108,7 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
             Geometry::draw_line(p, 2.f, effective_angle, line_color);
         }
     } else if(index_in_component == 1) {
+        // torso
         Geometry::draw_square(p, radius * 1.5f, color_);
         if(show_tsegment) {
             Geometry::draw_segment(p, 2.f, effective_angle, color_);
@@ -115,6 +117,7 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
             Geometry::draw_line(p, 2.f, effective_angle, line_color);
         }
     } else if(index_in_component == 2 || index_in_component == 3) {
+        // arms
         Geometry::draw_circle(p, radius * .5f, color_);
     } else {
         Geometry::draw_square(p, radius * 1.f, color_);

@@ -6,6 +6,8 @@
 
 #include <QString>
 
+#include <boost/polygon/polygon.hpp>
+
 #include "color.h"
 
 namespace ipme::wb {

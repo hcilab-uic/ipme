@@ -37,9 +37,15 @@ public:
         show_tsegment_ = show;
     }
 
+    inline void set_show_intersection(bool show)
+    {
+        show_intersection_ = show;
+    }
+
 private:
     bool show_centerline_ = true;
     bool show_tsegment_ = false;
+    bool show_intersection_ = false;
 
     std::vector<Scene_object> objects_;
     std::vector<Color> colors_{Color{.0f, .0f, .0f}};

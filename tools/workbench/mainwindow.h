@@ -77,6 +77,8 @@ private slots:
 
     void on_visualized_frame_returnPressed();
 
+    void on_show_intersection_checkbox_stateChanged(int arg1);
+
 private:
     void show_html_log(const QString& message, const QString& color);
 
