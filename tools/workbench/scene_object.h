@@ -10,6 +10,7 @@
 
 #include "color.h"
 #include "core/polygon.h"
+#include "geometry.h"
 
 namespace ipme::wb {
 class Scene_object {
@@ -57,6 +58,8 @@ public:
 
     void draw_transaction_segment(float angle) const;
 
+    void set_ts_angle(float angle);
+
 private:
     core::Polygon3f::ring_type
     create_polygon_ring(core::Polygon3f::point_type::coordinate_type x,
@@ -70,6 +73,7 @@ private:
     Color color_;
     std::array<float, point_dimension> coords_;
     std::array<float, vector_dimenstion> rot_vector_;
+    float ts_angle_ = pi / 6.f;
     float angle_;
     QString timestamp_;
 

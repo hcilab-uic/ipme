@@ -82,8 +82,9 @@ core::Polygon3f::ring_type Scene_object::create_polygon_ring(
     core::Polygon3f::point_type::coordinate_type z, float center_angle) const
 {
     //    auto center_angle = angle() + pi;
-    auto left_angle = center_angle - half_segment_angle;
-    auto right_angle = center_angle + half_segment_angle;
+    float half_segment_angle_radian = ts_angle_ * .5f;
+    auto left_angle = center_angle - half_segment_angle_radian;
+    auto right_angle = center_angle + half_segment_angle_radian;
 
     core::Point3f p0{x, y, z};
     core::Point3f p1{x + (max_length * std::cos(left_angle)),
@@ -165,6 +166,11 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
 void Scene_object::draw_transaction_segment(float angle) const
 {
     Geometry::draw_polygon(transaction_segment(angle), color_);
+}
+
+void Scene_object::set_ts_angle(float angle)
+{
+    ts_angle_ = angle / 180.f * pi;
 }
 
 size_t Scene_object::next_index()

@@ -42,7 +42,13 @@ public:
         show_intersection_ = show;
     }
 
+    void set_ts_angle(float angle);
+
+    void show_intersections() const;
+
 private:
+    void show_intersections(size_t object_index1, size_t object_index2) const;
+
     bool show_centerline_ = true;
     bool show_tsegment_ = false;
     bool show_intersection_ = false;

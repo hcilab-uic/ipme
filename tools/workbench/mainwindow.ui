@@ -366,7 +366,7 @@ background-color: rgb(255, 255, 255);</string>
              <widget class="QCheckBox" name="centerline_checkbox">
               <property name="geometry">
                <rect>
-                <x>188</x>
+                <x>180</x>
                 <y>24</y>
                 <width>141</width>
                 <height>22</height>
@@ -382,9 +382,9 @@ background-color: rgb(255, 255, 255);</string>
              <widget class="QLineEdit" name="visualized_frame">
               <property name="geometry">
                <rect>
-                <x>528</x>
+                <x>556</x>
                 <y>24</y>
-                <width>113</width>
+                <width>85</width>
                 <height>24</height>
                </rect>
               </property>
@@ -395,7 +395,7 @@ background-color: rgb(255, 255, 255);</string>
              <widget class="QCheckBox" name="show_intersection_checkbox">
               <property name="geometry">
                <rect>
-                <x>308</x>
+                <x>300</x>
                 <y>24</y>
                 <width>129</width>
                 <height>22</height>
@@ -403,6 +403,19 @@ background-color: rgb(255, 255, 255);</string>
               </property>
               <property name="text">
                <string>Show Intersection</string>
+              </property>
+             </widget>
+             <widget class="QLineEdit" name="transaction_segment_angle_lineedit">
+              <property name="geometry">
+               <rect>
+                <x>432</x>
+                <y>24</y>
+                <width>101</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>TS Angle</string>
               </property>
              </widget>
             </widget>

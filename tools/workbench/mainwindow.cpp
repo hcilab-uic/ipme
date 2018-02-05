@@ -467,3 +467,27 @@ void MainWindow::on_show_intersection_checkbox_stateChanged(int arg1)
     show_value_message("Showing intersecting transaction segments",
                        show_tsegment);
 }
+
+void MainWindow::on_transaction_segment_angle_lineedit_returnPressed()
+{
+    on_transaction_segment_angle_lineedit_editingFinished();
+}
+
+void MainWindow::on_transaction_segment_angle_lineedit_editingFinished()
+{
+    float angle = ui->transaction_segment_angle_lineedit->text().toFloat();
+
+    if(angle < 0.f || angle > 180.f) {
+        emit show_warn_log("Please enter an angle between 0 and 180 degrees");
+        return;
+    }
+
+    ui->opengl_widget->set_ts_angle(angle);
+    emit show_success_log("Transaction segment angle changed to " +
+                          QString::number(angle) + " degrees");
+}
+
+void MainWindow::on_transaction_segment_angle_lineedit_selectionChanged()
+{
+    ui->transaction_segment_angle_lineedit->clear();
+}

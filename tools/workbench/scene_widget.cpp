@@ -45,6 +45,8 @@ void Scene_widget::paintGL()
         object.draw(show_centerline_, show_tsegment_);
     }
 
+    show_intersections();
+
     glDisable(GL_STENCIL_TEST);
 
     glFlush();
@@ -54,6 +56,61 @@ void Scene_widget::clear_objects()
 {
     objects_.clear();
     update();
+}
+
+void Scene_widget::set_ts_angle(float angle)
+{
+    for(auto& object : objects_) {
+        object.set_ts_angle(angle);
+    }
+    repaint();
+}
+
+core::Point2f flatten_point(const core::Point3f& point)
+{
+    return core::Point2f{point.x(), point.y()};
+}
+
+core::Polygon2f flatten_polygon(const core::Polygon3f& polygon)
+{
+    std::vector<core::Point2f> points;
+    for(const auto point : polygon.outer()) {
+        points.push_back(flatten_point(point));
+    }
+
+    return core::Polygon2f{
+        core::Polygon2f::ring_type{std::begin(points), std::end(points)}};
+}
+
+void Scene_widget::show_intersections() const
+{
+    if(!show_intersection_ || objects_.size() < 2) {
+        return;
+    }
+
+    show_intersections(0, 6);
+    show_intersections(0, 11);
+    show_intersections(6, 11);
+
+    show_intersections(1, 7);
+    show_intersections(1, 12);
+    show_intersections(7, 12);
+}
+
+void Scene_widget::show_intersections(size_t object_index1,
+                                      size_t object_index2) const
+{
+    auto intersections = core::compute_intersection(
+        flatten_polygon(objects_[object_index1].transaction_segment(60)),
+        flatten_polygon(objects_[object_index2].transaction_segment(60)));
+
+    qInfo() << "intersection count: " << intersections.size();
+
+    for(const auto& polygon : intersections) {
+        auto point2 = boost::geometry::return_centroid<core::Point2f>(polygon);
+        core::Point3f point{point2.x(), point2.y(), 0.f};
+        Geometry::draw_circle(point, .05f, Color{.3f, .3f, 0.f, .2f});
+    }
 }
 
 } // namespace ipme::wb

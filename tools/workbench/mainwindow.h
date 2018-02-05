@@ -79,6 +79,12 @@ private slots:
 
     void on_show_intersection_checkbox_stateChanged(int arg1);
 
+    void on_transaction_segment_angle_lineedit_returnPressed();
+
+    void on_transaction_segment_angle_lineedit_editingFinished();
+
+    void on_transaction_segment_angle_lineedit_selectionChanged();
+
 private:
     void show_html_log(const QString& message, const QString& color);
 

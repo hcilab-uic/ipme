@@ -22,7 +22,7 @@ public:
     using coordinate_type = CoordinateType;
     static constexpr std::size_t dimension_count = DimensionCount;
 
-    //    Point() = default;
+    Point() = default;
 
     inline Point(coordinate_type v0, coordinate_type v1 = coordinate_type{},
                  coordinate_type v2 = coordinate_type{})
@@ -87,7 +87,7 @@ struct coordinate_system<ipme::core::Point<CoordinateType, DimensionCount>> {
 
 template <typename CoordinateType, std::size_t DimensionCount>
 struct dimension<ipme::core::Point<CoordinateType, DimensionCount>>
-    : boost::mpl::int_<3> {
+    : boost::mpl::int_<DimensionCount> {
 };
 
 template <typename CoordinateType, std::size_t DimensionCount,

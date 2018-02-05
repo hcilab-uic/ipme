@@ -1,7 +1,9 @@
 #ifndef IPME_CORE_POLYGON_H
 #define IPME_CORE_POLYGON_H
 
-#include <boost/geometry/geometries/polygon.hpp>
+#include <deque>
+
+#include <boost/geometry.hpp>
 
 #include "point.h"
 
@@ -15,6 +17,27 @@ using Polygon2d = Polygon<Point2d>;
 
 using Polygon3f = Polygon<Point3f>;
 using Polygon3d = Polygon<Point3d>;
+
+template <typename Polygon>
+std::deque<Polygon> compute_intersection(const Polygon& p0, const Polygon& p1)
+{
+    if(!boost::geometry::intersects(p0, p1)) {
+        return std::deque<Polygon>{p0};
+    }
+
+    std::deque<Polygon> outputs;
+    boost::geometry::intersection(p0, p1, outputs);
+    return outputs;
+}
+
+template <typename PolygonContainer>
+std::deque<typename PolygonContainer::value_type>
+compute_intersection(const PolygonContainer& polygons)
+{
+    assert(polygons.size() > 1);
+
+    return compute_intersection(polygons[0], polygons[1]);
+}
 
 } // namespace core
 } // namespace ipme
