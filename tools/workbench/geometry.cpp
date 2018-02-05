@@ -71,4 +71,16 @@ void Geometry::draw_segment(const core::Point3f& point, float length,
     glEnd();
 }
 
+void Geometry::draw_polygon(const core::Polygon3f& polygon, const Color& color)
+{
+    glBegin(GL_TRIANGLES);
+    glColor4f(color.r, color.g, color.b, .1f);
+
+    for(const auto& point : polygon.outer()) {
+        glVertex3f(point.x(), point.y(), point.z());
+    }
+
+    glEnd();
+}
+
 } // namespace ipme::wb

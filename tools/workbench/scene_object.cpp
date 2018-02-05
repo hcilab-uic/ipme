@@ -76,6 +76,33 @@ Scene_object::create_from_cells(const QStringList cells, int ignore_cell_count)
     return objects;
 }
 
+core::Polygon3f::ring_type Scene_object::create_polygon_ring(
+    core::Polygon3f::point_type::coordinate_type x,
+    core::Polygon3f::point_type::coordinate_type y,
+    core::Polygon3f::point_type::coordinate_type z, float center_angle) const
+{
+    //    auto center_angle = angle() + pi;
+    auto left_angle = center_angle - half_segment_angle;
+    auto right_angle = center_angle + half_segment_angle;
+
+    core::Point3f p0{x, y, z};
+    core::Point3f p1{x + (max_length * std::cos(left_angle)),
+                     y + (max_length * std::sin(left_angle)), z};
+    core::Point3f p2{x + (max_length * std::cos(right_angle)),
+                     y + (max_length * std::sin(right_angle)), z};
+
+    return core::Polygon3f::ring_type{p0, p1, p2};
+}
+
+ipme::core::Polygon3f Scene_object::transaction_segment(float angle) const
+{
+    const auto c = coords();
+    core::Polygon3f polygon{
+        create_polygon_ring(c[0] / 3.f, c[2] / 3.f * -1.f, c[1] / 3.f, angle)};
+
+    return polygon;
+}
+
 void Scene_object::draw(bool show_centerline, bool show_tsegment) const
 {
     static constexpr float radius = 0.0125f;
@@ -102,7 +129,9 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
         // head
         Geometry::draw_circle(p, radius * 1.f, color_);
         if(show_tsegment) {
-            Geometry::draw_segment(p, 2.f, effective_angle, color_);
+            //            Geometry::draw_segment(p, 2.f, effective_angle,
+            //            color_);
+            draw_transaction_segment(effective_angle);
         }
         if(show_centerline) {
             Geometry::draw_line(p, 2.f, effective_angle, line_color);
@@ -111,7 +140,7 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
         // torso
         Geometry::draw_square(p, radius * 1.5f, color_);
         if(show_tsegment) {
-            Geometry::draw_segment(p, 2.f, effective_angle, color_);
+            draw_transaction_segment(effective_angle);
         }
         if(show_centerline) {
             Geometry::draw_line(p, 2.f, effective_angle, line_color);
@@ -125,12 +154,17 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
         // For device, the segment and the line are draws in the reverse
         // direction
         if(show_tsegment) {
-            Geometry::draw_segment(p, .5f, effective_angle + pi, color_);
+            draw_transaction_segment(effective_angle + pi);
         }
         if(show_centerline) {
             Geometry::draw_line(p, .5f, effective_angle + pi, line_color);
         }
     }
+}
+
+void Scene_object::draw_transaction_segment(float angle) const
+{
+    Geometry::draw_polygon(transaction_segment(angle), color_);
 }
 
 size_t Scene_object::next_index()

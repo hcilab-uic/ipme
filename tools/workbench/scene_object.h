@@ -9,6 +9,7 @@
 #include <boost/polygon/polygon.hpp>
 
 #include "color.h"
+#include "core/polygon.h"
 
 namespace ipme::wb {
 class Scene_object {
@@ -50,9 +51,19 @@ public:
         return timestamp_;
     }
 
+    core::Polygon3f transaction_segment(float angle) const;
+
     virtual void draw(bool show_centerline, bool show_tsegment) const;
 
+    void draw_transaction_segment(float angle) const;
+
 private:
+    core::Polygon3f::ring_type
+    create_polygon_ring(core::Polygon3f::point_type::coordinate_type x,
+                        core::Polygon3f::point_type::coordinate_type y,
+                        core::Polygon3f::point_type::coordinate_type z,
+                        float center_angle) const;
+
     static size_t next_index();
 
     size_t object_index_;
@@ -63,6 +74,7 @@ private:
     QString timestamp_;
 
     static const std::vector<Color> object_colors;
+    static constexpr float max_length = 2.f;
 };
 
 } // namespace ipme::wb

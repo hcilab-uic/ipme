@@ -5,6 +5,7 @@
 
 #include "color.h"
 #include "core/point.h"
+#include "core/polygon.h"
 
 namespace ipme::wb {
 #if defined(_WIN64) || defined(_WIN32)
@@ -35,6 +36,9 @@ public:
 
     static void draw_segment(const core::Point3f& point, float length,
                              float angle, const Color& color = Color{});
+
+    static void draw_polygon(const core::Polygon3f& polygon,
+                             const Color& color);
 };
 
 } // namespace ipme::wb

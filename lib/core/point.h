@@ -2,9 +2,11 @@
 #define IPME_CORE_POINT_H
 
 #include <boost/geometry/core/cs.hpp>
+#include <boost/geometry/core/tags.hpp>
 #include <boost/geometry/geometries/point.hpp>
 
-namespace ipme::core {
+namespace ipme {
+namespace core {
 template <typename CoordinateType, size_t DimensionCount>
 using Basic_point =
     boost::geometry::model::point<CoordinateType, DimensionCount,
@@ -19,6 +21,8 @@ public:
     using parent_type = Basic_point<CoordinateType, DimensionCount>;
     using coordinate_type = CoordinateType;
     static constexpr std::size_t dimension_count = DimensionCount;
+
+    //    Point() = default;
 
     inline Point(coordinate_type v0, coordinate_type v1 = coordinate_type{},
                  coordinate_type v2 = coordinate_type{})
@@ -61,6 +65,46 @@ using Point2d = Point2<double>;
 using Point3f = Point3<float>;
 using Point3d = Point3<double>;
 
-} // namespace ipme::core
+} // namespace core
+} // namespace ipme
+
+namespace boost::geometry::traits {
+
+template <typename CoordinateType, std::size_t DimensionCount>
+struct tag<ipme::core::Point<CoordinateType, DimensionCount>> {
+    using type = boost::geometry::point_tag;
+};
+
+template <typename CoordinateType, std::size_t DimensionCount>
+struct coordinate_type<ipme::core::Point<CoordinateType, DimensionCount>> {
+    using type = CoordinateType;
+};
+
+template <typename CoordinateType, std::size_t DimensionCount>
+struct coordinate_system<ipme::core::Point<CoordinateType, DimensionCount>> {
+    using type = boost::geometry::cs::cartesian;
+};
+
+template <typename CoordinateType, std::size_t DimensionCount>
+struct dimension<ipme::core::Point<CoordinateType, DimensionCount>>
+    : boost::mpl::int_<3> {
+};
+
+template <typename CoordinateType, std::size_t DimensionCount,
+          std::size_t Dimension>
+struct access<ipme::core::Point<CoordinateType, DimensionCount>, Dimension> {
+    static inline CoordinateType
+    get(ipme::core::Point<CoordinateType, DimensionCount> const& p)
+    {
+        return p.template get<Dimension>();
+    }
+
+    static inline void set(ipme::core::Point<CoordinateType, DimensionCount>& p,
+                           CoordinateType const& value)
+    {
+        p.template set<Dimension>(value);
+    }
+};
+}
 
 #endif // IPME_CORE_POINT_H
