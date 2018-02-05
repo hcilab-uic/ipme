@@ -4,7 +4,7 @@
 #include <cmath>
 
 #include "color.h"
-#include "point.h"
+#include "core/point.h"
 
 namespace ipme::wb {
 #if defined(_WIN64) || defined(_WIN32)
@@ -20,21 +20,21 @@ static constexpr float half_segment_angle = segment_angle / 2.f;
 #endif
 
 class Geometry {
-  public:
-    static void draw_circle(const Point& point, float radius,
+public:
+    static void draw_circle(const core::Point3f& point, float radius,
                             const Color& color = Color{});
 
-    static void draw_square(const Point& point, float side,
+    static void draw_square(const core::Point3f& point, float side,
                             const Color& color = Color{});
 
-    static void draw_eq_triangle(const Point& point, float side,
+    static void draw_eq_triangle(const core::Point3f& point, float side,
                                  const Color& color = Color{});
 
-    static void draw_line(const Point& point, float length, float angle,
+    static void draw_line(const core::Point3f& point, float length, float angle,
                           const Color& color = Color{});
 
-    static void draw_segment(const Point& point, float length, float angle,
-                             const Color& color = Color{});
+    static void draw_segment(const core::Point3f& point, float length,
+                             float angle, const Color& color = Color{});
 };
 
 } // namespace ipme::wb

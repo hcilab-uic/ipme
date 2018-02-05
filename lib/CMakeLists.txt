@@ -5,6 +5,7 @@
 # adding the relevant header files
 
 set(lib_HEADERS
+    core/point.h
     data/person.h
     data/trackable_factory.h
     data/trackable_object.h
@@ -22,6 +23,7 @@ set(lib_HEADERS
 )
 
 set(lib_SOURCES
+    core/point.cpp
     data/person.cpp
     data/trackable_factory.cpp
     data/trackable_object.cpp

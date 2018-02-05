@@ -6,8 +6,8 @@
 #include <QStringList>
 
 #include "color.h"
+#include "core/point.h"
 #include "geometry.h"
-#include "point.h"
 
 namespace ipme::wb {
 const std::vector<Color> Scene_object::object_colors = {{1.f, 0.f, 0.f},
@@ -83,14 +83,14 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
 
     const auto c = coords();
 
-    const Point p{c[0] / 3.f, c[2] / 3.f * -1.f, c[1] / 3.f};
+    const core::Point3f p{c[0] / 3.f, c[2] / 3.f * -1.f, c[1] / 3.f};
     //    const Point p{c[0] / 3.f, c[1] / 3.f, c[2] / 3.f};
 
     auto effective_angle = angle() + pi;
 
     // Somewhat pessimistic view that if my co-ordinates are dead in the center,
     // then I must have invalid data
-    if(p.x == 0.f && p.y == 0.f && p.z == 0.f) {
+    if(p.x() == 0.f && p.y() == 0.f && p.z() == 0.f) {
         return;
     }
 

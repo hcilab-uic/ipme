@@ -5,8 +5,8 @@
 #include <QDebug>
 
 #include "color.h"
+#include "core/point.h"
 #include "geometry.h"
-#include "point.h"
 
 namespace ipme::wb {
 Scene_widget::Scene_widget(QWidget* widget) : QOpenGLWidget(widget)
@@ -26,7 +26,8 @@ void Scene_widget::paintGL()
     glClear(GL_STENCIL_BUFFER_BIT);
 
     // boundary
-    Geometry::draw_circle(Point{0.f, 0.f, 0.f}, 1.f, Color{.1f, .1f, .1f, 1.f});
+    Geometry::draw_circle(core::Point3f{0.f, 0.f, 0.f}, 1.f,
+                          Color{.1f, .1f, .1f, 1.f});
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_TRUE);
@@ -37,7 +38,7 @@ void Scene_widget::paintGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    Geometry::draw_circle(Point{0.f, 0.f, 0.f}, 1.f,
+    Geometry::draw_circle(core::Point3f{0.f, 0.f, 0.f}, 1.f,
                           Color{.05f, .05f, .05f, 1.f});
 
     for(const auto& object : objects_) {
