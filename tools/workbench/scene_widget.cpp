@@ -99,16 +99,33 @@ void Scene_widget::show_intersections() const
         return;
     }
 
+    static Color head_intersection_color{.5f, .2f, .2f, .15f};
+    static Color body_intersection_color{.2f, .5f, .2f, .15f};
+    static Color tight_coupling_color{.5f, .2f, .2f, .15f};
+    static Color loose_coupling_color{.5f, .2f, .2f, .15f};
+
     if(show_head_intersection_) {
-        show_intersections(0, 5, Color{.5f, .2f, .2f, .15f});
-        show_intersections(0, 10, Color{.5f, .2f, .2f, .15f});
-        show_intersections(5, 10, Color{.5f, .2f, .2f, .15f});
+        show_intersections(0, 5, head_intersection_color);
+        show_intersections(0, 10, head_intersection_color);
+        show_intersections(5, 10, head_intersection_color);
     }
 
     if(show_body_intersection_) {
-        show_intersections(1, 6, Color{.2f, .5f, .2f, .15f});
-        show_intersections(1, 11, Color{.2f, .5f, .2f, .15f});
-        show_intersections(6, 11, Color{.2f, .5f, .2f, .15f});
+        show_intersections(1, 6, body_intersection_color);
+        show_intersections(1, 11, body_intersection_color);
+        show_intersections(6, 11, body_intersection_color);
+    }
+
+    if(show_tight_coupling_) {
+        show_intersections(0, 4, tight_coupling_color);
+        show_intersections(5, 9, tight_coupling_color);
+        show_intersections(10, 14, tight_coupling_color);
+    }
+
+    if(show_loose_coupling_) {
+        show_intersections(1, 4, loose_coupling_color);
+        show_intersections(6, 9, loose_coupling_color);
+        show_intersections(11, 14, loose_coupling_color);
     }
 }
 

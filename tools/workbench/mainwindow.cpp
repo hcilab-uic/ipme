@@ -109,7 +109,6 @@ void MainWindow::show_scene(const std::vector<ipme::wb::Scene_object>& objects)
     // Display scene
     if(objects.size() > 0) {
         ui->timestamp_lcd->display(objects[0].timestamp());
-        ui->object_count_lcd->display(QString{"%1"}.arg(objects.size()));
     }
 
     ui->opengl_widget->set_objects(objects);
@@ -500,5 +499,27 @@ void MainWindow::on_body_intersection_checkbox_stateChanged(int arg1)
     ui->opengl_widget->update();
 
     show_value_message("Showing intersecting body transactional segments",
+                       show_tsegment);
+}
+
+void MainWindow::on_tight_coupling_box_stateChanged(int arg1)
+{
+    bool show_tsegment = arg1 != 0;
+
+    ui->opengl_widget->set_show_tight_coupling(show_tsegment);
+    ui->opengl_widget->update();
+
+    show_value_message("Showing tight couplings in transactional segments",
+                       show_tsegment);
+}
+
+void MainWindow::on_loose_coupling_box_stateChanged(int arg1)
+{
+    bool show_tsegment = arg1 != 0;
+
+    ui->opengl_widget->set_show_loose_coupling(show_tsegment);
+    ui->opengl_widget->update();
+
+    show_value_message("Showing loose couplings in transactional segments",
                        show_tsegment);
 }

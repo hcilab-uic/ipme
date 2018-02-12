@@ -21,17 +21,17 @@ class MainWindow;
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-  public:
+public:
     explicit MainWindow(QWidget* parent = 0);
     ~MainWindow();
 
-  signals:
+signals:
     void show_log(const QString& message);
     void show_warn_log(const QString& message);
     void show_success_log(const QString& message);
     void show_error_log(const QString& message);
 
-  private slots:
+private slots:
     void on_actionFrame_Loader_triggered();
 
     void on_clear_button_clicked();
@@ -87,7 +87,11 @@ class MainWindow : public QMainWindow {
 
     void on_body_intersection_checkbox_stateChanged(int arg1);
 
-  private:
+    void on_tight_coupling_box_stateChanged(int arg1);
+
+    void on_loose_coupling_box_stateChanged(int arg1);
+
+private:
     void show_html_log(const QString& message, const QString& color);
 
     void show_scene(const QString& frame_text);
