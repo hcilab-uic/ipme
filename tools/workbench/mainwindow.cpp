@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(this, &MainWindow::show_error_log, this,
             &MainWindow::on_show_error_log);
 
-    ui->opengl_widget->set_show_tsegment(ui->tsegment_checkbox->isChecked());
+    ui->opengl_widget->set_show_head_ts(ui->head_ts_checkbox->isChecked());
     ui->opengl_widget->set_show_centerline(
         ui->centerline_checkbox->isChecked());
 
@@ -263,14 +263,34 @@ void MainWindow::on_centerline_checkbox_stateChanged(int arg1)
     show_value_message("Showing center line", show_center_line);
 }
 
-void MainWindow::on_tsegment_checkbox_stateChanged(int arg1)
+void MainWindow::on_head_ts_checkbox_stateChanged(int arg1)
 {
     bool show_tsegment = arg1 != 0;
 
-    ui->opengl_widget->set_show_tsegment(show_tsegment);
+    ui->opengl_widget->set_show_head_ts(show_tsegment);
     ui->opengl_widget->update();
 
-    show_value_message("Showing transaction segment", show_tsegment);
+    show_value_message("Showing head transaction segment", show_tsegment);
+}
+
+void MainWindow::on_body_ts_checkbox_stateChanged(int arg1)
+{
+    bool show_tsegment = arg1 != 0;
+
+    ui->opengl_widget->set_show_body_ts(show_tsegment);
+    ui->opengl_widget->update();
+
+    show_value_message("Showing body transaction segment", show_tsegment);
+}
+
+void MainWindow::on_device_ts_checkbox_stateChanged(int arg1)
+{
+    bool show_tsegment = arg1 != 0;
+
+    ui->opengl_widget->set_show_device_ts(show_tsegment);
+    ui->opengl_widget->update();
+
+    show_value_message("Showing device transaction segment", show_tsegment);
 }
 
 void MainWindow::on_actionExport_triggered()

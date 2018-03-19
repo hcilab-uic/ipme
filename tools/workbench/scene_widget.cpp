@@ -42,7 +42,8 @@ void Scene_widget::paintGL()
                           Color{.05f, .05f, .05f, 1.f});
 
     for(const auto& object : objects_) {
-        object.draw(show_centerline_, show_tsegment_);
+        object.draw(show_centerline_, show_head_ts_, show_body_ts_,
+                    show_device_ts_);
     }
 
     show_intersections();

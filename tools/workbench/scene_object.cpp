@@ -116,7 +116,8 @@ ipme::core::Polygon3f Scene_object::transaction_segment() const
     return polygon;
 }
 
-void Scene_object::draw(bool show_centerline, bool show_tsegment) const
+void Scene_object::draw(bool show_centerline, bool show_head_ts,
+                        bool show_body_ts, bool show_device_ts) const
 {
     static constexpr float radius = 0.0125f;
     static const Color line_color{.15f, .15f, .15f, .1f};
@@ -139,9 +140,7 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
     if(index_in_component == 0) {
         // head
         Geometry::draw_circle(p, radius * 1.f, color_);
-        if(show_tsegment) {
-            //            Geometry::draw_segment(p, 2.f, effective_angle,
-            //            color_);
+        if(show_head_ts) {
             draw_transaction_segment();
         }
         if(show_centerline) {
@@ -150,7 +149,7 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
     } else if(index_in_component == 1) {
         // torso
         Geometry::draw_square(p, radius * 1.5f, color_);
-        if(show_tsegment) {
+        if(show_body_ts) {
             draw_transaction_segment();
         }
         if(show_centerline) {
@@ -164,7 +163,7 @@ void Scene_object::draw(bool show_centerline, bool show_tsegment) const
 
         // For device, the segment and the line are draws in the reverse
         // direction
-        if(show_tsegment) {
+        if(show_device_ts) {
             draw_transaction_segment();
         }
         if(show_centerline) {

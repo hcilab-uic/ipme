@@ -32,9 +32,19 @@ public:
         show_centerline_ = show;
     }
 
-    inline void set_show_tsegment(bool show)
+    inline void set_show_head_ts(bool show)
     {
-        show_tsegment_ = show;
+        show_head_ts_ = show;
+    }
+
+    inline void set_show_body_ts(bool show)
+    {
+        show_body_ts_ = show;
+    }
+
+    inline void set_show_device_ts(bool show)
+    {
+        show_device_ts_ = show;
     }
 
     inline void set_show_head_intersection(bool show)
@@ -66,7 +76,9 @@ private:
                             const Color& color) const;
 
     bool show_centerline_ = true;
-    bool show_tsegment_ = false;
+    bool show_head_ts_ = false;
+    bool show_body_ts_ = false;
+    bool show_device_ts_ = false;
     bool show_head_intersection_ = false;
     bool show_body_intersection_ = false;
     bool show_tight_coupling_ = false;

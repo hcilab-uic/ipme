@@ -58,7 +58,7 @@ private slots:
 
     void on_centerline_checkbox_stateChanged(int arg1);
 
-    void on_tsegment_checkbox_stateChanged(int arg1);
+    void on_head_ts_checkbox_stateChanged(int arg1);
 
     void on_actionExport_triggered();
 
@@ -90,6 +90,10 @@ private slots:
     void on_tight_coupling_box_stateChanged(int arg1);
 
     void on_loose_coupling_box_stateChanged(int arg1);
+
+    void on_body_ts_checkbox_stateChanged(int arg1);
+
+    void on_device_ts_checkbox_stateChanged(int arg1);
 
 private:
     void show_html_log(const QString& message, const QString& color);
