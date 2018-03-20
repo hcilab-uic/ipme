@@ -95,6 +95,8 @@ private slots:
 
     void on_device_ts_checkbox_stateChanged(int arg1);
 
+    void on_actionAppend_to_file_triggered();
+
 private:
     void show_html_log(const QString& message, const QString& color);
 
@@ -141,6 +143,7 @@ private:
     cv::VideoCapture capture_;
     bool video_play_ = false;
     QTimer* video_timer_{nullptr};
+    QString append_file_;
 };
 
 #endif // MAINWINDOW_H

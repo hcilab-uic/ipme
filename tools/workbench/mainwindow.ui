@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1634</width>
-    <height>1010</height>
+    <height>1038</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -617,6 +617,7 @@ color: rgb(0, 0, 0);</string>
      <string>Tools</string>
     </property>
     <addaction name="actionFrame_Loader"/>
+    <addaction name="actionAppend_to_file"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -642,6 +643,7 @@ color: rgb(0, 0, 0);</string>
    <addaction name="actionExport"/>
    <addaction name="actionImport"/>
    <addaction name="action_load_video"/>
+   <addaction name="actionAppend_to_file"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionNew">
@@ -696,6 +698,11 @@ color: rgb(0, 0, 0);</string>
   <action name="action_load_video">
    <property name="text">
     <string>Load Video</string>
+   </property>
+  </action>
+  <action name="actionAppend_to_file">
+   <property name="text">
+    <string>Append to file</string>
    </property>
   </action>
  </widget>

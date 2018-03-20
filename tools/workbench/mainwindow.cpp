@@ -36,6 +36,9 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::on_show_error_log);
 
     ui->opengl_widget->set_show_head_ts(ui->head_ts_checkbox->isChecked());
+    ui->opengl_widget->set_show_body_ts(ui->body_ts_checkbox->isChecked());
+    ui->opengl_widget->set_show_device_ts(ui->device_ts_checkbox->isChecked());
+
     ui->opengl_widget->set_show_centerline(
         ui->centerline_checkbox->isChecked());
 
@@ -293,45 +296,6 @@ void MainWindow::on_device_ts_checkbox_stateChanged(int arg1)
     show_value_message("Showing device transaction segment", show_tsegment);
 }
 
-void MainWindow::on_actionExport_triggered()
-{
-    const auto selection =
-        ui->frame_table_widget->selectionModel()->selectedRows();
-
-    if(selection.count() == 0) {
-        QString message{"No rows selected"};
-        qDebug() << message;
-        emit show_warn_log(message);
-        return;
-    }
-
-    std::vector<QString> rows;
-    const auto column_count = ui->frame_table_widget->columnCount();
-    for(const auto& row : selection) {
-        QString row_text;
-        int row_id = row.row();
-        for(int col = 0; col < column_count; ++col) {
-            row_text += ui->frame_table_widget->item(row_id, col)->text();
-            if(col < column_count - 1) {
-                row_text += ",";
-            }
-        }
-
-        rows.push_back(row_text);
-    }
-
-    QFileDialog dialog;
-    const auto export_filename =
-        dialog.getSaveFileName(this, "File to export", "", "*.csv");
-
-    std::ofstream output_file{export_filename.toStdString().c_str()};
-    for(const auto& row : rows) {
-        output_file << row.toStdString() << "\n";
-    }
-
-    emit show_log("Selection exported to file " + export_filename);
-}
-
 void MainWindow::on_show_log(const QString& message)
 {
     //    ui->log_view_browser->insertPlainText(message + "\n");
@@ -542,4 +506,71 @@ void MainWindow::on_loose_coupling_box_stateChanged(int arg1)
 
     show_value_message("Showing loose couplings in transactional segments",
                        show_tsegment);
+}
+
+void MainWindow::on_actionExport_triggered()
+{
+    const auto selection =
+        ui->frame_table_widget->selectionModel()->selectedRows();
+
+    if(selection.count() == 0) {
+        QString message{"No rows selected"};
+        qDebug() << message;
+        emit show_warn_log(message);
+        return;
+    }
+
+    std::vector<QString> rows;
+    const auto column_count = ui->frame_table_widget->columnCount();
+    for(const auto& row : selection) {
+        QString row_text;
+        int row_id = row.row();
+        for(int col = 0; col < column_count; ++col) {
+            row_text += ui->frame_table_widget->item(row_id, col)->text();
+            if(col < column_count - 1) {
+                row_text += ",";
+            }
+        }
+
+        rows.push_back(row_text);
+    }
+
+    QFileDialog dialog;
+    const auto export_filename =
+        dialog.getSaveFileName(this, "File to export", "", "*.csv");
+
+    std::ofstream output_file{export_filename.toStdString().c_str()};
+    for(const auto& row : rows) {
+        output_file << row.toStdString() << "\n";
+    }
+
+    emit show_log("Selection exported to file " + export_filename);
+}
+
+void MainWindow::on_actionAppend_to_file_triggered()
+{
+    if(append_file_.isEmpty()) {
+        QFileDialog dialog;
+        append_file_ =
+            dialog.getSaveFileName(this, "File to append", "", "*.csv");
+    }
+
+    const auto column_count = ui->frame_table_widget->columnCount();
+    const auto selection =
+        ui->frame_table_widget->selectionModel()->selectedRows();
+    std::ofstream outfile{append_file_.toStdString().c_str(), std::ios::app};
+
+    for(const auto& row : selection) {
+        QString row_text;
+        int row_id = row.row();
+        for(int col = 0; col < column_count; ++col) {
+            row_text += ui->frame_table_widget->item(row_id, col)->text();
+            if(col < column_count - 1) {
+                row_text += ",";
+            }
+        }
+        row_text += "\n";
+        show_log("Appending to file: " + row_text);
+        outfile << row_text.toStdString();
+    }
 }
