@@ -79,11 +79,11 @@ private slots:
 
     void on_show_intersection_checkbox_stateChanged(int arg1);
 
-    void on_transaction_segment_angle_lineedit_returnPressed();
+    //    void on_transaction_segment_angle_lineedit_returnPressed();
 
-    void on_transaction_segment_angle_lineedit_editingFinished();
+    //    void on_transaction_segment_angle_lineedit_editingFinished();
 
-    void on_transaction_segment_angle_lineedit_selectionChanged();
+    //    void on_transaction_segment_angle_lineedit_selectionChanged();
 
     void on_body_intersection_checkbox_stateChanged(int arg1);
 
@@ -96,6 +96,24 @@ private slots:
     void on_device_ts_checkbox_stateChanged(int arg1);
 
     void on_actionAppend_to_file_triggered();
+
+    void on_head_ts_angle_lineedit_editingFinished();
+
+    void on_head_ts_angle_lineedit_returnPressed();
+
+    void on_head_ts_angle_lineedit_selectionChanged();
+
+    void on_device_ts_angle_lineedit_editingFinished();
+
+    void on_device_ts_angle_lineedit_returnPressed();
+
+    void on_device_ts_angle_lineedit_selectionChanged();
+
+    void on_body_ts_angle_lineedit_editingFinished();
+
+    void on_body_ts_angle_lineedit_returnPressed();
+
+    void on_body_ts_angle_lineedit_selectionChanged();
 
 private:
     void show_html_log(const QString& message, const QString& color);

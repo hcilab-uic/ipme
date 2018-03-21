@@ -390,7 +390,7 @@ color: rgb(0, 0, 0);</string>
            <widget class="QLineEdit" name="visualized_frame">
             <property name="geometry">
              <rect>
-              <x>72</x>
+              <x>228</x>
               <y>24</y>
               <width>85</width>
               <height>24</height>
@@ -400,17 +400,43 @@ color: rgb(0, 0, 0);</string>
              <string>Frame Number</string>
             </property>
            </widget>
-           <widget class="QLineEdit" name="transaction_segment_angle_lineedit">
+           <widget class="QLineEdit" name="head_ts_angle_lineedit">
             <property name="geometry">
              <rect>
               <x>4</x>
               <y>24</y>
-              <width>61</width>
+              <width>33</width>
               <height>24</height>
              </rect>
             </property>
             <property name="text">
-             <string>TS Angle</string>
+             <string>30</string>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="body_ts_angle_lineedit">
+            <property name="geometry">
+             <rect>
+              <x>44</x>
+              <y>24</y>
+              <width>37</width>
+              <height>24</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>30</string>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="device_ts_angle_lineedit">
+            <property name="geometry">
+             <rect>
+              <x>88</x>
+              <y>24</y>
+              <width>29</width>
+              <height>24</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>45</string>
             </property>
            </widget>
           </widget>

@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QStringList>
 
+#include <boost/geometry.hpp>
+
 #include "color.h"
 #include "core/point.h"
 #include "geometry.h"
@@ -14,7 +16,7 @@ const std::vector<Color> Scene_object::object_colors = {{1.f, 0.f, 0.f},
                                                         {0.f, 1.f, 0.f},
                                                         {0.f, 0.f, 1.f},
                                                         {1.f, 1.f, 0.f},
-                                                        {1.f, 0.f, 1.f}};
+                                                        {1.f, .75f, .75f, .8f}};
 
 static std::vector<float> make_floats(const std::vector<QString>& cells)
 {
@@ -83,14 +85,11 @@ Scene_object::create_from_cells(const QStringList cells, int ignore_cell_count)
     return objects;
 }
 
-#include <boost/geometry.hpp>
-
 core::Polygon3f::ring_type Scene_object::create_polygon_ring(
     core::Polygon3f::point_type::coordinate_type x,
     core::Polygon3f::point_type::coordinate_type y,
     core::Polygon3f::point_type::coordinate_type z, float center_angle) const
 {
-    //    auto center_angle = angle() + pi;
     float half_segment_angle_radian = ts_angle_ * .5f;
     auto left_angle = center_angle - half_segment_angle_radian;
     auto right_angle = center_angle + half_segment_angle_radian;
@@ -101,9 +100,6 @@ core::Polygon3f::ring_type Scene_object::create_polygon_ring(
     core::Point3f p2{x + (max_length * std::cos(left_angle)),
                      y + (max_length * std::sin(left_angle)), z};
 
-    //    boost::geometry::model::segment<core::Point3f> segment{p0, p1};
-    //    core::Point3f
-    //    p01{boost::geometry::return_centroid<core::Point3f>(segment)};
     return core::Polygon3f::ring_type{p0, p1, p2, p0};
 }
 
@@ -117,7 +113,8 @@ ipme::core::Polygon3f Scene_object::transaction_segment() const
 }
 
 void Scene_object::draw(bool show_centerline, bool show_head_ts,
-                        bool show_body_ts, bool show_device_ts) const
+                        bool show_body_ts, bool show_device_ts,
+                        const Ts_angles& ts_angles)
 {
     static constexpr float radius = 0.0125f;
     static const Color line_color{.15f, .15f, .15f, .1f};
@@ -125,7 +122,6 @@ void Scene_object::draw(bool show_centerline, bool show_head_ts,
     const auto c = coords();
 
     const core::Point3f p{c[0] / 3.f, c[2] / 3.f * -1.f, c[1] / 3.f};
-    //    const Point p{c[0] / 3.f, c[1] / 3.f, c[2] / 3.f};
 
     // Somewhat pessimistic view that if my co-ordinates are dead in the center,
     // then I must have invalid data
@@ -139,8 +135,10 @@ void Scene_object::draw(bool show_centerline, bool show_head_ts,
     // FIXME: This is very ugly. Please subclass Scene_object and override draw
     if(index_in_component == 0) {
         // head
-        Geometry::draw_circle(p, radius * 1.f, color_);
         if(show_head_ts) {
+            Geometry::draw_square(p, radius * 1.f, color_);
+
+            ts_angle_ = ts_angles.head / 180.f * pi;
             draw_transaction_segment();
         }
         if(show_centerline) {
@@ -148,8 +146,10 @@ void Scene_object::draw(bool show_centerline, bool show_head_ts,
         }
     } else if(index_in_component == 1) {
         // torso
-        Geometry::draw_square(p, radius * 1.5f, color_);
         if(show_body_ts) {
+            Geometry::draw_square(p, radius * 1.5f, color_);
+
+            ts_angle_ = ts_angles.body / 180.f * pi;
             draw_transaction_segment();
         }
         if(show_centerline) {
@@ -159,11 +159,12 @@ void Scene_object::draw(bool show_centerline, bool show_head_ts,
         // arms
         Geometry::draw_circle(p, radius * .5f, color_);
     } else {
-        Geometry::draw_square(p, radius * 1.f, color_);
-
         // For device, the segment and the line are draws in the reverse
         // direction
         if(show_device_ts) {
+            Geometry::draw_square(p, radius * 1.f, color_);
+
+            ts_angle_ = ts_angles.device / 180.f * pi;
             draw_transaction_segment();
         }
         if(show_centerline) {

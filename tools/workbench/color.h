@@ -7,13 +7,14 @@ namespace ipme::wb {
 struct Color {
     Color();
 
+    /*!
+     * \brief Color
+     * \param r_
+     * \param g_
+     * \param b_
+     * \param a_
+     */
     Color(float r_, float g_, float b_, float a_ = 0.f);
-
-    //    Color(const Color& other);
-    //    Color(Color&& other);
-
-    //    Color& operator=(const Color& other);
-    //    Color& operator=(Color&& other);
 
     /// Return web hexadecimal format (eg: #FF0000 for (1.0, 0.0, 0.0))
     QString hex_string() const;

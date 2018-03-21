@@ -67,8 +67,27 @@ public:
         show_loose_coupling_ = show;
     }
 
-    void set_ts_angle(float angle);
+    /*!
+     * \brief set_head_ts_angle
+     * \param angle transactional segment for head
+     */
+    void set_head_ts_angle(float angle);
 
+    /*!
+     * \brief set_body_ts_angle
+     * \param angle transactional segment for body
+     */
+    void set_body_ts_angle(float angle);
+
+    /*!
+     * \brief set_device_ts_angle
+     * \param angle transactional segment for device
+     */
+    void set_device_ts_angle(float angle);
+
+    /*!
+     * \brief show_intersections
+     */
     void show_intersections() const;
 
 private:
@@ -86,6 +105,8 @@ private:
 
     std::vector<Scene_object> objects_;
     std::vector<Color> colors_{Color{.0f, .0f, .0f}};
+
+    Scene_object::Ts_angles ts_angles_;
 };
 } // namespace ipme::wb
 

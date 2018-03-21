@@ -39,6 +39,13 @@ MainWindow::MainWindow(QWidget* parent)
     ui->opengl_widget->set_show_body_ts(ui->body_ts_checkbox->isChecked());
     ui->opengl_widget->set_show_device_ts(ui->device_ts_checkbox->isChecked());
 
+    ui->opengl_widget->set_head_ts_angle(
+        ui->head_ts_angle_lineedit->text().toFloat());
+    ui->opengl_widget->set_body_ts_angle(
+        ui->body_ts_angle_lineedit->text().toFloat());
+    ui->opengl_widget->set_device_ts_angle(
+        ui->device_ts_angle_lineedit->text().toFloat());
+
     ui->opengl_widget->set_show_centerline(
         ui->centerline_checkbox->isChecked());
 
@@ -69,8 +76,6 @@ void MainWindow::on_clear_button_clicked()
 
 void MainWindow::on_add_frame_button_clicked()
 {
-    //    auto frame_text = ui->frame_text->document()->toPlainText();
-    //    load_table(frame_text);
 }
 
 void MainWindow::on_frame_table_widget_itemClicked(QTableWidgetItem* item)
@@ -130,8 +135,6 @@ void MainWindow::load_table(const QString& line)
         auto cell_content = new QTableWidgetItem(tr("%1").arg(text_cells[i]));
         ui->frame_table_widget->setItem(row, i, cell_content);
     }
-
-    //    emit show_log("Table loaded");
 }
 
 bool MainWindow::show_row(int current_row)
@@ -451,30 +454,6 @@ void MainWindow::on_show_intersection_checkbox_stateChanged(int arg1)
                        show_tsegment);
 }
 
-void MainWindow::on_transaction_segment_angle_lineedit_returnPressed()
-{
-    on_transaction_segment_angle_lineedit_editingFinished();
-}
-
-void MainWindow::on_transaction_segment_angle_lineedit_editingFinished()
-{
-    float angle = ui->transaction_segment_angle_lineedit->text().toFloat();
-
-    if(angle < 0.f || angle > 180.f) {
-        emit show_warn_log("Please enter an angle between 0 and 180 degrees");
-        return;
-    }
-
-    ui->opengl_widget->set_ts_angle(angle);
-    emit show_success_log("Transaction segment angle changed to " +
-                          QString::number(angle) + " degrees");
-}
-
-void MainWindow::on_transaction_segment_angle_lineedit_selectionChanged()
-{
-    ui->transaction_segment_angle_lineedit->clear();
-}
-
 void MainWindow::on_body_intersection_checkbox_stateChanged(int arg1)
 {
     bool show_tsegment = arg1 != 0;
@@ -573,4 +552,76 @@ void MainWindow::on_actionAppend_to_file_triggered()
         show_log("Appending to file: " + row_text);
         outfile << row_text.toStdString();
     }
+}
+
+void MainWindow::on_head_ts_angle_lineedit_returnPressed()
+{
+    on_head_ts_angle_lineedit_editingFinished();
+}
+
+void MainWindow::on_head_ts_angle_lineedit_editingFinished()
+{
+    float angle = ui->head_ts_angle_lineedit->text().toFloat();
+
+    if(angle < 0.f || angle > 180.f) {
+        emit show_warn_log("Please enter an angle between 0 and 180 degrees");
+        return;
+    }
+
+    ui->opengl_widget->set_head_ts_angle(angle);
+    emit show_success_log("Head transaction segment angle changed to " +
+                          QString::number(angle) + " degrees");
+}
+
+void MainWindow::on_head_ts_angle_lineedit_selectionChanged()
+{
+    ui->head_ts_angle_lineedit->clear();
+}
+
+void MainWindow::on_device_ts_angle_lineedit_returnPressed()
+{
+    on_device_ts_angle_lineedit_editingFinished();
+}
+
+void MainWindow::on_device_ts_angle_lineedit_editingFinished()
+{
+    float angle = ui->device_ts_angle_lineedit->text().toFloat();
+
+    if(angle < 0.f || angle > 180.f) {
+        emit show_warn_log("Please enter an angle between 0 and 180 degrees");
+        return;
+    }
+
+    ui->opengl_widget->set_device_ts_angle(angle);
+    emit show_success_log("Device transaction segment angle changed to " +
+                          QString::number(angle) + " degrees");
+}
+
+void MainWindow::on_device_ts_angle_lineedit_selectionChanged()
+{
+    ui->device_ts_angle_lineedit->clear();
+}
+
+void MainWindow::on_body_ts_angle_lineedit_returnPressed()
+{
+    on_body_ts_angle_lineedit_editingFinished();
+}
+
+void MainWindow::on_body_ts_angle_lineedit_editingFinished()
+{
+    float angle = ui->body_ts_angle_lineedit->text().toFloat();
+
+    if(angle < 0.f || angle > 180.f) {
+        emit show_warn_log("Please enter an angle between 0 and 180 degrees");
+        return;
+    }
+
+    ui->opengl_widget->set_body_ts_angle(angle);
+    emit show_success_log("Body transaction segment angle changed to " +
+                          QString::number(angle) + " degrees");
+}
+
+void MainWindow::on_body_ts_angle_lineedit_selectionChanged()
+{
+    ui->body_ts_angle_lineedit->clear();
 }

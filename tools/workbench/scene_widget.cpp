@@ -41,9 +41,9 @@ void Scene_widget::paintGL()
     Geometry::draw_circle(core::Point3f{0.f, 0.f, 0.f}, 1.f,
                           Color{.05f, .05f, .05f, 1.f});
 
-    for(const auto& object : objects_) {
+    for(auto& object : objects_) {
         object.draw(show_centerline_, show_head_ts_, show_body_ts_,
-                    show_device_ts_);
+                    show_device_ts_, ts_angles_);
     }
 
     show_intersections();
@@ -59,11 +59,21 @@ void Scene_widget::clear_objects()
     update();
 }
 
-void Scene_widget::set_ts_angle(float angle)
+void Scene_widget::set_head_ts_angle(float angle)
 {
-    for(auto& object : objects_) {
-        object.set_ts_angle(angle);
-    }
+    ts_angles_.head = angle;
+    repaint();
+}
+
+void Scene_widget::set_body_ts_angle(float angle)
+{
+    ts_angles_.body = angle;
+    repaint();
+}
+
+void Scene_widget::set_device_ts_angle(float angle)
+{
+    ts_angles_.device = angle;
     repaint();
 }
 

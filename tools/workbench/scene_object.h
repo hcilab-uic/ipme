@@ -19,6 +19,12 @@ class Scene_object {
     static constexpr size_t cells_per_object = 7;
 
 public:
+    struct Ts_angles {
+        float head = pi / 6;
+        float body = pi / 6;
+        float device = pi / 4;
+    };
+
     Scene_object(const std::vector<QString>& parameters,
                  const QString& timestamp = "not-set");
     Scene_object(const std::vector<float>& parameters,
@@ -55,7 +61,8 @@ public:
     core::Polygon3f transaction_segment() const;
 
     virtual void draw(bool show_centerline, bool show_head_ts,
-                      bool show_body_ts, bool show_device_ts) const;
+                      bool show_body_ts, bool show_device_ts,
+                      const Ts_angles& ts_angles);
 
     void draw_transaction_segment() const;
 
