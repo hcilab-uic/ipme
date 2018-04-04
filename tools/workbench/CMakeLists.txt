@@ -14,7 +14,6 @@ set(SOURCES
     geometry.cpp
     main.cpp
     mainwindow.cpp
-#    point.cpp
     scene_object.cpp
     scene_widget.cpp
 
@@ -22,7 +21,6 @@ set(SOURCES
     frame_model.h
     geometry.h
     mainwindow.h
-#    point.h
     scene_object.h
     scene_widget.h)
 
@@ -40,4 +38,4 @@ qt5_use_modules(MainWindow ${QT5_LIBRARIES})
 
 add_executable(${TARGET} ${SOURCES} ${UI_GENERATED_HEADERS} resources.qrc)
 qt5_use_modules(${TARGET} ${QT5_LIBRARIES})
-target_link_libraries(${TARGET} ipme GL ${OpenCV_LIBS})
+target_link_libraries(${TARGET} MainWindow GL ${OpenCV_LIBS})
