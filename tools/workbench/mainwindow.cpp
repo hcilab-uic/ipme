@@ -625,3 +625,12 @@ void MainWindow::on_body_ts_angle_lineedit_selectionChanged()
 {
     ui->body_ts_angle_lineedit->clear();
 }
+
+void MainWindow::on_clear_all_clicked()
+{
+    const int row_count = ui->frame_table_widget->rowCount();
+    for(int i = row_count - 1; i >= 0; --i) {
+        ui->frame_table_widget->removeRow(i);
+    }
+    clear_scene();
+}

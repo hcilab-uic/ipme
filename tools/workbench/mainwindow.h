@@ -115,6 +115,8 @@ private slots:
 
     void on_body_ts_angle_lineedit_selectionChanged();
 
+    void on_clear_all_clicked();
+
 private:
     void show_html_log(const QString& message, const QString& color);
 
