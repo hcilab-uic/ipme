@@ -1,5 +1,7 @@
 include_directories(${ipmelib_DIR})
 
+set(BUILD_WORKBENCH false CACHE BOOL "Build Proxemics visualization tool")
+
 if(${BUILD_VISUALIZATION_TOOLS})
     if(${BUILD_SENSOR_WALABOT})
         add_subdirectory(debug_tool)
@@ -13,4 +15,7 @@ if(${BUILD_SENSOR_WALABOT})
 endif()
 
 add_subdirectory(data_collection)
-add_subdirectory(workbench)
+
+if(${BUILD_WORKBENCH})
+    add_subdirectory(workbench)
+endif()

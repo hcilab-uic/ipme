@@ -3,13 +3,16 @@ set(TARGET proxemics-wb)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Gui REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 find_package(OpenGL REQUIRED)
 
-set(CMAKE_AUTOMOC ON)
+find_package(OpenCV REQUIRED CONFIG)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(SOURCES
+include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${VTK_INCLUDE_DIRS})
+
+set(workbench_SRCS
     color.cpp
     frame_model.cpp
     geometry.cpp
@@ -31,7 +34,7 @@ set(UI_SOURCES
 )
 
 include_directories(${OMICRON_SOURCE_PATH}/include)
-
+    ${workbench_SRCS}
 add_library(workbench_ui SHARED
     mainwindow.cpp
     workbench_window.cpp
