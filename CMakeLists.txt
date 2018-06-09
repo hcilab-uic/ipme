@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.11)
 project(ipme)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -18,6 +18,8 @@ set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME ON)
+
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH} /opt/software/Qt/5.11.0/5.11.0")
 find_package(Boost REQUIRED COMPONENTS system filesystem log_setup log
     program_options)
 
