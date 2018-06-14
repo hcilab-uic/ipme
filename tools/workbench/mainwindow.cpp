@@ -60,6 +60,7 @@ MainWindow::~MainWindow()
 {
     if(video_timer_) {
         delete video_timer_;
+        video_timer_ = nullptr;
     }
 
     delete ui;
