@@ -36,11 +36,7 @@ private slots:
 
     void on_clear_button_clicked();
 
-    //    void on_plot_button_clicked();
-
     void on_add_frame_button_clicked();
-
-    //    void on_remove_frame_button_clicked();
 
     void on_frame_table_widget_itemClicked(QTableWidgetItem* item);
 
