@@ -38,6 +38,7 @@ void Live_window::on_stop_experiment_button_clicked()
 {
     run_experiment_ = false;
     capture_.release();
+    ui->video_feed_label->clear();
 }
 
 void Live_window::process_video()
@@ -56,7 +57,8 @@ void Live_window::process_video()
         }
 
         cv::cvtColor(frame, frame, CV_BGR2RGB);
-        cv::resize(frame, frame, cv::Size(640, 360), 0, 0, cv::INTER_CUBIC);
+        //        cv::resize(frame, frame, cv::Size(640, 360), 0, 0,
+        //        cv::INTER_CUBIC);
         QImage widget_image(static_cast<uchar*>(frame.data), frame.cols,
                             frame.rows, frame.step, QImage::Format_RGB888);
 
