@@ -39,6 +39,11 @@ private slots:
 
     void on_set_output_dir_button_clicked();
 
+private slots:
+    void on_start_experiment_button_clicked();
+
+    void on_stop_experiment_button_clicked();
+
 private:
     void process_video();
     bool initialize_vrpn();
