@@ -36,7 +36,6 @@ if(${BUILD_SENSOR_WALABOT})
 endif()
 
 
-
 add_library(sensor ${SRCS})
 
 target_include_directories(sensor PUBLIC

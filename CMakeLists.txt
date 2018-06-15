@@ -17,10 +17,10 @@ set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_USE_STATIC_RUNTIME ON)
 
 find_package(Boost 1.67 REQUIRED COMPONENTS system filesystem log_setup log
-    program_options)
+    program_options thread)
 
 if(${BUILD_VISUALIZATION_TOOLS})
     find_package(OpenCV REQUIRED CONFIG)

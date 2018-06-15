@@ -38,7 +38,7 @@ set(lib_SOURCES
     ${lib_HEADERS}
 )
 
-add_library(ipme sensor ${lib_SOURCES} ${Boost_LIBRARIES})
+add_library(ipme SHARED sensor ${lib_SOURCES} ${Boost_LIBRARIES})
 
 add_subdirectory(sensor)
 
