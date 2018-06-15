@@ -1,11 +1,20 @@
 #include "live_window.h"
 #include "ui_live_window.h"
 
+#include <mutex>
+#include <shared_mutex>
+
 #include <QDebug>
+#include <QDir>
+#include <QFileDialog>
 #include <opencv2/core/mat.hpp>
 
+#include "sensor/vicon_csvwriter.h"
+#include "sensor/vicon_listener.h"
+#include "utils/utils.h"
+
 Live_window::Live_window(QWidget* parent)
-    : QDialog(parent), ui(new Ui::Live_window)
+    : QDialog(parent), ui(new Ui::Live_window), output_dir_{QDir::homePath()}
 {
     ui->setupUi(this);
 
@@ -13,6 +22,11 @@ Live_window::Live_window(QWidget* parent)
     connect(capture_timer_, &QTimer::timeout, this,
             &Live_window::process_video);
     capture_timer_->start(1000 / 24);
+
+    // FIXME: This should come from elsewhere, not hard-coded here
+    ui->vrpn_host_edit->setText("cave2tracker.evl.uic.edu");
+    ui->vrpn_port_edit->setText("28000");
+    initialize_vrpn();
 }
 
 Live_window::~Live_window()
@@ -62,6 +76,46 @@ void Live_window::process_video()
         QImage widget_image(static_cast<uchar*>(frame.data), frame.cols,
                             frame.rows, frame.step, QImage::Format_RGB888);
 
+        int frame_num = static_cast<int>(capture_.get(CV_CAP_PROP_POS_FRAMES));
+        update_frame_number(frame_num);
         ui->video_feed_label->setPixmap(QPixmap::fromImage(widget_image));
     }
+}
+
+void Live_window::initialize_vrpn()
+{
+    std::string file_basename{
+        "vrpn_record_" + ipme::utils::create_timestamp_string("%Y%m%d-%H%M%S") +
+        ".csv"};
+    std::string filepath{output_dir_.toStdString() + "/" + file_basename};
+    ipme::sensor::Vicon_listener listener{
+        std::make_unique<ipme::sensor::Vicon_csvwriter>(filepath, false)};
+    omicron_client_ =
+        std::make_unique<omicronConnector::OmicronConnectorClient>(&listener);
+
+    const auto host = ui->vrpn_host_edit->text();
+    const auto port = ui->vrpn_port_edit->text().toShort();
+    omicron_client_->connect(host.toStdString().c_str(), port);
+}
+
+void Live_window::update_frame_number(int frame_number)
+{
+    std::unique_lock<std::shared_mutex> lock{frame_number_mutex_};
+    frame_number_ = frame_number;
+}
+
+int Live_window::frame_number() const
+{
+    std::shared_lock<std::shared_mutex> lock{frame_number_mutex_};
+    return frame_number_;
+}
+
+void Live_window::on_pushButton_clicked()
+{
+}
+
+void Live_window::on_set_output_dir_button_clicked()
+{
+    output_dir_ = QFileDialog::getExistingDirectory(
+        this, tr("Output Directory"), QDir::homePath());
 }

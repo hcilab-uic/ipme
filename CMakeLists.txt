@@ -17,10 +17,9 @@ set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
 
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH} /opt/software/Qt/5.11.0/5.11.0")
-find_package(Boost REQUIRED COMPONENTS system filesystem log_setup log
+find_package(Boost 1.67 REQUIRED COMPONENTS system filesystem log_setup log
     program_options)
 
 if(${BUILD_VISUALIZATION_TOOLS})

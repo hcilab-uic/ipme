@@ -16,7 +16,7 @@
   <widget class="QLabel" name="video_feed_label">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>260</x>
      <y>40</y>
      <width>371</width>
      <height>251</height>
@@ -71,6 +71,45 @@ font-size: 24px;</string>
    </property>
    <property name="text">
     <string>Stop</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="vrpn_host_edit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>140</y>
+     <width>161</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>VRPN Host</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="vrpn_port_edit">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>140</y>
+     <width>71</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>VRPN Port</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="set_output_dir_button">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>180</y>
+     <width>141</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Set Output Directory</string>
    </property>
   </widget>
  </widget>
