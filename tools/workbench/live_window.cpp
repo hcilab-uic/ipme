@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileDialog>
+#include <QStatusBar>
 #include <opencv2/core/mat.hpp>
 
 #include "sensor/vicon_csvwriter.h"
@@ -14,19 +15,19 @@
 #include "utils/utils.h"
 
 Live_window::Live_window(QWidget* parent)
-    : QDialog(parent), ui(new Ui::Live_window), output_dir_{QDir::homePath()}
+    : QDialog{parent}, ui{new Ui::Live_window}, output_dir_{QDir::homePath()},
+      status_bar_{parent}
 {
     ui->setupUi(this);
-
-    capture_timer_ = new QTimer{this};
-    connect(capture_timer_, &QTimer::timeout, this,
-            &Live_window::process_video);
-    capture_timer_->start(1000 / 24);
+    set_start_button_init();
+    ui->video_device_index_edit->setText("0");
 
     // FIXME: This should come from elsewhere, not hard-coded here
     ui->vrpn_host_edit->setText("cave2tracker.evl.uic.edu");
     ui->vrpn_port_edit->setText("28000");
     initialize_vrpn();
+
+    status_bar_.showMessage("Ready");
 }
 
 Live_window::~Live_window()
@@ -40,19 +41,33 @@ Live_window::~Live_window()
 
 void Live_window::on_start_experiment_button_clicked()
 {
-    capture_.open(0);
-    int frame_width = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_WIDTH));
-    int frame_height = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
-    ui->video_feed_label->resize(frame_width, frame_height);
-
-    run_experiment_ = true;
+    if(current_state_ == experiment_state::uninitialized) {
+        // initialization code
+        initialize_camera();
+        set_start_button_start();
+        current_state_ = experiment_state::initialized;
+    } else if(current_state_ == experiment_state::initialized ||
+              current_state_ == experiment_state::paused ||
+              current_state_ == experiment_state::stopped) {
+        // Start experiment
+        reset_camera();
+        current_state_ = experiment_state::running;
+        set_start_button_pause();
+        enable_stop_button();
+    } else if(current_state_ == experiment_state::running) {
+        // Enter pause
+        stop_camera();
+        set_start_button_start();
+        current_state_ = experiment_state::paused;
+    }
 }
 
 void Live_window::on_stop_experiment_button_clicked()
 {
-    run_experiment_ = false;
-    capture_.release();
+    stop_camera();
     ui->video_feed_label->clear();
+    current_state_ = experiment_state::stopped;
+    set_start_button_start();
 }
 
 void Live_window::process_video()
@@ -62,7 +77,7 @@ void Live_window::process_video()
     }
 
     cv::Mat frame;
-    if(run_experiment_) {
+    if(current_state_ == experiment_state::running) {
         capture_ >> frame;
 
         if(frame.empty()) {
@@ -70,14 +85,13 @@ void Live_window::process_video()
             return;
         }
 
+        ++frame_number_;
+        update_frame_number(frame_number_);
+        ui->frame_num_value_label->setText(QString::number(frame_number_));
+
         cv::cvtColor(frame, frame, CV_BGR2RGB);
-        //        cv::resize(frame, frame, cv::Size(640, 360), 0, 0,
-        //        cv::INTER_CUBIC);
         QImage widget_image(static_cast<uchar*>(frame.data), frame.cols,
                             frame.rows, frame.step, QImage::Format_RGB888);
-
-        int frame_num = static_cast<int>(capture_.get(CV_CAP_PROP_POS_FRAMES));
-        update_frame_number(frame_num);
         ui->video_feed_label->setPixmap(QPixmap::fromImage(widget_image));
     }
 }
@@ -98,6 +112,66 @@ void Live_window::initialize_vrpn()
     omicron_client_->connect(host.toStdString().c_str(), port);
 }
 
+void Live_window::initialize_camera()
+{
+    capture_timer_ = new QTimer{this};
+    connect(capture_timer_, &QTimer::timeout, this,
+            &Live_window::process_video);
+    reset_camera();
+}
+
+void Live_window::reset_camera()
+{
+    int video_device_index = ui->video_device_index_edit->text().toInt();
+    capture_.open(video_device_index);
+    int frame_width = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_WIDTH));
+    int frame_height = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
+    int fps = static_cast<int>(capture_.get(CV_CAP_PROP_FPS));
+
+    if(fps == 0) {
+        qDebug() << "Error: could not get FPS information from camera";
+        return;
+    }
+
+    ui->frame_rate_value_label->setText(QString::number(fps));
+    qDebug() << "Streaming at " << fps << " frames per second";
+
+    ui->video_feed_label->resize(frame_width, frame_height);
+    int ms_per_frame = 1000 / fps;
+    capture_timer_->start(ms_per_frame);
+}
+
+void Live_window::stop_camera()
+{
+    capture_.release();
+    capture_timer_->stop();
+}
+
+void Live_window::set_start_button_state(std::string_view text,
+                                         std::string_view color)
+{
+    ui->start_experiment_button->setText(text.data());
+    QString style{"font-weight: bold; font-size: 24px; background-color: " +
+                  QString{color.data()} + ";"};
+    ui->start_experiment_button->setStyleSheet(style);
+}
+
+void Live_window::enable_stop_button()
+{
+    ui->stop_experiment_button->setEnabled(true);
+    ui->stop_experiment_button->setStyleSheet("background-color: red;"
+                                              "font-size: 24px;"
+                                              "font-weight: bold;");
+    ui->stop_experiment_button->setText("Stop");
+}
+
+void Live_window::disable_stop_button()
+{
+    ui->stop_experiment_button->setText("");
+    ui->stop_experiment_button->setStyleSheet("");
+    ui->stop_experiment_button->setEnabled(false);
+}
+
 void Live_window::update_frame_number(int frame_number)
 {
     std::unique_lock<std::shared_mutex> lock{frame_number_mutex_};
@@ -108,10 +182,6 @@ int Live_window::frame_number() const
 {
     std::shared_lock<std::shared_mutex> lock{frame_number_mutex_};
     return frame_number_;
-}
-
-void Live_window::on_pushButton_clicked()
-{
 }
 
 void Live_window::on_set_output_dir_button_clicked()

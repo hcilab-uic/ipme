@@ -18,18 +18,18 @@
     <rect>
      <x>260</x>
      <y>40</y>
-     <width>371</width>
-     <height>251</height>
+     <width>245</width>
+     <height>137</height>
     </rect>
    </property>
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: #000</string>
+    <string notr="true">background-color: transparent;</string>
    </property>
    <property name="text">
-    <string>Video</string>
+    <string>Video Stream</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -45,13 +45,12 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: #42f498;
-color: #000;
-font-weight: bold;
-font-size: 24px;</string>
+    <string notr="true">font-weight: bold;
+font-size: 24px;
+border-radius: 25px;</string>
    </property>
    <property name="text">
-    <string>Start</string>
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="stop_experiment_button">
@@ -64,13 +63,14 @@ font-size: 24px;</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: red;
-color: #000;
+    <string notr="true">background: transparent;
+border-color: transparent;
+border-radius: 50%;
 font-weight: bold;
 font-size: 24px;</string>
    </property>
    <property name="text">
-    <string>Stop</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLineEdit" name="vrpn_host_edit">
@@ -102,8 +102,8 @@ font-size: 24px;</string>
   <widget class="QPushButton" name="set_output_dir_button">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>180</y>
+     <x>8</x>
+     <y>8</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -111,6 +111,62 @@ font-size: 24px;</string>
    <property name="text">
     <string>Set Output Directory</string>
    </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>188</y>
+     <width>216</width>
+     <height>70</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="camera_settings_grid">
+    <item row="0" column="0">
+     <widget class="QLabel" name="video_device_index_label">
+      <property name="text">
+       <string>Video Device Index</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="video_device_index_edit"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="frame_rate_label">
+      <property name="text">
+       <string>Frame Rate:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="frame_rate_value_label">
+      <property name="styleSheet">
+       <string notr="true">font-weight: bold;</string>
+      </property>
+      <property name="text">
+       <string> Unknown</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="frame_num_label">
+      <property name="text">
+       <string>Frame Number:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="frame_num_value_label">
+      <property name="styleSheet">
+       <string notr="true">text-align: right;</string>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
