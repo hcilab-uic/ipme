@@ -38,7 +38,10 @@ set(lib_SOURCES
     ${lib_HEADERS}
 )
 
-add_library(ipme SHARED sensor ${lib_SOURCES} ${Boost_LIBRARIES})
+add_library(ipme SHARED ${lib_SOURCES})
 
 add_subdirectory(sensor)
+
+target_link_libraries(ipme sensor ${VTK_LIBRARIES} Boost::system Boost::log
+    Boost::log_setup Boost::thread)
 
