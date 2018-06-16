@@ -27,7 +27,8 @@ Live_window::Live_window(QWidget* parent)
     ui->vrpn_port_edit->setText("28000");
     initialize_vrpn();
 
-    status_bar_.showMessage("Ready");
+    ui->bottom_layout->addWidget(&status_bar_);
+    set_status("Ready");
 }
 
 Live_window::~Live_window()
@@ -46,6 +47,8 @@ void Live_window::on_start_experiment_button_clicked()
         initialize_camera();
         set_start_button_start();
         current_state_ = experiment_state::initialized;
+
+        show_message("Initialized");
     } else if(current_state_ == experiment_state::initialized ||
               current_state_ == experiment_state::paused ||
               current_state_ == experiment_state::stopped) {
@@ -54,11 +57,14 @@ void Live_window::on_start_experiment_button_clicked()
         current_state_ = experiment_state::running;
         set_start_button_pause();
         enable_stop_button();
+
+        show_message("Started");
     } else if(current_state_ == experiment_state::running) {
         // Enter pause
         stop_camera();
         set_start_button_start();
         current_state_ = experiment_state::paused;
+        show_message("Paused");
     }
 }
 
@@ -145,6 +151,8 @@ void Live_window::stop_camera()
 {
     capture_.release();
     capture_timer_->stop();
+
+    set_status("Camera stopped");
 }
 
 void Live_window::set_start_button_state(std::string_view text,
@@ -154,6 +162,20 @@ void Live_window::set_start_button_state(std::string_view text,
     QString style{"font-weight: bold; font-size: 24px; background-color: " +
                   QString{color.data()} + ";"};
     ui->start_experiment_button->setStyleSheet(style);
+}
+
+void Live_window::set_status(std::string_view status, std::string_view color)
+{
+    QString style =
+        "background-color: " + QString{color.data()} + ";" +
+        "border-color: #000; border-style: inset; border: 2px solid #000";
+    status_bar_.setStyleSheet(style);
+    status_bar_.showMessage(status.data());
+}
+
+void Live_window::show_message(const QString& message)
+{
+    ui->log_window->insertPlainText(message);
 }
 
 void Live_window::enable_stop_button()
@@ -170,6 +192,7 @@ void Live_window::disable_stop_button()
     ui->stop_experiment_button->setText("");
     ui->stop_experiment_button->setStyleSheet("");
     ui->stop_experiment_button->setEnabled(false);
+    ui->stop_experiment_button->setHidden(true);
 }
 
 void Live_window::update_frame_number(int frame_number)

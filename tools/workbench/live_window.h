@@ -55,6 +55,11 @@ private:
         set_start_button_state("Init", "blue");
     }
 
+    void set_status(std::string_view status,
+                    std::string_view color = "#68a2ff");
+
+    void show_message(const QString& message);
+
     void enable_stop_button();
     void disable_stop_button();
 
