@@ -66,19 +66,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actionFrame_Loader_triggered()
-{
-}
-
-void MainWindow::on_clear_button_clicked()
-{
-    clear_scene();
-}
-
-void MainWindow::on_add_frame_button_clicked()
-{
-}
-
 void MainWindow::on_frame_table_widget_itemClicked(QTableWidgetItem* item)
 {
     int current_row = item->row();
@@ -179,11 +166,6 @@ void MainWindow::clear_scene()
     ui->device_label->setStyleSheet("background: white;");
 }
 
-void MainWindow::on_clear_text_button_clicked()
-{
-    //    ui->frame_text->clear();
-}
-
 void MainWindow::on_actionOpen_triggered()
 {
     const auto file_name = QFileDialog::getOpenFileName(
@@ -217,16 +199,6 @@ void MainWindow::on_actionOpen_triggered()
 
     //    qInfo() << "Number of CSV rows read: " << row;
     emit show_success_log("Number of CSV rows read: " + QString::number(row));
-}
-
-void MainWindow::on_clear_table_button_clicked()
-{
-    ui->frame_table_widget->clear();
-    int rows = ui->frame_table_widget->rowCount();
-    for(int i = 0; i < rows; ++i) {
-        // Delete from bottom up, else index gets messed up
-        ui->frame_table_widget->removeRow(rows - i);
-    }
 }
 
 void MainWindow::on_next_frame_button_clicked()
