@@ -16,10 +16,10 @@
   <widget class="QSplitter" name="main_vertical_splitter">
    <property name="geometry">
     <rect>
-     <x>4</x>
-     <y>8</y>
+     <x>0</x>
+     <y>0</y>
      <width>929</width>
-     <height>757</height>
+     <height>765</height>
     </rect>
    </property>
    <property name="orientation">

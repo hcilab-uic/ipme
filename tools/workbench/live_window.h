@@ -36,6 +36,8 @@ private:
     void process_video();
     void initialize_vrpn();
     void initialize_camera();
+    void initialize_sage();
+
     void reset_camera();
     void stop_camera();
 

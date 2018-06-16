@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileDialog>
+#include <QScrollBar>
 #include <QStatusBar>
 #include <opencv2/core/mat.hpp>
 
@@ -26,6 +27,11 @@ Live_window::Live_window(QWidget* parent)
     ui->vrpn_host_edit->setText("cave2tracker.evl.uic.edu");
     ui->vrpn_port_edit->setText("28000");
     initialize_vrpn();
+    initialize_vrpn();
+    initialize_sage();
+
+    ui->sage_host_edit->setText("localhost");
+    ui->sage_port_edit->setText("9292");
 
     ui->bottom_layout->addWidget(&status_bar_);
     set_status("Ready");
@@ -126,6 +132,10 @@ void Live_window::initialize_camera()
     reset_camera();
 }
 
+void Live_window::initialize_sage()
+{
+}
+
 void Live_window::reset_camera()
 {
     int video_device_index = ui->video_device_index_edit->text().toInt();
@@ -175,7 +185,9 @@ void Live_window::set_status(std::string_view status, std::string_view color)
 
 void Live_window::show_message(const QString& message)
 {
-    ui->log_window->insertPlainText(message);
+    ui->log_window->insertPlainText(message + "\n");
+    const auto scroll_bar = ui->log_window->verticalScrollBar();
+    scroll_bar->setValue(scroll_bar->maximum());
 }
 
 void Live_window::enable_stop_button()
