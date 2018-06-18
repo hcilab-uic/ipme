@@ -34,11 +34,11 @@ private slots:
 
 private:
     void process_video();
-    void initialize_vrpn();
-    void initialize_camera();
-    void initialize_sage();
+    bool initialize_vrpn();
+    bool initialize_camera();
+    bool initialize_sage();
 
-    void reset_camera();
+    bool reset_camera();
     void stop_camera();
 
     void set_start_button_state(std::string_view text, std::string_view color);
@@ -68,6 +68,8 @@ private:
     void update_frame_number(int frame_number);
 
     int frame_number() const;
+
+    void set_status_indicator(QWidget* widget, bool status);
 
     Ui::Live_window* ui;
     cv::VideoCapture capture_;

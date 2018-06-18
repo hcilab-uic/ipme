@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>936</width>
+    <width>1363</width>
     <height>770</height>
    </rect>
   </property>
@@ -123,6 +123,70 @@ font-size: 24px;</string>
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="status_indicator_layout">
+         <item>
+          <widget class="QLabel" name="video_status_indicator_label">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: #ff1a16;</string>
+           </property>
+           <property name="text">
+            <string> Video</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="vrpn_status_indicator_label">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: #ff1a16;</string>
+           </property>
+           <property name="text">
+            <string> VRPN</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="sage_status_indicator_label">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: #ff1a16;</string>
+           </property>
+           <property name="text">
+            <string>SAGE</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QGridLayout" name="camera_settings_grid">

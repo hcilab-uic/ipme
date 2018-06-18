@@ -26,9 +26,6 @@ Live_window::Live_window(QWidget* parent)
     // FIXME: This should come from elsewhere, not hard-coded here
     ui->vrpn_host_edit->setText("cave2tracker.evl.uic.edu");
     ui->vrpn_port_edit->setText("28000");
-    initialize_vrpn();
-    initialize_vrpn();
-    initialize_sage();
 
     ui->sage_host_edit->setText("localhost");
     ui->sage_port_edit->setText("9292");
@@ -50,7 +47,15 @@ void Live_window::on_start_experiment_button_clicked()
 {
     if(current_state_ == experiment_state::uninitialized) {
         // initialization code
-        initialize_camera();
+        auto camera_status = initialize_camera();
+        set_status_indicator(ui->video_status_indicator_label, camera_status);
+
+        auto vrpn_status = initialize_vrpn();
+        set_status_indicator(ui->vrpn_status_indicator_label, vrpn_status);
+
+        auto sage_status = initialize_sage();
+        set_status_indicator(ui->sage_status_indicator_label, sage_status);
+
         set_start_button_start();
         current_state_ = experiment_state::initialized;
 
@@ -89,7 +94,8 @@ void Live_window::process_video()
     }
 
     cv::Mat frame;
-    if(current_state_ == experiment_state::running) {
+    if(current_state_ == experiment_state::initialized ||
+       current_state_ == experiment_state::running) {
         capture_ >> frame;
 
         if(frame.empty()) {
@@ -97,18 +103,23 @@ void Live_window::process_video()
             return;
         }
 
-        ++frame_number_;
-        update_frame_number(frame_number_);
-        ui->frame_num_value_label->setText(QString::number(frame_number_));
-
         cv::cvtColor(frame, frame, CV_BGR2RGB);
         QImage widget_image(static_cast<uchar*>(frame.data), frame.cols,
                             frame.rows, frame.step, QImage::Format_RGB888);
         ui->video_feed_label->setPixmap(QPixmap::fromImage(widget_image));
+
+        // FIXME: There are two nested if blocks here. We should be able to do
+        // this with one. Figure out how
+        if(current_state_ == experiment_state::running) {
+            // If experiment is in running state, then record
+            ++frame_number_;
+            update_frame_number(frame_number_);
+            ui->frame_num_value_label->setText(QString::number(frame_number_));
+        }
     }
 }
 
-void Live_window::initialize_vrpn()
+bool Live_window::initialize_vrpn()
 {
     std::string file_basename{
         "vrpn_record_" + ipme::utils::create_timestamp_string("%Y%m%d-%H%M%S") +
@@ -121,22 +132,23 @@ void Live_window::initialize_vrpn()
 
     const auto host = ui->vrpn_host_edit->text();
     const auto port = ui->vrpn_port_edit->text().toShort();
-    omicron_client_->connect(host.toStdString().c_str(), port);
+    return omicron_client_->connect(host.toStdString().c_str(), port);
 }
 
-void Live_window::initialize_camera()
+bool Live_window::initialize_camera()
 {
     capture_timer_ = new QTimer{this};
     connect(capture_timer_, &QTimer::timeout, this,
             &Live_window::process_video);
-    reset_camera();
+    return reset_camera();
 }
 
-void Live_window::initialize_sage()
+bool Live_window::initialize_sage()
 {
+    return false;
 }
 
-void Live_window::reset_camera()
+bool Live_window::reset_camera()
 {
     int video_device_index = ui->video_device_index_edit->text().toInt();
     capture_.open(video_device_index);
@@ -146,7 +158,7 @@ void Live_window::reset_camera()
 
     if(fps == 0) {
         qDebug() << "Error: could not get FPS information from camera";
-        return;
+        return false;
     }
 
     ui->frame_rate_value_label->setText(QString::number(fps));
@@ -155,6 +167,8 @@ void Live_window::reset_camera()
     ui->video_feed_label->resize(frame_width, frame_height);
     int ms_per_frame = 1000 / fps;
     capture_timer_->start(ms_per_frame);
+
+    return true;
 }
 
 void Live_window::stop_camera()
@@ -217,6 +231,14 @@ int Live_window::frame_number() const
 {
     std::shared_lock<std::shared_mutex> lock{frame_number_mutex_};
     return frame_number_;
+}
+
+void Live_window::set_status_indicator(QWidget* widget, bool status)
+{
+    QString background =
+        QString{"background: "} + (status ? "#48f442;" : "red;");
+    show_message("set to " + background);
+    widget->setStyleSheet(background);
 }
 
 void Live_window::on_set_output_dir_button_clicked()
