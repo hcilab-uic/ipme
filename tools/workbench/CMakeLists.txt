@@ -31,6 +31,7 @@ set(UI_SOURCES
 )
 
 include_directories(${OMICRON_SOURCE_PATH}/include)
+include_directories(${Boost_INCLUDE_DIR})
 
 add_library(workbench_ui SHARED
     mainwindow.cpp
