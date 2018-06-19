@@ -387,7 +387,7 @@ font-weight: bold;</string>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="middle_layout_outer_widget">
         <layout class="QVBoxLayout" name="middle_layout">
          <item>
           <widget class="QGroupBox" name="viz_contol_box">
@@ -487,7 +487,7 @@ font-weight: bold;</string>
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="video_layout_outer_widger">
         <layout class="QVBoxLayout" name="video_layout">
          <item>
           <widget class="QGroupBox" name="video_control_box">

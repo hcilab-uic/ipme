@@ -67,17 +67,24 @@ void Live_window::on_start_experiment_button_clicked()
         auto vrpn_status = initialize_vrpn();
         set_status_indicator(ui->vrpn_status_indicator_label, vrpn_status);
 
-        auto sage_status =
-            sage_handler_.connect(ui->sage_host_edit->text().toStdString(),
-                                  ui->sage_port_edit->text().toStdString());
-        set_status_indicator(ui->sage_status_indicator_label, sage_status);
-        sage_handler_.set_state_machine(shared_from_this());
+        bool sage_status{false};
+        try {
+            sage_status =
+                sage_handler_.connect(ui->sage_host_edit->text().toStdString(),
+                                      ui->sage_port_edit->text().toStdString());
+            set_status_indicator(ui->sage_status_indicator_label, sage_status);
+            sage_handler_.set_state_machine(shared_from_this());
+        } catch(boost::system::system_error err) {
+            show_message(err.what());
+            set_status("SAGE2 connection refused", "red");
+        }
 
-        set_start_button_start();
+        if(camera_status && vrpn_status && sage_status) {
+            set_start_button_start();
+            set_state(ipme::wb::State_machine::State::initialized);
+            show_message("Initialized");
+        }
 
-        set_state(ipme::wb::State_machine::State::initialized);
-
-        show_message("Initialized");
     } else if(state() == ipme::wb::State_machine::State::initialized ||
               state() == ipme::wb::State_machine::State::paused ||
               state() == ipme::wb::State_machine::State::stopped) {
