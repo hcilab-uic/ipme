@@ -91,7 +91,7 @@ font-size: 24px;</string>
            </property>
            <property name="minimumSize">
             <size>
-             <width>175</width>
+             <width>150</width>
              <height>0</height>
             </size>
            </property>
@@ -104,7 +104,7 @@ font-size: 24px;</string>
           <widget class="QLineEdit" name="vrpn_port_edit">
            <property name="maximumSize">
             <size>
-             <width>60</width>
+             <width>75</width>
              <height>16777215</height>
             </size>
            </property>
@@ -124,7 +124,7 @@ font-size: 24px;</string>
           <widget class="QLineEdit" name="sage_port_edit">
            <property name="maximumSize">
             <size>
-             <width>60</width>
+             <width>75</width>
              <height>16777215</height>
             </size>
            </property>
@@ -137,7 +137,7 @@ font-size: 24px;</string>
           <widget class="QLineEdit" name="vrpn_data_port_edit">
            <property name="maximumSize">
             <size>
-             <width>60</width>
+             <width>75</width>
              <height>16777215</height>
             </size>
            </property>
