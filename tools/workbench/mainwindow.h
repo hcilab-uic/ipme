@@ -32,25 +32,11 @@ signals:
     void show_error_log(const QString& message);
 
 private slots:
-    void on_actionFrame_Loader_triggered();
-
-    void on_clear_button_clicked();
-
-    //    void on_plot_button_clicked();
-
-    void on_add_frame_button_clicked();
-
-    //    void on_remove_frame_button_clicked();
-
     void on_frame_table_widget_itemClicked(QTableWidgetItem* item);
 
     void on_frame_table_widget_itemDoubleClicked(QTableWidgetItem* item);
 
-    void on_clear_text_button_clicked();
-
     void on_actionOpen_triggered();
-
-    void on_clear_table_button_clicked();
 
     void on_next_frame_button_clicked();
 
@@ -78,12 +64,6 @@ private slots:
     void on_visualized_frame_returnPressed();
 
     void on_show_intersection_checkbox_stateChanged(int arg1);
-
-    //    void on_transaction_segment_angle_lineedit_returnPressed();
-
-    //    void on_transaction_segment_angle_lineedit_editingFinished();
-
-    //    void on_transaction_segment_angle_lineedit_selectionChanged();
 
     void on_body_intersection_checkbox_stateChanged(int arg1);
 

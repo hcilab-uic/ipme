@@ -36,8 +36,7 @@ if(${BUILD_SENSOR_WALABOT})
 endif()
 
 
-
-add_library(sensor ${SRCS})
+add_library(sensor SHARED ${SRCS})
 
 target_include_directories(sensor PUBLIC
     $<BUILD_INTERFACE:${OMICRON_SOURCE_PATH}/include>

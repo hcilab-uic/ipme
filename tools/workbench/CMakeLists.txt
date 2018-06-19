@@ -1,11 +1,12 @@
-#cmake_minimum_required(VERSION 3.9)
+set(TARGET proxemics-wb)
 
-#project(proxemics-wb)
-
-find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Gui REQUIRED)
 find_package(OpenGL REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(SOURCES
@@ -13,29 +14,31 @@ set(SOURCES
     frame_model.cpp
     geometry.cpp
     main.cpp
-    mainwindow.cpp
+    sage_handler.cpp
     scene_object.cpp
     scene_widget.cpp
 
     color.h
     frame_model.h
     geometry.h
-    mainwindow.h
     scene_object.h
     scene_widget.h)
 
 set(UI_SOURCES
-    mainwindow.ui)
+    mainwindow.ui
+    workbench_window.ui
+    live_window.ui
+)
 
-set(QT5_LIBRARIES Core Widgets Gui OpenGL)
+include_directories(${OMICRON_SOURCE_PATH}/include)
 
-set(TARGET proxemics-wb)
+add_library(workbench_ui SHARED
+    mainwindow.cpp
+    workbench_window.cpp
+    live_window.cpp ${UI_SOURCES})
+target_link_libraries(workbench_ui Qt5::Core Qt5::Widgets Qt5::Gui)
 
-qt5_wrap_cpp(MainWindow_moc mainwindow.h)
-qt5_wrap_ui(MainWindow_hdr ${UI_SOURCES})
-add_library(MainWindow ${MainWindow_moc} ${MainWindow_hdr})
-qt5_use_modules(MainWindow ${QT5_LIBRARIES})
-
-add_executable(${TARGET} ${SOURCES} ${UI_GENERATED_HEADERS} resources.qrc)
-qt5_use_modules(${TARGET} ${QT5_LIBRARIES})
-target_link_libraries(${TARGET} MainWindow GL ${OpenCV_LIBS})
+add_executable(${TARGET} ${SOURCES} resources.qrc)
+target_link_libraries(${TARGET}
+    workbench_ui ipme sensor GL ${OpenCV_LIBS}
+)

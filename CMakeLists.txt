@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Unfortunately VTK headers have a lot of errors with -pedantic flag. So
 # removing -pedantic for now
-set(CMAKE_CXX_FLAGS "-D__LINUX__ -DBOOST_LOG_DYN_LINK -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS "-D__LINUX__ -DBOOST_ALL_DYN_LINK -Wall -Wextra -Werror")
 
 set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")
@@ -17,11 +17,11 @@ set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+set(BUILD_SHARED_LIBS ON)
 
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH} /opt/software/Qt/5.11.0/5.11.0")
 find_package(Boost REQUIRED COMPONENTS system filesystem log_setup log
-    program_options)
+    program_options thread)
 
 if(${BUILD_VISUALIZATION_TOOLS})
     find_package(OpenCV REQUIRED CONFIG)
@@ -40,7 +40,6 @@ if(${BUILD_VICON_CODE})
 endif()
 
 add_subdirectory(lib)
-
 add_subdirectory(demos)
 add_subdirectory(tools)
 
