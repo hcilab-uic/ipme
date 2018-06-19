@@ -14,17 +14,23 @@
 
 #include "connector/omicronConnectorClient.h"
 #include "sage_handler.h"
+#include "state_machine.h"
 
 namespace Ui {
 class Live_window;
 }
 
-class Live_window : public QDialog {
+class Live_window : public QDialog,
+                    public ipme::wb::State_machine,
+                    public std::enable_shared_from_this<Live_window> {
     Q_OBJECT
 
 public:
     explicit Live_window(QWidget* parent = 0);
-    ~Live_window();
+    virtual ~Live_window() override;
+
+    virtual State state() const override;
+    virtual void set_state(const State state) override;
 
 private slots:
     void on_start_experiment_button_clicked();
@@ -37,7 +43,6 @@ private:
     void process_video();
     bool initialize_vrpn();
     bool initialize_camera();
-    bool initialize_sage();
 
     bool reset_camera();
     void stop_camera();
@@ -83,17 +88,11 @@ private:
     mutable std::shared_mutex frame_number_mutex_;
     int frame_number_ = 0;
 
-    ipme::wb::Sage_handler sage_handler_;
+    mutable std::shared_mutex state_mutex_;
+    ipme::wb::State_machine::State state_ =
+        ipme::wb::State_machine::State::uninitialized;
 
-    enum class experiment_state
-    {
-        uninitialized,
-        initialized,
-        running,
-        paused,
-        stopped
-    };
-    experiment_state current_state_ = experiment_state::uninitialized;
+    ipme::wb::Sage_handler sage_handler_;
 
     std::unique_ptr<omicronConnector::OmicronConnectorClient> omicron_client_;
 };

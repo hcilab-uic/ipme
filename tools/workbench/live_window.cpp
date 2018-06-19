@@ -45,9 +45,21 @@ Live_window::~Live_window()
     delete ui;
 }
 
+ipme::wb::State_machine::State Live_window::state() const
+{
+    std::shared_lock<std::shared_mutex> lock{state_mutex_};
+    return state_;
+}
+
+void Live_window::set_state(const ipme::wb::State_machine::State state)
+{
+    std::unique_lock<std::shared_mutex> lock{state_mutex_};
+    state_ = state;
+}
+
 void Live_window::on_start_experiment_button_clicked()
 {
-    if(current_state_ == experiment_state::uninitialized) {
+    if(state() == ipme::wb::State_machine::State::uninitialized) {
         // initialization code
         auto camera_status = initialize_camera();
         set_status_indicator(ui->video_status_indicator_label, camera_status);
@@ -59,26 +71,30 @@ void Live_window::on_start_experiment_button_clicked()
             sage_handler_.connect(ui->sage_host_edit->text().toStdString(),
                                   ui->sage_port_edit->text().toStdString());
         set_status_indicator(ui->sage_status_indicator_label, sage_status);
+        sage_handler_.set_state_machine(shared_from_this());
 
         set_start_button_start();
-        current_state_ = experiment_state::initialized;
+
+        set_state(ipme::wb::State_machine::State::initialized);
 
         show_message("Initialized");
-    } else if(current_state_ == experiment_state::initialized ||
-              current_state_ == experiment_state::paused ||
-              current_state_ == experiment_state::stopped) {
+    } else if(state() == ipme::wb::State_machine::State::initialized ||
+              state() == ipme::wb::State_machine::State::paused ||
+              state() == ipme::wb::State_machine::State::stopped) {
         // Start experiment
         reset_camera();
-        current_state_ = experiment_state::running;
+        set_state(ipme::wb::State_machine::State::running);
+        //        current_state_ = experiment_state::running;
         set_start_button_pause();
         enable_stop_button();
 
         show_message("Started");
-    } else if(current_state_ == experiment_state::running) {
+    } else if(state() == ipme::wb::State_machine::State::running) {
         // Enter pause
         stop_camera();
         set_start_button_start();
-        current_state_ = experiment_state::paused;
+        set_state(ipme::wb::State_machine::State::paused);
+        //        current_state_ = experiment_state::paused;
         show_message("Paused");
     }
 }
@@ -87,7 +103,8 @@ void Live_window::on_stop_experiment_button_clicked()
 {
     stop_camera();
     ui->video_feed_label->clear();
-    current_state_ = experiment_state::stopped;
+    //    current_state_ = experiment_state::stopped;
+    set_state(ipme::wb::State_machine::State::stopped);
     set_start_button_start();
 }
 
@@ -98,8 +115,8 @@ void Live_window::process_video()
     }
 
     cv::Mat frame;
-    if(current_state_ == experiment_state::initialized ||
-       current_state_ == experiment_state::running) {
+    if(state() == ipme::wb::State_machine::State::initialized ||
+       state() == ipme::wb::State_machine::State::running) {
         capture_ >> frame;
 
         if(frame.empty()) {
@@ -114,7 +131,7 @@ void Live_window::process_video()
 
         // FIXME: There are two nested if blocks here. We should be able to do
         // this with one. Figure out how
-        if(current_state_ == experiment_state::running) {
+        if(state() == ipme::wb::State_machine::State::running) {
             // If experiment is in running state, then record
             ++frame_number_;
             update_frame_number(frame_number_);
@@ -155,11 +172,6 @@ bool Live_window::initialize_camera()
     connect(capture_timer_, &QTimer::timeout, this,
             &Live_window::process_video);
     return reset_camera();
-}
-
-bool Live_window::initialize_sage()
-{
-    return false;
 }
 
 bool Live_window::reset_camera()
