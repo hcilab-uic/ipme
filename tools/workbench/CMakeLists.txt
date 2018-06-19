@@ -14,6 +14,7 @@ set(SOURCES
     frame_model.cpp
     geometry.cpp
     main.cpp
+    sage_handler.cpp
     scene_object.cpp
     scene_widget.cpp
 

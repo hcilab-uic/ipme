@@ -13,6 +13,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "connector/omicronConnectorClient.h"
+#include "sage_handler.h"
 
 namespace Ui {
 class Live_window;
@@ -81,6 +82,8 @@ private:
     // function violates constness
     mutable std::shared_mutex frame_number_mutex_;
     int frame_number_ = 0;
+
+    ipme::wb::Sage_handler sage_handler_;
 
     enum class experiment_state
     {

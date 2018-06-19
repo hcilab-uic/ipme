@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <shared_mutex>
+#include <sstream>
 
 #include <QDebug>
 #include <QDir>
@@ -26,6 +27,7 @@ Live_window::Live_window(QWidget* parent)
     // FIXME: This should come from elsewhere, not hard-coded here
     ui->vrpn_host_edit->setText("cave2tracker.evl.uic.edu");
     ui->vrpn_port_edit->setText("28000");
+    ui->vrpn_data_port_edit->setText("7000");
 
     ui->sage_host_edit->setText("localhost");
     ui->sage_port_edit->setText("9292");
@@ -53,7 +55,9 @@ void Live_window::on_start_experiment_button_clicked()
         auto vrpn_status = initialize_vrpn();
         set_status_indicator(ui->vrpn_status_indicator_label, vrpn_status);
 
-        auto sage_status = initialize_sage();
+        auto sage_status =
+            sage_handler_.connect(ui->sage_host_edit->text().toStdString(),
+                                  ui->sage_port_edit->text().toStdString());
         set_status_indicator(ui->sage_status_indicator_label, sage_status);
 
         set_start_button_start();
@@ -115,6 +119,8 @@ void Live_window::process_video()
             ++frame_number_;
             update_frame_number(frame_number_);
             ui->frame_num_value_label->setText(QString::number(frame_number_));
+
+            cv::circle(frame, cv::Point{100, 100}, 50, cv::Scalar{255, 0, 0});
         }
     }
 }
@@ -125,6 +131,8 @@ bool Live_window::initialize_vrpn()
         "vrpn_record_" + ipme::utils::create_timestamp_string("%Y%m%d-%H%M%S") +
         ".csv"};
     std::string filepath{output_dir_.toStdString() + "/" + file_basename};
+
+    show_message("Writing output to " + QString{filepath.c_str()});
     ipme::sensor::Vicon_listener listener{
         std::make_unique<ipme::sensor::Vicon_csvwriter>(filepath, false)};
     omicron_client_ =
@@ -132,7 +140,13 @@ bool Live_window::initialize_vrpn()
 
     const auto host = ui->vrpn_host_edit->text();
     const auto port = ui->vrpn_port_edit->text().toShort();
-    return omicron_client_->connect(host.toStdString().c_str(), port);
+    const auto data_port = ui->vrpn_data_port_edit->text().toShort();
+    std::stringstream ss;
+    auto ret = omicron_client_->connect(host.toStdString().c_str(), port,
+                                        data_port, 0, ss);
+    show_message(ss.str().c_str());
+
+    return ret;
 }
 
 bool Live_window::initialize_camera()
@@ -185,6 +199,7 @@ void Live_window::set_start_button_state(std::string_view text,
     ui->start_experiment_button->setText(text.data());
     QString style{"font-weight: bold; font-size: 24px; background-color: " +
                   QString{color.data()} + ";"};
+    show_message(style);
     ui->start_experiment_button->setStyleSheet(style);
 }
 

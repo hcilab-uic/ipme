@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1363</width>
+    <width>931</width>
     <height>770</height>
    </rect>
   </property>
@@ -83,6 +83,18 @@ font-size: 24px;</string>
         <layout class="QGridLayout" name="connection_settings_layout">
          <item row="0" column="0">
           <widget class="QLineEdit" name="vrpn_host_edit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>175</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>VRPN Host</string>
            </property>
@@ -90,8 +102,14 @@ font-size: 24px;</string>
          </item>
          <item row="0" column="1">
           <widget class="QLineEdit" name="vrpn_port_edit">
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
-            <string>VRPN Port</string>
+            <string>Port</string>
            </property>
           </widget>
          </item>
@@ -104,8 +122,27 @@ font-size: 24px;</string>
          </item>
          <item row="1" column="1">
           <widget class="QLineEdit" name="sage_port_edit">
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
-            <string>SAGE2 Port</string>
+            <string>Port</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLineEdit" name="vrpn_data_port_edit">
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string> Data Port</string>
            </property>
           </widget>
          </item>
@@ -141,7 +178,7 @@ font-size: 24px;</string>
             <string notr="true">background-color: #ff1a16;</string>
            </property>
            <property name="text">
-            <string> Video</string>
+            <string>Camera</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -198,7 +235,14 @@ font-size: 24px;</string>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="video_device_index_edit"/>
+          <widget class="QLineEdit" name="video_device_index_edit">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="frame_rate_label">
@@ -226,6 +270,12 @@ font-size: 24px;</string>
          </item>
          <item row="2" column="1">
           <widget class="QLabel" name="frame_num_value_label">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">text-align: right;</string>
            </property>
