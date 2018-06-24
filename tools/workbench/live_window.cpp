@@ -72,7 +72,7 @@ void Live_window::on_start_experiment_button_clicked()
                                       ui->sage_port_edit->text().toStdString());
             set_status_indicator(ui->sage_status_indicator_label, sage_status);
             sage_handler_.set_state_machine(shared_from_this());
-        } catch(boost::system::system_error err) {
+        } catch(const boost::system::system_error& err) {
             show_message(err.what());
             set_status("SAGE2 connection refused", "red");
         }
@@ -212,12 +212,12 @@ void Live_window::stop_camera()
 
 void Live_window::shutdown()
 {
+    stop_camera();
     if(capture_timer_) {
         delete capture_timer_;
         capture_timer_ = nullptr;
     }
     shutdown_vrpn();
-    stop_camera();
     set_state(ipme::wb::State_machine::State::uninitialized);
 }
 
@@ -297,5 +297,11 @@ void Live_window::on_set_output_dir_button_clicked()
 
 void Live_window::on_Live_window_destroyed()
 {
+    shutdown();
+}
+
+void Live_window::closeEvent(QCloseEvent* event)
+{
+    QDialog::closeEvent(event);
     shutdown();
 }

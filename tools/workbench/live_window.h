@@ -41,6 +41,9 @@ private slots:
 
     void on_Live_window_destroyed();
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private:
     void process_video();
     bool initialize_vrpn();
