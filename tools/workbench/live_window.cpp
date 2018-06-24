@@ -38,10 +38,8 @@ Live_window::Live_window(QWidget* parent)
 
 Live_window::~Live_window()
 {
-    if(capture_timer_) {
-        delete capture_timer_;
-        capture_timer_ = nullptr;
-    }
+    shutdown();
+
     delete ui;
 }
 
@@ -212,6 +210,22 @@ void Live_window::stop_camera()
     set_status("Camera stopped");
 }
 
+void Live_window::shutdown()
+{
+    if(capture_timer_) {
+        delete capture_timer_;
+        capture_timer_ = nullptr;
+    }
+    shutdown_vrpn();
+    stop_camera();
+    set_state(ipme::wb::State_machine::State::uninitialized);
+}
+
+void Live_window::shutdown_vrpn()
+{
+    omicron_client_->dispose();
+}
+
 void Live_window::set_start_button_state(std::string_view text,
                                          std::string_view color)
 {
@@ -279,4 +293,9 @@ void Live_window::on_set_output_dir_button_clicked()
 {
     output_dir_ = QFileDialog::getExistingDirectory(
         this, tr("Output Directory"), QDir::homePath());
+}
+
+void Live_window::on_Live_window_destroyed()
+{
+    shutdown();
 }

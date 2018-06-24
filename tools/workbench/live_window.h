@@ -39,6 +39,8 @@ private slots:
 
     void on_set_output_dir_button_clicked();
 
+    void on_Live_window_destroyed();
+
 private:
     void process_video();
     bool initialize_vrpn();
@@ -46,6 +48,10 @@ private:
 
     bool reset_camera();
     void stop_camera();
+
+    void shutdown();
+
+    void shutdown_vrpn();
 
     void set_start_button_state(std::string_view text, std::string_view color);
     inline void set_start_button_start()
