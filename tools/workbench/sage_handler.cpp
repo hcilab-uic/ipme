@@ -4,6 +4,10 @@
 
 namespace ipme {
 namespace wb {
+using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
+namespace websocket =
+    boost::beast::websocket; // from <boost/beast/websocket.hpp>
+
 Sage_handler::Sage_handler() : resolver_{ioc_}, wstream_{ioc_}
 {
 }
@@ -13,6 +17,8 @@ Sage_handler::~Sage_handler()
     if(sage_thread_) {
         sage_thread_->join();
     }
+
+    wstream_.close(websocket::close_code::normal);
 }
 
 bool Sage_handler::connect(std::string_view host, std::string_view port)
@@ -26,6 +32,11 @@ bool Sage_handler::connect(std::string_view host, std::string_view port)
 
     // throws system_error on failure
     wstream_.handshake(host.data(), "/");
+
+    boost::beast::multi_buffer buffer;
+    wstream_.read(buffer);
+
+    std::cout << boost::beast::buffers(buffer.data()) << std::endl;
 
     return true;
 }
