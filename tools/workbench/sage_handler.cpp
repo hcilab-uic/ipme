@@ -81,14 +81,22 @@ public:
         std::string ret;
         try {
             ret = tree_.get<std::string>(path.data());
+            last_read_ = true;
         } catch(const boost::property_tree::ptree_bad_path& ex) {
             std::cout << ex.what() << std::endl;
+            last_read_ = false;
         }
 
         return ret;
     }
 
+    inline bool last_read_success()
+    {
+        return last_read_;
+    }
+
 private:
+    bool last_read_ = false;
     pt::ptree tree_;
 };
 
@@ -143,21 +151,33 @@ void Sage_handler::internal_start()
         std::stringstream ss;
         ss << boost::beast::buffers(buffer.data());
         Json_reader reader{ss};
-        if(reader.read("f") != "0000") {
+        auto f_value = reader.read("f");
+        if(f_value != "0000") {
             //"left":27,"top":40.5,"width":336,"height":182,"native_width":336,
             //"native_height":182,"previous_left":null,"previous_top":null,
             //"previous_width":null,"previous_height":null,"maximized":false,
             //"aspect":1.8461538461538463
-            std::cout << "id: " << reader.read("d.id")
-                      << ", title: " << reader.read("d.title")
-                      << ", left: " << reader.read("d.left")
-                      << ", top: " << reader.read("d.top")
-                      << ", width: " << reader.read("d.width")
-                      << ", height: " << reader.read("d.height")
-                      << ", native_width: " << reader.read("d.native_width")
-                      << ", native_height: " << reader.read("d.native_height")
-                      << ", aspect: " << reader.read("d.aspect")
-                      << ", maximized: " << reader.read("d.maximized") << "\n";
+
+            // fake read
+            reader.read("d.id");
+
+            if(reader.last_read_success()) {
+                std::cout << "id: " << reader.read("d.id")
+                          << ", title: " << reader.read("d.title")
+                          << ", left: " << reader.read("d.left")
+                          << ", top: " << reader.read("d.top")
+                          << ", width: " << reader.read("d.width")
+                          << ", height: " << reader.read("d.height")
+                          << ", native_width: " << reader.read("d.native_width")
+                          << ", native_height: "
+                          << reader.read("d.native_height")
+                          << ", aspect: " << reader.read("d.aspect")
+                          << ", maximized: " << reader.read("d.maximized")
+                          << "\n";
+            } else {
+                std::cout << "f_value: " << f_value << "\n";
+                std::cout << ss.str() << "\n";
+            }
         }
     }
 
