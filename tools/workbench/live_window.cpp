@@ -29,11 +29,11 @@ Live_window::Live_window(QWidget* parent)
     ui->vrpn_port_edit->setText("28000");
     ui->vrpn_data_port_edit->setText("7000");
 
-    ui->sage_host_edit->setText("localhost");
-    ui->sage_port_edit->setText("9292");
+    //    ui->sage_host_edit->setText("localhost");
+    //    ui->sage_port_edit->setText("9292");
 
-    //    ui->sage_host_edit->setText("sage2rtt.evl.uic.edu");
-    //    ui->sage_port_edit->setText("1099");
+    ui->sage_host_edit->setText("sage2rtt.evl.uic.edu");
+    ui->sage_port_edit->setText("1099");
 
     ui->bottom_layout->addWidget(&status_bar_);
     set_status("Ready");

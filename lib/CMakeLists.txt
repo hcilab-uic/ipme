@@ -30,6 +30,7 @@ set(lib_SOURCES
     io/json_parser.cpp
     io/parser.cpp
     utils/config.cpp
+    utils/json.cpp
     utils/omicron_config.cpp
     utils/logger.cpp
     utils/string_utils.cpp

@@ -7,6 +7,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "sage_messages.h"
+#include "utils/json.h"
 
 namespace ipme {
 namespace wb {
@@ -67,53 +68,6 @@ void callback(websocket::frame_type ft, boost::string_view sv)
     std::cout << sv << "\n";
 }
 
-namespace pt = boost::property_tree;
-
-class Json_reader {
-public:
-    Json_reader(std::istream& in)
-    {
-        pt::read_json(in, tree_);
-    }
-
-    inline std::string read(std::string_view path)
-    {
-        std::string ret;
-        try {
-            ret = tree_.get<std::string>(path.data());
-            last_read_ = true;
-        } catch(const boost::property_tree::ptree_bad_path& ex) {
-            std::cout << ex.what() << std::endl;
-            last_read_ = false;
-        }
-
-        return ret;
-    }
-
-    inline bool last_read_success()
-    {
-        return last_read_;
-    }
-
-private:
-    bool last_read_ = false;
-    pt::ptree tree_;
-};
-
-std::string read_json(std::istream& in, std::string_view path)
-{
-    pt::ptree tree;
-    pt::read_json(in, tree);
-    std::string ret;
-    try {
-        ret = tree.get<std::string>(path.data());
-    } catch(const boost::property_tree::ptree_bad_path& ex) {
-        std::cout << ex.what() << std::endl;
-    }
-
-    return ret;
-}
-
 void Sage_handler::internal_start()
 {
     if(!wstream_.is_open()) {
@@ -122,6 +76,7 @@ void Sage_handler::internal_start()
 
     std::cout << "Sending initial message to SAGE2\n";
 
+    utils::Json json;
     if(state_machine_->is_running()) {
         wstream_.write(boost::asio::buffer(add_client_msg));
 
@@ -133,7 +88,8 @@ void Sage_handler::internal_start()
 
             std::stringstream ss;
             ss << boost::beast::buffers(buffer.data());
-            std::cout << read_json(ss, "d.listener") << std::endl;
+            json.read(ss);
+            std::cout << json.get("d.listener") << std::endl;
         }
 
         std::cout << "Sending subscribe messages\n";
@@ -150,8 +106,10 @@ void Sage_handler::internal_start()
 
         std::stringstream ss;
         ss << boost::beast::buffers(buffer.data());
-        Json_reader reader{ss};
-        auto f_value = reader.read("f");
+        json.read(ss);
+        auto f_value = json.get("f");
+        //        Json_reader reader{ss};
+        //        auto f_value = reader.read("f");
         if(f_value != "0000") {
             //"left":27,"top":40.5,"width":336,"height":182,"native_width":336,
             //"native_height":182,"previous_left":null,"previous_top":null,
@@ -159,24 +117,22 @@ void Sage_handler::internal_start()
             //"aspect":1.8461538461538463
 
             // fake read
-            reader.read("d.id");
+            json.get("d.id");
 
-            if(reader.last_read_success()) {
-                std::cout << "id: " << reader.read("d.id")
-                          << ", title: " << reader.read("d.title")
-                          << ", left: " << reader.read("d.left")
-                          << ", top: " << reader.read("d.top")
-                          << ", width: " << reader.read("d.width")
-                          << ", height: " << reader.read("d.height")
-                          << ", native_width: " << reader.read("d.native_width")
-                          << ", native_height: "
-                          << reader.read("d.native_height")
-                          << ", aspect: " << reader.read("d.aspect")
-                          << ", maximized: " << reader.read("d.maximized")
-                          << "\n";
+            if(json.last_read_success()) {
+                std::cout << "id: " << json.get("d.id")
+                          << ", title: " << json.get("d.title")
+                          << ", left: " << json.get("d.left")
+                          << ", top: " << json.get("d.top")
+                          << ", width: " << json.get("d.width")
+                          << ", height: " << json.get("d.height")
+                          << ", native_width: " << json.get("d.native_width")
+                          << ", native_height: " << json.get("d.native_height")
+                          << ", aspect: " << json.get("d.aspect")
+                          << ", maximized: " << json.get("d.maximized") << "\n";
             } else {
                 std::cout << "f_value: " << f_value << "\n";
-                std::cout << ss.str() << "\n";
+                std::cout << "returned value: \n" << ss.str() << "\n";
             }
         }
     }
