@@ -21,11 +21,9 @@ Sage_handler::Sage_handler() : resolver_{ioc_}, wstream_{ioc_}
 
 Sage_handler::~Sage_handler()
 {
-    //    if(sage_thread_) {
-    //        sage_thread_->join();
-    //    }
-
-    wstream_.close(websocket::close_code::normal);
+    if(wstream_.is_open()) {
+        wstream_.close(websocket::close_code::normal);
+    }
 }
 
 bool Sage_handler::connect(std::string_view host, std::string_view port)
