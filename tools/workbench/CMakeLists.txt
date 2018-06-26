@@ -14,6 +14,11 @@ set(SOURCES
     frame_model.cpp
     geometry.cpp
     main.cpp
+    sage/create_app_window_handler.cpp
+    sage/default_sage_message_handler.cpp
+    sage/sage_element.cpp
+    sage/sage_element_container.cpp
+    sage/update_item_order_handler.cpp
     sage_handler.cpp
     scene_object.cpp
     scene_widget.cpp

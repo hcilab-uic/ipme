@@ -1,11 +1,16 @@
 #include "sage_handler.h"
 
+#include <memory>
 #include <string_view>
 
 #include <boost/asio.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "sage/create_app_window_handler.h"
+#include "sage/default_sage_message_handler.h"
+#include "sage/update_item_order_handler.h"
+#include "sage_message_handler.h"
 #include "sage_messages.h"
 #include "utils/json.h"
 
@@ -15,8 +20,64 @@ using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 namespace websocket =
     boost::beast::websocket; // from <boost/beast/websocket.hpp>
 
-Sage_handler::Sage_handler() : resolver_{ioc_}, wstream_{ioc_}
+std::pair<std::string_view, std::shared_ptr<Sage_message_handler>>
+create_default(std::string_view alias, std::string_view name)
 {
+    return std::make_pair(
+        alias, std::make_shared<ipme::wb::sage::Default_sage_message_handler>(
+                   name, alias));
+}
+
+template <typename Handler>
+std::pair<std::string_view, std::shared_ptr<Sage_message_handler>>
+create(std::string_view alias)
+{
+    return std::make_pair(alias, std::make_shared<Handler>(alias));
+}
+
+Sage_handler::Sage_handler()
+    : resolver_{ioc_}, wstream_{ioc_},
+      element_container_{
+          std::make_shared<ipme::wb::sage::Sage_element_container>()}
+{
+    namespace sage = ipme::wb::sage;
+    //    handler_map_.insert(create_default("0002",
+    //    "registerInteractionClient"));
+    //    handler_map_.insert(create_default("0003", "getActiveClients"));
+    //    handler_map_.insert(create_default("0004", "getRbac"));
+    //    handler_map_.insert(create_default("0005", "updateAppState"));
+    //    handler_map_.insert(create_default("0006", "updateStateOptions"));
+    handler_map_.insert(create_default("0007", "appResize"));
+    handler_map_.insert(create_default("0008", "appFullscreen"));
+    handler_map_.insert(create_default("0009", "clearDisplay"));
+
+    handler_map_.insert(create<sage::Create_app_window_handler>("000a"));
+    //    handler_map_.insert(create<sage::Update_item_order_handler>("000b"));
+
+    handler_map_.insert(create_default("000c", "deleteAllApplications"));
+    handler_map_.insert(create_default("000d", "tileApplications"));
+    //    handler_map_.insert(create_default("000e", "addNewWebElement"));
+    //    handler_map_.insert(create_default("000f", "openNewWebpage"));
+    //    handler_map_.insert(create_default("0010", "startApplicationMove"));
+    //    handler_map_.insert(create_default("0011", "startApplicationResize"));
+    //    handler_map_.insert(create_default("0012",
+    //    "updateApplicationPosition")); handler_map_.insert(
+    //        create_default("0013", "updateApplicationPositionAndSize"));
+    //    handler_map_.insert(create_default("0014", "finishApplicationMove"));
+    //    handler_map_.insert(create_default("0015",
+    //    "finishApplicationResize"));
+    //    handler_map_.insert(create_default("0016", "deleteApplication"));
+    //    handler_map_.insert(create_default("0017", "updateApplicationState"));
+    //    handler_map_.insert(
+    //        create_default("0018", "updateApplicationStateOptions"));
+    //    handler_map_.insert(create_default("0019", "requestClientUpdate"));
+    handler_map_.insert(create_default("0020", "setItemPosition"));
+    handler_map_.insert(create_default("0021", "setItemPositionAndSize"));
+    handler_map_.insert(create_default("0022", "deleteElement"));
+
+    for(auto& handler : handler_map_) {
+        handler.second->set_element_container(element_container_);
+    }
 }
 
 Sage_handler::~Sage_handler()
@@ -57,15 +118,6 @@ void Sage_handler::set_state_machine(
     state_machine_ = state_machine;
 }
 
-void callback(websocket::frame_type ft, boost::string_view sv)
-{
-    if(ft == websocket::frame_type::ping) {
-        std::cout << "ping received\n";
-    }
-
-    std::cout << sv << "\n";
-}
-
 void Sage_handler::internal_start()
 {
     if(!wstream_.is_open()) {
@@ -77,8 +129,6 @@ void Sage_handler::internal_start()
     utils::Json json;
     if(state_machine_->is_running()) {
         wstream_.write(boost::asio::buffer(add_client_msg));
-
-        //        wstream_.control_callback(callback);
 
         for(int i = 1; i < 0x9d; ++i) {
             boost::beast::multi_buffer buffer;
@@ -92,8 +142,9 @@ void Sage_handler::internal_start()
 
         std::cout << "Sending subscribe messages\n";
 
-        for(const auto& msg : subscribe_messages) {
-            std::cout << "TX: " << msg << "\n";
+        for(const auto& handler : handler_map_) {
+            const auto msg = handler.second->generate_registration_message();
+            std::cout << "TX: " << msg;
             wstream_.write(boost::asio::buffer(msg));
         }
     }
@@ -105,34 +156,8 @@ void Sage_handler::internal_start()
         std::stringstream ss;
         ss << boost::beast::buffers(buffer.data());
         json.read(ss);
-        auto f_value = json.get("f");
-        //        Json_reader reader{ss};
-        //        auto f_value = reader.read("f");
-        if(f_value != "0000") {
-            //"left":27,"top":40.5,"width":336,"height":182,"native_width":336,
-            //"native_height":182,"previous_left":null,"previous_top":null,
-            //"previous_width":null,"previous_height":null,"maximized":false,
-            //"aspect":1.8461538461538463
-
-            // fake read
-            json.get("d.id");
-
-            if(json.last_read_success()) {
-                std::cout << "id: " << json.get("d.id")
-                          << ", title: " << json.get("d.title")
-                          << ", left: " << json.get("d.left")
-                          << ", top: " << json.get("d.top")
-                          << ", width: " << json.get("d.width")
-                          << ", height: " << json.get("d.height")
-                          << ", native_width: " << json.get("d.native_width")
-                          << ", native_height: " << json.get("d.native_height")
-                          << ", aspect: " << json.get("d.aspect")
-                          << ", maximized: " << json.get("d.maximized") << "\n";
-            } else {
-                std::cout << "f_value: " << f_value << "\n";
-                std::cout << "returned value: \n" << ss.str() << "\n";
-            }
-        }
+        const auto& handler = handler_map_[json.get("f")];
+        handler->dispatch(json);
     }
 
     std::cout << "Shutting down ...";

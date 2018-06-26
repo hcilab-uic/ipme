@@ -42,7 +42,9 @@ Live_window::Live_window(QWidget* parent)
 Live_window::~Live_window()
 {
     set_state(ipme::wb::State_machine::State::uninitialized);
-    delete ui;
+    if(ui) {
+        delete ui;
+    }
 }
 
 ipme::wb::State_machine::State Live_window::state() const
@@ -112,7 +114,7 @@ void Live_window::on_stop_experiment_button_clicked()
 {
     stop_camera();
     ui->video_feed_label->clear();
-    //    current_state_ = experiment_state::stopped;
+    shutdown();
     set_state(ipme::wb::State_machine::State::stopped);
     set_start_button_start();
 }
