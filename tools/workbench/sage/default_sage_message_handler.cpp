@@ -52,6 +52,8 @@ void Default_sage_message_handler::dispatch(const utils::Json& message)
     } else {
         std::cout << "Unhandled " << name_ << "\n";
     }
+
+    std::cout << message.to_string();
 }
 
 void Default_sage_message_handler::set_element_container(

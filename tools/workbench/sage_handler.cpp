@@ -68,9 +68,8 @@ Sage_handler::Sage_handler()
     //    "finishApplicationResize"));
     //    handler_map_.insert(create_default("0016", "deleteApplication"));
     //    handler_map_.insert(create_default("0017", "updateApplicationState"));
-    //    handler_map_.insert(
-    //        create_default("0018", "updateApplicationStateOptions"));
-    //    handler_map_.insert(create_default("0019", "requestClientUpdate"));
+    handler_map_.insert(create_default("0018", "startSagePointer"));
+    handler_map_.insert(create_default("0019", "createSagePointer"));
     handler_map_.insert(create_default("0020", "setItemPosition"));
     handler_map_.insert(create_default("0021", "setItemPositionAndSize"));
     handler_map_.insert(create_default("0022", "deleteElement"));
