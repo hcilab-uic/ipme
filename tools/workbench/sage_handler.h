@@ -5,12 +5,15 @@
 #include <memory>
 #include <string_view>
 #include <thread>
+#include <unordered_map>
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 
+#include "sage/sage_element_container.h"
+#include "sage_message_handler.h"
 #include "state_machine.h"
 
 namespace ipme {
@@ -32,8 +35,10 @@ private:
     boost::asio::ip::tcp::resolver resolver_;
     boost::beast::websocket::stream<boost::asio::ip::tcp::socket> wstream_;
     std::unique_ptr<std::thread> sage_thread_;
-
     std::shared_ptr<State_machine> state_machine_;
+    std::unordered_map<std::string_view, std::shared_ptr<Sage_message_handler>>
+        handler_map_;
+    std::shared_ptr<ipme::wb::sage::Sage_element_container> element_container_;
 };
 
 } // namespace wb

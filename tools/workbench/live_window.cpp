@@ -29,8 +29,11 @@ Live_window::Live_window(QWidget* parent)
     ui->vrpn_port_edit->setText("28000");
     ui->vrpn_data_port_edit->setText("7000");
 
-    ui->sage_host_edit->setText("localhost");
-    ui->sage_port_edit->setText("9292");
+    //    ui->sage_host_edit->setText("localhost");
+    //    ui->sage_port_edit->setText("9292");
+
+    ui->sage_host_edit->setText("sage2rtt.evl.uic.edu");
+    ui->sage_port_edit->setText("1099");
 
     ui->bottom_layout->addWidget(&status_bar_);
     set_status("Ready");
@@ -38,11 +41,10 @@ Live_window::Live_window(QWidget* parent)
 
 Live_window::~Live_window()
 {
-    if(capture_timer_) {
-        delete capture_timer_;
-        capture_timer_ = nullptr;
+    set_state(ipme::wb::State_machine::State::uninitialized);
+    if(ui) {
+        delete ui;
     }
-    delete ui;
 }
 
 ipme::wb::State_machine::State Live_window::state() const
@@ -74,7 +76,7 @@ void Live_window::on_start_experiment_button_clicked()
                                       ui->sage_port_edit->text().toStdString());
             set_status_indicator(ui->sage_status_indicator_label, sage_status);
             sage_handler_.set_state_machine(shared_from_this());
-        } catch(boost::system::system_error err) {
+        } catch(const boost::system::system_error& err) {
             show_message(err.what());
             set_status("SAGE2 connection refused", "red");
         }
@@ -90,6 +92,8 @@ void Live_window::on_start_experiment_button_clicked()
               state() == ipme::wb::State_machine::State::stopped) {
         // Start experiment
         reset_camera();
+        sage_handler_.start();
+
         set_state(ipme::wb::State_machine::State::running);
         //        current_state_ = experiment_state::running;
         set_start_button_pause();
@@ -110,7 +114,7 @@ void Live_window::on_stop_experiment_button_clicked()
 {
     stop_camera();
     ui->video_feed_label->clear();
-    //    current_state_ = experiment_state::stopped;
+    shutdown();
     set_state(ipme::wb::State_machine::State::stopped);
     set_start_button_start();
 }
@@ -206,10 +210,28 @@ bool Live_window::reset_camera()
 
 void Live_window::stop_camera()
 {
+    if(capture_timer_) {
+        capture_timer_->stop();
+    }
     capture_.release();
-    capture_timer_->stop();
 
     set_status("Camera stopped");
+}
+
+void Live_window::shutdown()
+{
+    stop_camera();
+    if(capture_timer_) {
+        delete capture_timer_;
+        capture_timer_ = nullptr;
+    }
+    shutdown_vrpn();
+    set_state(ipme::wb::State_machine::State::uninitialized);
+}
+
+void Live_window::shutdown_vrpn()
+{
+    omicron_client_->dispose();
 }
 
 void Live_window::set_start_button_state(std::string_view text,
@@ -279,4 +301,15 @@ void Live_window::on_set_output_dir_button_clicked()
 {
     output_dir_ = QFileDialog::getExistingDirectory(
         this, tr("Output Directory"), QDir::homePath());
+}
+
+void Live_window::on_Live_window_destroyed()
+{
+    shutdown();
+}
+
+void Live_window::closeEvent(QCloseEvent* event)
+{
+    QDialog::closeEvent(event);
+    shutdown();
 }
