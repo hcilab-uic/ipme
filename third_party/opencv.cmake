@@ -7,6 +7,12 @@ ExternalProject_Add(OpenCV
   
   CMAKE_ARGS            -DBUILD_SHARED_LIBS=ON
   CMAKE_CACHE_ARGS
+    -DWITH_TBB:BOOL=ON
+    -DWITH_OPENMP:BOOL=ON
+    -DWITH_IPP:BOOL=ON
+    -DCMAKE_BUILD_TYPE:STRING=RELEASE
+    -DWITH_NVCUVID:BOOL=ON
+    -DWITH_CUDA:BOOL=ON
     -DWITH_VTK:BOOL=OFF
     -DWITH_WEBP:BOOL=OFF
     -DWITH_LAPACK:BOOL=OFF
@@ -16,12 +22,9 @@ ExternalProject_Add(OpenCV
     -DProtobuf_DIR:PATH=${EXT_INSTALL_DIR}
   
   CONFIGURE_COMMAND
-    cmake -GNinja ${SRC_DIR}
+    cmake ${SRC_DIR}
     -DCMAKE_INSTALL_PREFIX=${EXT_INSTALL_DIR}
     -DVTK_DIR=${EXT_INSTALL_DIR}/lib/cmake/vtk-8.1
-    
-  BUILD_COMMAND         ninja
-  INSTALL_COMMAND       ninja install
 )
 
 # ExternalProject_Get_Property(Protobuf EXT_INSTALL_DIR)

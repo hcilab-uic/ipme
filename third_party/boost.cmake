@@ -12,7 +12,6 @@ ExternalProject_Add(Boost
       cd ${SRC_DIR} &&
       pwd &&
       ./b2 -j8 install --prefix=${EXT_INSTALL_DIR}
-  INSTALL_COMMAND      ""
 )
 
 # ExternalProject_Get_Property(Protobuf EXT_INSTALL_DIR)
