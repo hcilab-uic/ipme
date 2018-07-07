@@ -1,5 +1,5 @@
 ---
-image: gcc:8.1.0
+image: hnaik2/ipme-20180707-121816
 
 pipelines:
   default:
