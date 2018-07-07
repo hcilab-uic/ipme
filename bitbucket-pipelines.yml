@@ -7,7 +7,7 @@ pipelines:
         script:  # Modify the commands below to build your repository.
           - apt-get update
           - apt-get install -y cmake ninja-build
-          - apt-get install build-essential libgl1-mesa-dev
+          - apt-get install -y build-essential libgl1-mesa-dev
           - mkdir -p build/third_party
           - cd build/third_party
           - cmake -GNinja ../../third_party && ninja
