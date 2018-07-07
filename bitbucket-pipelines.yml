@@ -1,13 +1,11 @@
 ---
-image: hnaik2/ipme-20180707-121816
+image: hnaik2/ipme-bitbucket
 
 pipelines:
   default:
     - step:
-        script:  # Modify the commands below to build your repository.
-          - apt-get update
-          - apt-get install -y cmake ninja-build
-          - apt-get install -y build-essential libgl1-mesa-dev
+        script:
+          - apt-get update && apt-get upgrade -y
           - mkdir -p build/third_party
           - cd build/third_party
           - cmake -GNinja ../../third_party && ninja
