@@ -3,15 +3,17 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: gcc:7.1
+image: gcc:8.1.0
 
 pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
           - apt-get update
-          - apt-get install -y cmake libboost-all-dev
-          - mkdir build
-          - cd build
-          - cmake .. -DBUILD_VICON_CODE=ON
-          - make -j4
+          - apt-get install -y cmake ninja-build
+	  - apt-get install build-essential libgl1-mesa-dev
+          - mkdir -p build/third_party
+          - cd build/third_party
+          - cmake -GNinja ../../third_party && ninja
+	  - cd ..
+	  - cmake -GNinja .. && ninja

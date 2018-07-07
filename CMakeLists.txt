@@ -8,6 +8,7 @@ set(CMAKE_CXX_FLAGS "-D__LINUX__ -DBOOST_ALL_DYN_LINK -Wall -Wextra -Werror")
 
 set(THIRD_PARTY_DIR "${CMAKE_CURRENT_BINARY_DIR}/third_party/third_party"
   CACHE PATH "Path to the third-party build directory")
+set(QT5_ROOT CACHE PATH "Path to Qt5 installation")
 
 set(BOOST_ROOT ${THIRD_PARTY_DIR})
 set(VTK_DIR ${THIRD_PARTY_DIR}/lib/cmake/vtk-8.1)
@@ -16,6 +17,8 @@ set(Protobuf_INCLUDE_DIR ${THIRD_PARTY_DIR}/include)
 set(Protobuf_LIBRARY ${THIRD_PARTY_DIR}/lib/libprotobuf.a)
 set(OMICRON_SOURCE_PATH
   ${CMAKE_CURRENT_BINARY_DIR}/third_party/omicron/src/Omicron)
+set(Qt5Core_DIR "${QT5_ROOT}/gcc_64/lib/cmake/Qt5Core")
+set(Qt5Widgets_DIR "${QT5_ROOT}/gcc_64/lib/cmake/Qt5Widgets")
 
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message("BOOST_ROOT=${BOOST_ROOT}")
