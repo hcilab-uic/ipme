@@ -4,7 +4,7 @@ ExternalProject_Add(OpenCV
   PREFIX                opencv
   GIT_REPOSITORY        https://github.com/opencv/opencv.git
   GIT_TAG               3.4.1
-  
+
   CMAKE_ARGS            -DBUILD_SHARED_LIBS=ON
   CMAKE_CACHE_ARGS
     -DWITH_TBB:BOOL=ON
@@ -17,10 +17,10 @@ ExternalProject_Add(OpenCV
     -DWITH_WEBP:BOOL=OFF
     -DWITH_LAPACK:BOOL=OFF
     -DBUILD_PERF_TESTS:BOOL=OFF
-    -DBUILD_TESTS:BOOL=OFF        
+    -DBUILD_TESTS:BOOL=OFF
     -DBUILD_PROTOBUF:BOOL=OFF
     -DProtobuf_DIR:PATH=${EXT_INSTALL_DIR}
-  
+
   CONFIGURE_COMMAND
     cmake ${SRC_DIR}
     -DCMAKE_INSTALL_PREFIX=${EXT_INSTALL_DIR}
