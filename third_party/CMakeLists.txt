@@ -14,4 +14,9 @@ include(vtk.cmake)
 include(opencv.cmake)
 include(omicron.cmake)
 
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH)
+
 message("Important: Third-party install directory: ${EXT_INSTALL_DIR}")
