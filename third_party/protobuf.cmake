@@ -5,15 +5,15 @@ ExternalProject_Add(Protobuf
   GIT_REPOSITORY        https://github.com/google/protobuf
   GIT_TAG               v3.6.0.1
 
-  CMAKE_ARGS            -DBUILD_SHARED_LIBS=ON
   CMAKE_CACHE_ARGS
-    -Dprotobuf_BUILD_TESTS:BOOL=OFF
-    -Dprotobuf_BUILD_EXAMPLES:BOOL=OFF
+      -DBUILD_SHARED_LIBS:BOOL=ON
+      -Dprotobuf_BUILD_TESTS:BOOL=OFF
+      -Dprotobuf_BUILD_EXAMPLES:BOOL=OFF
 
   CONFIGURE_COMMAND
-    cmake ${SRC_DIR}/cmake
-      -DCMAKE_INSTALL_PREFIX=${EXT_INSTALL_DIR}
+      cmake ${SRC_DIR}/cmake
+          -DCMAKE_INSTALL_PREFIX=${EXT_INSTALL_DIR}
+          -Dprotobuf_BUILD_TESTS=OFF
+	  -Dprotobug_BUILD_EXAMPLES=OFF
 )
 
-# ExternalProject_Get_Property(Protobuf EXT_INSTALL_DIR)
-message(STATUS "Install directory ${EXT_INSTALL_DIR}")

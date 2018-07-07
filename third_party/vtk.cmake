@@ -19,5 +19,3 @@ ExternalProject_Add(VTK
       -DCMAKE_INSTALL_PREFIX=${EXT_INSTALL_DIR}
 )
 
-# ExternalProject_Get_Property(Protobuf EXT_INSTALL_DIR)
-message(STATUS "Install directory ${EXT_INSTALL_DIR}")
