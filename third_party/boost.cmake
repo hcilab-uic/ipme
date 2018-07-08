@@ -18,8 +18,6 @@ set(boost_url
 ExternalProject_Add(Boost
   PREFIX                boost
   URL                   ${boost_url}
-  # GIT_REPOSITORY        https://github.com/boostorg/boost.git
-  # GIT_TAG               boost-1.67.0
 
   CMAKE_CACHE_ARGS
       -DBUILD_SHARED_LIBS:BOOL=ON
