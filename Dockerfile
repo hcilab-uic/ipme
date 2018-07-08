@@ -14,7 +14,8 @@ RUN apt-get install -y build-essential \
 		       pkg-config \
 		       ffmpeg \
 		       libxt-dev \
-		       libpng-dev
+		       libpng-dev \
+		       ccache
 
 RUN cd /usr/local && \
     wget https://cmake.org/files/v3.11/cmake-3.11.4-Linux-x86_64.tar.gz && \
