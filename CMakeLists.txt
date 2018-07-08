@@ -6,15 +6,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "-D__LINUX__ -DBOOST_ALL_DYN_LINK -Wall -Wextra -Werror")
 
-set(THIRD_PARTY_DIR "${CMAKE_CURRENT_BINARY_DIR}/third_party/third_party"
+set(THIRD_PARTY_DIR "${CMAKE_CURRENT_BINARY_DIR}/third_party/install"
   CACHE PATH "Path to the third-party build directory")
+
 set(QT5_ROOT CACHE PATH "Path to Qt5 installation")
 
 set(BOOST_ROOT ${THIRD_PARTY_DIR})
 set(VTK_DIR ${THIRD_PARTY_DIR}/lib/cmake/vtk-8.1)
 set(OpenCV_DIR ${THIRD_PARTY_DIR}/share/OpenCV)
 set(Protobuf_INCLUDE_DIR ${THIRD_PARTY_DIR}/include)
-set(Protobuf_LIBRARY ${THIRD_PARTY_DIR}/lib/libprotobuf.a)
+set(Protobuf_LIBRARY ${THIRD_PARTY_DIR}/lib/libprotobuf.so)
 set(OMICRON_SOURCE_PATH
   ${CMAKE_CURRENT_BINARY_DIR}/third_party/omicron/src/Omicron)
 set(Qt5Core_DIR "${QT5_ROOT}/gcc_64/lib/cmake/Qt5Core")
@@ -26,14 +27,8 @@ message("VTK_DIR=${VTK_DIR}")
 message("OpenCV_DIR=${OpenCV_DIR}")
 message("OMICRON_SOURCE_PATH=${OMICRON_SOURCE_PATH}")
 
-SET(CMAKE_EXE_LINKER_FLAGS
-  "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,${THIRD_PARTY_DIR}/lib")
-
-# set(CMAKE_INSTALL_RPATH "${THIRD_PARTY_DIR}/lib")
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
 find_package(Protobuf REQUIRED)
-
+include_directories(${Protobuf_INCLUDE_DIRS})
 
 set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")

@@ -5,7 +5,6 @@ pipelines:
   default:
     - step:
         script:
-          - apt-get update && apt-get upgrade -y
           - mkdir -p build/third_party
           - cd build/third_party
           - cmake -GNinja ../../third_party && ninja

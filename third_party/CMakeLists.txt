@@ -1,12 +1,24 @@
 cmake_minimum_required(VERSION 3.11)
-project(ipme_externals)
+
+set(default_build_type "Release")
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS
+    "Setting build type to '${default_build_type}' as none was specified.")
+
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+    STRING "Choose the type of build." FORCE)
+
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+    "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
 
 include(CheckIncludeFile)
 include(CheckIncludeFileCXX)
 include(CheckIncludeFiles)
 include(ExternalProject)
 
-set(EXT_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third_party)
+set(EXT_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/install)
 
 include(boost.cmake)
 include(protobuf.cmake)
