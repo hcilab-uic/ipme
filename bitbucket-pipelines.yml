@@ -1,17 +1,12 @@
-# This is a sample build configuration for C++ – Make.
-# Check our guides at https://confluence.atlassian.com/x/5Q4SMw for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
-image: gcc:7.1
+---
+image: hnaik2/ipme-bitbucket
 
 pipelines:
   default:
     - step:
-        script: # Modify the commands below to build your repository.
-          - apt-get update
-          - apt-get install -y cmake libboost-all-dev
-          - mkdir build
-          - cd build
-          - cmake .. -DBUILD_VICON_CODE=ON
-          - make -j4
+        script:
+          - mkdir -p build/third_party
+          - cd build/third_party
+          - cmake -GNinja ../../third_party && ninja
+          - cd ..
+          - cmake -GNinja .. && ninja

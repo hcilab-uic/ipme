@@ -4,13 +4,35 @@ project(ipme)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Unfortunately VTK headers have a lot of errors with -pedantic flag. So
-# removing -pedantic for now
 set(CMAKE_CXX_FLAGS "-D__LINUX__ -DBOOST_ALL_DYN_LINK -Wall -Wextra -Werror")
+
+set(THIRD_PARTY_DIR "${CMAKE_CURRENT_BINARY_DIR}/third_party/install"
+  CACHE PATH "Path to the third-party build directory")
+
+set(QT5_ROOT CACHE PATH "Path to Qt5 installation")
+
+set(BOOST_ROOT ${THIRD_PARTY_DIR})
+set(VTK_DIR ${THIRD_PARTY_DIR}/lib/cmake/vtk-8.1)
+set(OpenCV_DIR ${THIRD_PARTY_DIR}/share/OpenCV)
+set(Protobuf_INCLUDE_DIR ${THIRD_PARTY_DIR}/include)
+set(Protobuf_LIBRARY ${THIRD_PARTY_DIR}/lib/libprotobuf.so)
+set(OMICRON_SOURCE_PATH
+  ${CMAKE_CURRENT_BINARY_DIR}/third_party/omicron/src/Omicron)
+set(Qt5Core_DIR "${QT5_ROOT}/gcc_64/lib/cmake/Qt5Core")
+set(Qt5Widgets_DIR "${QT5_ROOT}/gcc_64/lib/cmake/Qt5Widgets")
+
+message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+message("BOOST_ROOT=${BOOST_ROOT}")
+message("VTK_DIR=${VTK_DIR}")
+message("OpenCV_DIR=${OpenCV_DIR}")
+message("OMICRON_SOURCE_PATH=${OMICRON_SOURCE_PATH}")
+
+find_package(Protobuf REQUIRED)
+include_directories(${Protobuf_INCLUDE_DIRS})
 
 set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")
-set(BUILD_VICON_CODE false CACHE BOOL "Build code using VICON motion capture")
+set(BUILD_VICON_CODE true CACHE BOOL "Build code using VICON motion capture")
 set(BUILD_TESTS false CACHE BOOL "Build unittests")
 
 set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
@@ -22,21 +44,14 @@ set(BUILD_SHARED_LIBS ON)
 
 find_package(Boost REQUIRED COMPONENTS system filesystem log_setup log
     program_options thread)
+find_package(OpenCV REQUIRED CONFIG)
+find_package(VTK REQUIRED CONFIG)
 
-if(${BUILD_VISUALIZATION_TOOLS})
-    find_package(OpenCV REQUIRED CONFIG)
-    find_package(VTK REQUIRED CONFIG)
-
-    include_directories(${OpenCV_INCLUDE_DIRS})
-    include_directories(${VTK_INCLUDE_DIRS})
-endif()
+include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${VTK_INCLUDE_DIRS})
 
 if(${BUILD_SENSOR_WALABOT})
     include_directories(${CMAKE_SOURCE_DIR}/sensor)
-endif()
-
-if(${BUILD_VICON_CODE})
-    set(OMICRON_SOURCE_PATH CACHE PATH "Path to Omicron SDK")
 endif()
 
 add_subdirectory(lib)
