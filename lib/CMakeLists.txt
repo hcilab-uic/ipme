@@ -25,6 +25,7 @@ set(lib_HEADERS
 set(lib_SOURCES
     core/point.cpp
     data/person.cpp
+    data/scene.cpp
     data/trackable_factory.cpp
     data/trackable_object.cpp
     io/json_parser.cpp
@@ -39,10 +40,14 @@ set(lib_SOURCES
     ${lib_HEADERS}
 )
 
-add_library(ipme SHARED ${lib_SOURCES})
-
+add_subdirectory(protobuf)
 add_subdirectory(sensor)
 
-target_link_libraries(ipme sensor ${VTK_LIBRARIES} Boost::system Boost::log
-    Boost::log_setup Boost::thread)
+add_library(ipme SHARED ${lib_SOURCES})
+
+target_link_libraries(ipme sensor proto
+    ${VTK_LIBRARIES}
+    Boost::system Boost::log
+    Boost::log_setup Boost::thread
+    stdc++fs)
 

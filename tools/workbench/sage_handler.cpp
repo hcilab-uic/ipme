@@ -35,10 +35,11 @@ create(std::string_view alias)
     return std::make_pair(alias, std::make_shared<Handler>(alias));
 }
 
-Sage_handler::Sage_handler()
+Sage_handler::Sage_handler(std::shared_ptr<data::Scene> scene)
     : resolver_{ioc_}, wstream_{ioc_},
       element_container_{
-          std::make_shared<ipme::wb::sage::Sage_element_container>()}
+          std::make_shared<ipme::wb::sage::Sage_element_container>()},
+      scene_{scene}
 {
     namespace sage = ipme::wb::sage;
     //    handler_map_.insert(create_default("0002",
@@ -117,6 +118,15 @@ void Sage_handler::set_state_machine(
     state_machine_ = state_machine;
 }
 
+void Sage_handler::flush()
+{
+    for(const auto& element : element_container_->elements()) {
+        // FIXME: blah blah
+        apply_transform(element.second);
+        scene_->add_object(nullptr);
+    }
+}
+
 void Sage_handler::internal_start()
 {
     if(!wstream_.is_open()) {
@@ -160,6 +170,11 @@ void Sage_handler::internal_start()
     }
 
     std::cout << "Shutting down ...";
+}
+
+void Sage_handler::apply_transform(const sage::Sage_element& /*element*/)
+{
+    // not exactly sure what this should do
 } // namespace wb
 } // namespace wb
 } // namespace ipme

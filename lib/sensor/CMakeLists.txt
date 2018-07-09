@@ -22,6 +22,7 @@ if(${BUILD_VICON_CODE})
         vicon_datahandler.h
         vicon_eventlogger.h vicon_eventlogger.cpp
         vicon_listener.h vicon_listener.cpp
+        vrpn_handler.h vrpn_handler.cpp
     )
 
     if(${BUILD_VISUALIZATION_TOOLS})
@@ -41,3 +42,5 @@ add_library(sensor SHARED ${SRCS})
 target_include_directories(sensor PUBLIC
     $<BUILD_INTERFACE:${OMICRON_SOURCE_PATH}/include>
 )
+
+target_link_libraries(sensor proto)

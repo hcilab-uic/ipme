@@ -13,6 +13,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "connector/omicronConnectorClient.h"
+#include "data/scene.h"
 #include "sage_handler.h"
 #include "state_machine.h"
 
@@ -84,6 +85,8 @@ private:
 
     int frame_number() const;
 
+    void add_new_frame();
+
     void set_status_indicator(QWidget* widget, bool status);
 
     Ui::Live_window* ui;
@@ -101,6 +104,7 @@ private:
     ipme::wb::State_machine::State state_ =
         ipme::wb::State_machine::State::uninitialized;
 
+    std::shared_ptr<ipme::data::Scene> scene_;
     ipme::wb::Sage_handler sage_handler_;
 
     std::unique_ptr<omicronConnector::OmicronConnectorClient> omicron_client_;
