@@ -6,27 +6,6 @@
 
 namespace ipme {
 namespace wb {
-constexpr std::string_view add_client_msg =
-    R"(
-{
-    "f":"0001",
-    "d":
-    {
-        "clientType":"display",
-        "requests":
-        {
-            "config":true,
-            "version":true,
-            "time":true,
-            "console":false
-        },
-            "clientID":"0",
-            "browser":"",
-            "session":""
-    }
-}
-)";
-
 //    R"({"f":"0000","d":{"listener":"updateSagePointerPosition","alias":"0000b"}})",
 std::vector<std::string_view> subscribe_messages = {
     R"({"f":"0000","d":{"listener":"registerInteractionClient","alias":"0002"}})",

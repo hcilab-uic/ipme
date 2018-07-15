@@ -15,6 +15,11 @@ message Quaternion {
     double z = 4;
 }
 
+message Size_2d {
+    double width = 1;
+    double height = 2;
+}
+
 message Pose {
     Position position = 1;
     Quaternion orientation = 2;
@@ -31,6 +36,12 @@ message Object {
     uint64 timestamp = 3;
 
     Pose pose = 4;
+}
+
+message Screen_object {
+    uint32 id = 1;
+    Position position = 2;
+    Size_2d size = 3;
 }
 
 message Vrpn_object {
@@ -58,6 +69,8 @@ message Frame {
     repeated Object simple_objects = 3;
 
     repeated Vrpn_object vrpn_objects = 4;
+
+    repeated Screen_object screen_objects = 5;
 }
 
 message Compound_object_config {
@@ -70,6 +83,7 @@ message Compound_object_config {
 message Scene_config {
     // Different configured entitied
     repeated Compound_object_config entities = 1;
+    Position screen_offset = 2;
 }
 
 // Object representing multiple frames with a starting configuration

@@ -1,5 +1,7 @@
 #include "vrpn_handler.h"
 
+#include "utils/logger.h"
+
 namespace ipme {
 namespace sensor {
 Vrpn_handler::Vrpn_handler(std::shared_ptr<data::Scene> scene) : scene_{scene}

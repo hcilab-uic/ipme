@@ -15,6 +15,7 @@
 #include "data/scene.h"
 #include "sage/sage_element_container.h"
 #include "sage_message_handler.h"
+#include "sage_session.h"
 #include "state_machine.h"
 
 namespace ipme {
@@ -25,7 +26,11 @@ public:
     ~Sage_handler();
 
     bool connect(std::string_view host, std::string_view port);
-    void start();
+    void disconnect();
+
+    bool start();
+
+    void stop();
 
     void set_state_machine(std::shared_ptr<State_machine> state_machine);
 
@@ -45,6 +50,9 @@ private:
         handler_map_;
     std::shared_ptr<ipme::wb::sage::Sage_element_container> element_container_;
     std::shared_ptr<data::Scene> scene_;
+
+    //    std::shared_ptr<Sage_session> session_;
+    //    boost::asio::io_context async_ioc_;
 };
 
 } // namespace wb

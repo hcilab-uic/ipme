@@ -20,6 +20,7 @@ set(SOURCES
     sage/sage_element_container.cpp
     sage/update_item_order_handler.cpp
     sage_handler.cpp
+    sage_session.cpp
     scene_object.cpp
     scene_widget.cpp
 

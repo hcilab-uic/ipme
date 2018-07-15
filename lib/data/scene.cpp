@@ -4,12 +4,34 @@
 #include <memory>
 
 #include "protobuf/scene.pb.h"
+#include "utils/logger.h"
 
 namespace ipme {
 namespace data {
 
+Scene::~Scene()
+{
+    finalize();
+}
+
+void Scene::set_config(double offset_x, double offset_y, double offset_z)
+{
+    auto config = scene_.mutable_config();
+    auto screen_offset = config->mutable_screen_offset();
+    screen_offset->set_x(offset_x);
+    screen_offset->set_y(offset_y);
+    screen_offset->set_z(offset_z);
+}
+
 void Scene::add_object(const omicronConnector::EventData& event)
 {
+    if(!current_frame_) {
+        // This means that the first video frame has not been initialized. We
+        // shall wait until that has been done
+        TRACE() << "current_frame_ not initialized. Not updating.";
+        return;
+    }
+
     auto object = current_frame_->add_vrpn_objects();
     object->set_timestamp(static_cast<uint64_t>(event.timestamp));
     object->set_source_id(event.sourceId);
@@ -30,10 +52,17 @@ void Scene::add_object(const omicronConnector::EventData& event)
     orientation->set_x(event.orx);
     orientation->set_y(event.ory);
     orientation->set_z(event.orz);
+
+    DEBUG() << "Added object with source id: " << event.sourceId;
 }
 
 void Scene::add_object(std::shared_ptr<scene::Object> object)
 {
+    if(!current_frame_) {
+        return;
+    }
+
+    // There is lot of duplicate work here. Please fix
     auto simple_object = current_frame_->add_simple_objects();
     simple_object->set_id(object->id());
     simple_object->set_name(object->name());
@@ -53,28 +82,79 @@ void Scene::add_object(std::shared_ptr<scene::Object> object)
     orientation->set_z(simple_object->pose().orientation().z());
 }
 
+void Scene::add_object(size_t id, double top, double left, double width,
+                       double height)
+{
+    if(!current_frame_) {
+        return;
+    }
+
+    auto screen_object = current_frame_->add_screen_objects();
+
+    screen_object->set_id(id);
+
+    auto position = screen_object->mutable_position();
+    position->set_x(left);
+    position->set_y(top);
+    position->set_z(0);
+
+    auto size = screen_object->mutable_size();
+    size->set_width(width);
+    size->set_height(height);
+
+    DEBUG() << "Screen object ID:" << id << " T:" << top << " L:" << left
+            << " W:" << width << " H:" << height;
+}
+
 void Scene::add_new_frame(uint32_t id, uint64_t timestamp)
 {
     current_frame_ = scene_.add_frames();
     current_frame_->set_id(id);
     current_frame_->set_timestamp(timestamp);
+    DEBUG() << "Current frame id set to " << id << " timestamp set to "
+            << timestamp;
 }
 
-// void Scene::set_current_frame_timestamp(uint64_t timestamp)
-//{
-//    if(!current_frame_) {
-//        throw std::runtime_error{"Current frame is null, cannot set
-//        timestamp"};
-//    }
+void Scene::set_output_file_path(const std::filesystem::__cxx11::path& path)
+{
+    output_path_ = path;
+    INFO() << "Writing scene output to " << output_path_;
+}
 
-//    current_frame_->set_timestamp(timestamp);
-//}
+void Scene::reset()
+{
+    save();
+    scene_.clear_frames();
+}
 
 void Scene::write(std::shared_ptr<Scene> scene,
                   const std::filesystem::path& output_path)
 {
-    std::ofstream ofs{output_path};
-    scene->scene_.SerializeToOstream(&ofs);
+    auto dirname = output_path.parent_path();
+    std::filesystem::create_directories(dirname);
+
+    std::ofstream ofs{output_path,
+                      std::ios::out | std::ios::trunc | std::ios::binary};
+
+    DEBUG() << "Trying to write " << scene->scene_.ByteSize() << " bytes to "
+            << output_path;
+
+    if(ofs.is_open()) {
+        DEBUG() << "Opened stream to " << output_path;
+    } else {
+        ERROR() << "Could not open stream to " << output_path;
+    }
+
+    if(scene->scene_.SerializeToOstream(&ofs)) {
+        INFO() << "Wrote output to " << output_path;
+    } else {
+        WARN() << "Could not write " << output_path;
+    }
+}
+
+void Scene::finalize()
+{
+    save();
 }
 
 } // namespace data

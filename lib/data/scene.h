@@ -15,26 +15,41 @@ public:
     using Frame_container = std::vector<std::shared_ptr<scene::Frame>>;
     using Vrpn_object = std::shared_ptr<scene::Vrpn_object>;
 
+    virtual ~Scene();
+
+    void set_config(double offset_x, double offset_y, double offset_z);
+
     void add_object(const omicronConnector::EventData& event);
     void add_object(std::shared_ptr<scene::Object> object);
+    void add_object(size_t id, double top, double left, double width,
+                    double height);
 
     void add_new_frame(uint32_t id, uint64_t timestamp);
-    //    void set_current_frame_timestamp(uint64_t timestamp);
 
-    inline void set_output_file_path(const std::filesystem::path& path)
-    {
-        output_path_ = path;
-    }
+    /// Set output file path
+    void set_output_file_path(const std::filesystem::path& path);
 
+    /// save to the scene to a file
     inline void save()
     {
         write(shared_from_this(), output_path_);
     }
 
+    /// Reset scene -> save scene and then clear all frames
+    void reset();
+
+    /*!
+     * \brief write static convenience function that takes a scene object and an
+     * output path and writes the scene to the file
+     * \param scene the @c scene object to write
+     * \param output_path the file path to write the scene to
+     */
     static void write(std::shared_ptr<Scene> scene,
                       const std::filesystem::path& output_path);
 
 private:
+    void finalize();
+
     scene::Frame* current_frame_ = nullptr;
     scene::Scene scene_;
     std::filesystem::path output_path_;

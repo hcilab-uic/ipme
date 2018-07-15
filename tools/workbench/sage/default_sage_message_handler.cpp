@@ -6,6 +6,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "utils/json.h"
+#include "utils/logger.h"
 
 namespace ipme::wb::sage {
 namespace pt = boost::property_tree;
@@ -49,17 +50,19 @@ void Default_sage_message_handler::dispatch(const utils::Json& message)
     } else if(name_ == "deleteElement") {
         auto id = message.get("d.elemId");
         container_->delete_element(id);
+        DEBUG() << message.to_string();
     } else {
-        std::cout << "Unhandled " << name_ << "\n";
+        WARN() << "Unhandled " << name_ << "\n";
     }
 
-    std::cout << message.to_string();
+    DEBUG() << "Dispatch called on " << name_ << " handler for processing";
 }
 
 void Default_sage_message_handler::set_element_container(
     std::shared_ptr<ipme::wb::sage::Sage_element_container> container)
 {
     container_ = container;
+    DEBUG() << "Setting element container for " << name_;
 }
 
 } // namespace ipme::wb::sage

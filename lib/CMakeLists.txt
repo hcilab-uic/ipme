@@ -12,12 +12,6 @@ set(lib_HEADERS
     data/vicon_point.h
     io/json_parser.h
     io/parser.h
-    utils/config.h
-    utils/omicron_config.h
-    utils/logger.h
-    utils/random.h utils/random.ipp
-    utils/string_utils.h
-    utils/utils.h
     data/point3d.h data/point3d.ipp
     visualization/polydata.h visualization/polydata.ipp
 )
@@ -30,24 +24,16 @@ set(lib_SOURCES
     data/trackable_object.cpp
     io/json_parser.cpp
     io/parser.cpp
-    utils/config.cpp
-    utils/json.cpp
-    utils/omicron_config.cpp
-    utils/logger.cpp
-    utils/string_utils.cpp
-    utils/utils.cpp
 
     ${lib_HEADERS}
 )
 
 add_subdirectory(protobuf)
 add_subdirectory(sensor)
+add_subdirectory(utils)
 
 add_library(ipme SHARED ${lib_SOURCES})
-
-target_link_libraries(ipme sensor proto
-    ${VTK_LIBRARIES}
-    Boost::system Boost::log
-    Boost::log_setup Boost::thread
-    stdc++fs)
-
+target_link_libraries(ipme sensor proto utils ${VTK_LIBRARIES})
+target_include_directories(ipme PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)

@@ -26,10 +26,10 @@ public:
     ~MainWindow();
 
 signals:
-    void show_log(const QString& message);
-    void show_warn_log(const QString& message);
-    void show_success_log(const QString& message);
-    void show_error_log(const QString& message);
+    void log(const QString& message);
+    void warn(const QString& message);
+    void success(const QString& message);
+    void error(const QString& message);
 
 private slots:
     void on_frame_table_widget_itemClicked(QTableWidgetItem* item);
@@ -48,10 +48,10 @@ private slots:
 
     void on_actionExport_triggered();
 
-    void on_show_log(const QString& message);
-    void on_show_success_log(const QString& message);
-    void on_show_warn_log(const QString& message);
-    void on_show_error_log(const QString& message);
+    void on_log(const QString& message);
+    void on_success(const QString& message);
+    void on_warn(const QString& message);
+    void on_error(const QString& message);
 
     void on_action_load_video_triggered();
 

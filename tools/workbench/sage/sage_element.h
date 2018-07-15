@@ -1,6 +1,8 @@
 #ifndef IPME_WB_SAGE_SAGE_ELEMENT_H
 #define IPME_WB_SAGE_SAGE_ELEMENT_H
 
+#include <ostream>
+
 #include "utils/json.h"
 
 namespace ipme::wb::sage {
@@ -36,6 +38,8 @@ public:
         return height_;
     }
 
+    std::string to_string() const;
+
 private:
     std::string id_;
     double left_ = 0.;
@@ -44,6 +48,7 @@ private:
     double height_ = 0.;
 };
 
+std::ostream& operator<<(std::ostream& out, const Sage_element& element);
 } // namespace ipme::wb::sage
 
 #endif // IPME_WB_SAGE_SAGE_ELEMENT_H

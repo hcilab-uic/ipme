@@ -1,12 +1,14 @@
 #ifndef LIVE_WINDOW_H
 #define LIVE_WINDOW_H
 
+#include <filesystem>
 #include <memory>
 #include <shared_mutex>
 #include <string_view>
 
 #include <QDialog>
 #include <QStatusBar>
+#include <QTime>
 #include <QTimer>
 
 #include <opencv2/highgui/highgui.hpp>
@@ -15,6 +17,7 @@
 #include "connector/omicronConnectorClient.h"
 #include "data/scene.h"
 #include "sage_handler.h"
+#include "sensor/vicon_listener.h"
 #include "state_machine.h"
 
 namespace Ui {
@@ -46,9 +49,17 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
+    void initialize_experiment();
+    void start_experiment();
+    void stop_experiment();
+
     void process_video();
+    void process_vrpn();
+
     bool initialize_vrpn();
     bool initialize_camera();
+
+    void init_file_setup();
 
     bool reset_camera();
     void stop_camera();
@@ -92,8 +103,16 @@ private:
     Ui::Live_window* ui;
     cv::VideoCapture capture_;
     QTimer* capture_timer_;
-    QString output_dir_;
+    QString output_root_dir_;
     QStatusBar status_bar_;
+    QTime elapsed_time_;
+    //    std::string outfile_timestamp_;
+    std::string video_filename_;
+    cv::VideoWriter video_writer_;
+    //    std::string timestamp_;
+    std::filesystem::path output_dir_;
+    //    std::string outfile_suffix_ = "0000";
+    //    size_t outfile_index_ = 0;
 
     // needs to be mutable because binding to a shared_lock inside const
     // function violates constness
@@ -104,8 +123,10 @@ private:
     ipme::wb::State_machine::State state_ =
         ipme::wb::State_machine::State::uninitialized;
 
+    std::unique_ptr<std::thread> omicron_thread_;
     std::shared_ptr<ipme::data::Scene> scene_;
     ipme::wb::Sage_handler sage_handler_;
+    ipme::sensor::Vicon_listener vrpn_listener_;
 
     std::unique_ptr<omicronConnector::OmicronConnectorClient> omicron_client_;
 };

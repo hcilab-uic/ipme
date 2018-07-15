@@ -1,4 +1,10 @@
 cmake_minimum_required(VERSION 3.11)
+
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif(CCACHE_PROGRAM)
+
 project(ipme)
 
 set(CMAKE_CXX_STANDARD 17)

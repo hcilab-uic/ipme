@@ -27,13 +27,10 @@ MainWindow::MainWindow(QWidget* parent)
     ui->setupUi(this);
     ui->opengl_widget->set_colors(colors_);
 
-    connect(this, &MainWindow::show_log, this, &MainWindow::on_show_log);
-    connect(this, &MainWindow::show_success_log, this,
-            &MainWindow::on_show_success_log);
-    connect(this, &MainWindow::show_warn_log, this,
-            &MainWindow::on_show_warn_log);
-    connect(this, &MainWindow::show_error_log, this,
-            &MainWindow::on_show_error_log);
+    connect(this, &MainWindow::log, this, &MainWindow::on_log);
+    connect(this, &MainWindow::success, this, &MainWindow::on_success);
+    connect(this, &MainWindow::warn, this, &MainWindow::on_warn);
+    connect(this, &MainWindow::error, this, &MainWindow::on_error);
 
     ui->opengl_widget->set_show_head_ts(ui->head_ts_checkbox->isChecked());
     ui->opengl_widget->set_show_body_ts(ui->body_ts_checkbox->isChecked());
@@ -53,7 +50,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(video_timer_, &QTimer::timeout, this, &MainWindow::process_video);
     video_timer_->start(1000 / 24);
 
-    emit show_log("Application started");
+    emit log("Application started");
 }
 
 MainWindow::~MainWindow()
@@ -129,14 +126,14 @@ bool MainWindow::show_row(int current_row)
 {
     const int total_items = ui->frame_table_widget->rowCount();
     if(total_items == 0) {
-        emit show_error_log("No table loaded, nothing to show");
+        emit error("No table loaded, nothing to show");
         return false;
     }
 
     int last_valid_row = total_items - 1;
     if(current_row > last_valid_row || current_row < 0) {
-        emit show_error_log("Invalid row value, enter a value between 0 and " +
-                            QString::number(last_valid_row));
+        emit error("Invalid row value, enter a value between 0 and " +
+                   QString::number(last_valid_row));
         return false;
     }
 
@@ -198,7 +195,7 @@ void MainWindow::on_actionOpen_triggered()
     }
 
     //    qInfo() << "Number of CSV rows read: " << row;
-    emit show_success_log("Number of CSV rows read: " + QString::number(row));
+    emit success("Number of CSV rows read: " + QString::number(row));
 }
 
 void MainWindow::on_next_frame_button_clicked()
@@ -272,23 +269,23 @@ void MainWindow::on_device_ts_checkbox_stateChanged(int arg1)
     show_value_message("Showing device transaction segment", show_tsegment);
 }
 
-void MainWindow::on_show_log(const QString& message)
+void MainWindow::on_log(const QString& message)
 {
     //    ui->log_view_browser->insertPlainText(message + "\n");
     show_html_log(message, "cyan");
 }
 
-void MainWindow::on_show_success_log(const QString& message)
+void MainWindow::on_success(const QString& message)
 {
     show_html_log(message, "green");
 }
 
-void MainWindow::on_show_warn_log(const QString& message)
+void MainWindow::on_warn(const QString& message)
 {
     show_html_log(message, "#FFA500");
 }
 
-void MainWindow::on_show_error_log(const QString& message)
+void MainWindow::on_error(const QString& message)
 {
     show_html_log(message, "red");
 }
@@ -320,12 +317,11 @@ void MainWindow::on_action_load_video_triggered()
     int frame_height = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
     ui->video_label->resize(frame_width, frame_height);
 
-    emit show_success_log(
-        "Opened video file " + file_name +
-        ", frames loaded: " + QString::number(video_total_frames_) +
-        ", frame width: " + QString::number(frame_width) +
-        ", height: " + QString::number(frame_height) +
-        ", FPS: " + QString::number(capture_.get(CV_CAP_PROP_FPS)));
+    emit success("Opened video file " + file_name +
+                 ", frames loaded: " + QString::number(video_total_frames_) +
+                 ", frame width: " + QString::number(frame_width) +
+                 ", height: " + QString::number(frame_height) +
+                 ", FPS: " + QString::number(capture_.get(CV_CAP_PROP_FPS)));
 }
 
 void MainWindow::process_video()
@@ -366,7 +362,7 @@ void MainWindow::process_video()
             ui->playpause_button->setText("Play");
             ui->video_slider->setValue(0);
 
-            emit show_log("Reached the end of video");
+            emit log("Reached the end of video");
         }
     }
 }
@@ -383,11 +379,11 @@ void MainWindow::on_playpause_button_clicked()
     ui->playpause_button->setText(video_play_ ? "Pause" : "Play");
 
     if(!video_play_) {
-        emit show_log(
-            "Paused at frame " +
-            QString::number(capture_.get(CV_CAP_PROP_POS_FRAMES)) + " at " +
-            QString::number(capture_.get(CV_CAP_PROP_POS_MSEC) / 1000) +
-            " seconds");
+        emit log("Paused at frame " +
+                 QString::number(capture_.get(CV_CAP_PROP_POS_FRAMES)) +
+                 " at " +
+                 QString::number(capture_.get(CV_CAP_PROP_POS_MSEC) / 1000) +
+                 " seconds");
     }
 }
 
@@ -396,11 +392,11 @@ void MainWindow::on_video_slider_sliderMoved(int position)
     double frame_to_advance = static_cast<double>(position) / 100.00 *
                               static_cast<double>(video_total_frames_);
     capture_.set(CV_CAP_PROP_POS_FRAMES, frame_to_advance);
-    emit show_log("Slider moved to position " + QString::number(position) +
-                  ", jumping to frame " +
-                  QString::number(static_cast<int>(frame_to_advance)) + ", " +
-                  QString::number(capture_.get(CV_CAP_PROP_POS_MSEC) / 1000) +
-                  " seconds");
+    emit log("Slider moved to position " + QString::number(position) +
+             ", jumping to frame " +
+             QString::number(static_cast<int>(frame_to_advance)) + ", " +
+             QString::number(capture_.get(CV_CAP_PROP_POS_MSEC) / 1000) +
+             " seconds");
 }
 
 void MainWindow::on_visualized_frame_selectionChanged()
@@ -468,7 +464,7 @@ void MainWindow::on_actionExport_triggered()
     if(selection.count() == 0) {
         QString message{"No rows selected"};
         qDebug() << message;
-        emit show_warn_log(message);
+        emit warn(message);
         return;
     }
 
@@ -496,7 +492,7 @@ void MainWindow::on_actionExport_triggered()
         output_file << row.toStdString() << "\n";
     }
 
-    emit show_log("Selection exported to file " + export_filename);
+    emit log("Selection exported to file " + export_filename);
 }
 
 void MainWindow::on_actionAppend_to_file_triggered()
@@ -522,7 +518,7 @@ void MainWindow::on_actionAppend_to_file_triggered()
             }
         }
         row_text += "\n";
-        show_log("Appending to file: " + row_text);
+        emit log("Appending to file: " + row_text);
         outfile << row_text.toStdString();
     }
 }
@@ -537,13 +533,13 @@ void MainWindow::on_head_ts_angle_lineedit_editingFinished()
     float angle = ui->head_ts_angle_lineedit->text().toFloat();
 
     if(angle < 0.f || angle > 180.f) {
-        emit show_warn_log("Please enter an angle between 0 and 180 degrees");
+        emit warn("Please enter an angle between 0 and 180 degrees");
         return;
     }
 
     ui->opengl_widget->set_head_ts_angle(angle);
-    emit show_success_log("Head transaction segment angle changed to " +
-                          QString::number(angle) + " degrees");
+    emit success("Head transaction segment angle changed to " +
+                 QString::number(angle) + " degrees");
 }
 
 void MainWindow::on_head_ts_angle_lineedit_selectionChanged()
@@ -561,13 +557,13 @@ void MainWindow::on_device_ts_angle_lineedit_editingFinished()
     float angle = ui->device_ts_angle_lineedit->text().toFloat();
 
     if(angle < 0.f || angle > 180.f) {
-        emit show_warn_log("Please enter an angle between 0 and 180 degrees");
+        emit warn("Please enter an angle between 0 and 180 degrees");
         return;
     }
 
     ui->opengl_widget->set_device_ts_angle(angle);
-    emit show_success_log("Device transaction segment angle changed to " +
-                          QString::number(angle) + " degrees");
+    emit success("Device transaction segment angle changed to " +
+                 QString::number(angle) + " degrees");
 }
 
 void MainWindow::on_device_ts_angle_lineedit_selectionChanged()
@@ -585,13 +581,13 @@ void MainWindow::on_body_ts_angle_lineedit_editingFinished()
     float angle = ui->body_ts_angle_lineedit->text().toFloat();
 
     if(angle < 0.f || angle > 180.f) {
-        emit show_warn_log("Please enter an angle between 0 and 180 degrees");
+        emit warn("Please enter an angle between 0 and 180 degrees");
         return;
     }
 
     ui->opengl_widget->set_body_ts_angle(angle);
-    emit show_success_log("Body transaction segment angle changed to " +
-                          QString::number(angle) + " degrees");
+    emit success("Body transaction segment angle changed to " +
+                 QString::number(angle) + " degrees");
 }
 
 void MainWindow::on_body_ts_angle_lineedit_selectionChanged()

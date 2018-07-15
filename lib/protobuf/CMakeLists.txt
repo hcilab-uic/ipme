@@ -8,7 +8,10 @@ include_directories(${PROTOBUF_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS scene.proto)
+
+set(proto_srcs scene.proto)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${proto_srcs})
+protobuf_generate_python(PROTO_PY ${proto_srcs})
 
 message("INC ${PROTOBUF_INCLUDE_DIRS}")
 message("LIB ${PROTOBUF_LIBRARIES}")

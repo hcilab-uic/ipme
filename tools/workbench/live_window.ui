@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>931</width>
+    <width>1025</width>
     <height>770</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>929</width>
+     <width>1011</width>
      <height>765</height>
     </rect>
    </property>
@@ -67,14 +67,14 @@ font-size: 24px;</string>
         </layout>
        </item>
        <item>
-        <spacer name="vspacer_2">
+        <spacer name="hspacer_3">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
-           <height>40</height>
+           <width>40</width>
+           <height>20</height>
           </size>
          </property>
         </spacer>
@@ -149,17 +149,83 @@ font-size: 24px;</string>
         </layout>
        </item>
        <item>
-        <spacer name="vspacer_1">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QGroupBox" name="screen_offset_groupbox">
+         <property name="title">
+          <string>Screen Offsets</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>20</y>
+            <width>311</width>
+            <height>46</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="1" column="0">
+            <widget class="QLineEdit" name="screen_offset_x_edit">
+             <property name="text">
+              <string>3.6</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="screen_offset_x_label">
+             <property name="text">
+              <string>X</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="screen_offset_y_label">
+             <property name="text">
+              <string>Y</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="screen_offset_y_edit">
+             <property name="text">
+              <string>2.3</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLineEdit" name="screen_offset_z_edit">
+             <property name="text">
+              <string>3.6</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="screen_offset_z_label">
+             <property name="text">
+              <string>Z</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="status_indicator_layout">
@@ -167,6 +233,7 @@ font-size: 24px;</string>
           <widget class="QLabel" name="video_status_indicator_label">
            <property name="font">
             <font>
+             <pointsize>-1</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -175,7 +242,11 @@ font-size: 24px;</string>
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: #ff1a16;</string>
+            <string notr="true">background-color: #ff1a16;
+border-radius: 40px;
+font-size: 22px;
+font-weight: bold;
+border-style: inset;</string>
            </property>
            <property name="text">
             <string>Camera</string>
@@ -189,12 +260,17 @@ font-size: 24px;</string>
           <widget class="QLabel" name="vrpn_status_indicator_label">
            <property name="font">
             <font>
+             <pointsize>-1</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: #ff1a16;</string>
+            <string notr="true">background-color: #ff1a16;
+border-radius: 40px;
+font-size: 22px;
+font-weight: bold;
+border-style: outset;</string>
            </property>
            <property name="text">
             <string> VRPN</string>
@@ -208,12 +284,17 @@ font-size: 24px;</string>
           <widget class="QLabel" name="sage_status_indicator_label">
            <property name="font">
             <font>
+             <pointsize>-1</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: #ff1a16;</string>
+            <string notr="true">background-color: #ff1a16;
+border-radius: 40px;
+font-size: 22px;
+font-weight: bold;
+border-style: outset;</string>
            </property>
            <property name="text">
             <string>SAGE</string>
@@ -234,40 +315,6 @@ font-size: 24px;</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="video_device_index_edit">
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>16777215</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="frame_rate_label">
-           <property name="text">
-            <string>Frame Rate:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="frame_rate_value_label">
-           <property name="styleSheet">
-            <string notr="true">font-weight: bold;</string>
-           </property>
-           <property name="text">
-            <string> Unknown</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="frame_num_label">
-           <property name="text">
-            <string>Frame Number:</string>
-           </property>
-          </widget>
-         </item>
          <item row="2" column="1">
           <widget class="QLabel" name="frame_num_value_label">
            <property name="minimumSize">
@@ -282,6 +329,69 @@ font-size: 24px;</string>
            <property name="text">
             <string>0</string>
            </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="video_device_index_edit">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="frame_rate_value_label">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;</string>
+           </property>
+           <property name="text">
+            <string> Unknown</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="frame_num_label">
+           <property name="text">
+            <string>Frame Number:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="frame_rate_label">
+           <property name="text">
+            <string>Frame Rate:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="elapsed_time_label">
+           <property name="text">
+            <string>Elapsed Time</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="elapsed_time_value_label">
+           <property name="styleSheet">
+            <string notr="true">font-weight: bold;</string>
+           </property>
+           <property name="text">
+            <string>00:00:00</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
           </widget>
          </item>
         </layout>
@@ -295,7 +405,7 @@ font-size: 24px;</string>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>10</width>
          <height>20</height>
         </size>
        </property>
@@ -303,6 +413,12 @@ font-size: 24px;</string>
      </item>
      <item>
       <widget class="QLabel" name="video_feed_label">
+       <property name="maximumSize">
+        <size>
+         <width>640</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="autoFillBackground">
         <bool>false</bool>
        </property>
@@ -324,7 +440,7 @@ font-size: 24px;</string>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>10</width>
          <height>20</height>
         </size>
        </property>

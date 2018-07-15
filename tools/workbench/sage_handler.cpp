@@ -11,11 +11,34 @@
 #include "sage/default_sage_message_handler.h"
 #include "sage/update_item_order_handler.h"
 #include "sage_message_handler.h"
-#include "sage_messages.h"
+//#include "sage_messages.h"
+#include "sage_session.h"
 #include "utils/json.h"
+#include "utils/logger.h"
 
 namespace ipme {
 namespace wb {
+constexpr std::string_view add_client_msg =
+    R"(
+{
+    "f":"0001",
+    "d":
+    {
+        "clientType":"display",
+        "requests":
+        {
+            "config":true,
+            "version":true,
+            "time":true,
+            "console":false
+        },
+            "clientID":"0",
+            "browser":"",
+            "session":""
+    }
+}
+)";
+
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 namespace websocket =
     boost::beast::websocket; // from <boost/beast/websocket.hpp>
@@ -36,7 +59,7 @@ create(std::string_view alias)
 }
 
 Sage_handler::Sage_handler(std::shared_ptr<data::Scene> scene)
-    : resolver_{ioc_}, wstream_{ioc_},
+    : resolver_{ioc_}, wstream_{ioc_}, sage_thread_{nullptr},
       element_container_{
           std::make_shared<ipme::wb::sage::Sage_element_container>()},
       scene_{scene}
@@ -101,15 +124,43 @@ bool Sage_handler::connect(std::string_view host, std::string_view port)
 
     boost::beast::multi_buffer buffer;
     wstream_.read(buffer);
-    std::cout << boost::beast::buffers(buffer.data()) << std::endl;
+    INFO() << boost::beast::buffers(buffer.data());
+
+    //    session_ = std::make_shared<Sage_session>(async_ioc_);
+    //    session_->run(host.data(), port.data(), add_client_msg.data());
 
     return true;
 }
 
-void Sage_handler::start()
+void Sage_handler::disconnect()
 {
-    sage_thread_ =
-        std::make_unique<std::thread>(&Sage_handler::internal_start, this);
+    wstream_.close(websocket::close_reason{websocket::close_code::normal});
+}
+
+bool Sage_handler::start()
+{
+    if(!sage_thread_) {
+        sage_thread_ =
+            std::make_unique<std::thread>(&Sage_handler::internal_start, this);
+
+        return sage_thread_ != nullptr;
+    }
+
+    return false;
+}
+
+void Sage_handler::stop()
+{
+    //    DEBUG() << "Joining SAGE2 thread to exit";
+    //    sage_thread_->join();
+    //    DEBUG() << "SAGE2 thread exited";
+    sage_thread_.release();
+
+    if(!sage_thread_) {
+        DEBUG() << "SAGE2 thread resources released";
+    } else {
+        ERROR() << "Did not release SAGE2 thread resources";
+    }
 }
 
 void Sage_handler::set_state_machine(
@@ -120,25 +171,45 @@ void Sage_handler::set_state_machine(
 
 void Sage_handler::flush()
 {
-    for(const auto& element : element_container_->elements()) {
+    const auto elements = element_container_->elements();
+    for(const auto& element : elements) {
+        char* end;
+        auto& ui = element.second;
+        size_t id = std::strtoul(ui.id().data(), &end, 10);
+        scene_->add_object(id, ui.top(), ui.left(), ui.width(), ui.height());
         // FIXME: blah blah
-        apply_transform(element.second);
-        scene_->add_object(nullptr);
+
+        //        apply_transform(element.second);
+        //        scene_->add_object(nullptr);
     }
+
+    DEBUG() << elements.size() << " SAGE2 elements flushed";
 }
 
 void Sage_handler::internal_start()
 {
+    //    async_ioc_.run();
+
     if(!wstream_.is_open()) {
         throw std::runtime_error{"Connection is not open"};
     }
 
-    std::cout << "Sending initial message to SAGE2\n";
+    INFO() << "Sending initial message to SAGE2";
 
     utils::Json json;
     if(state_machine_->is_running()) {
-        wstream_.write(boost::asio::buffer(add_client_msg));
+        //        wstream_.write(boost::asio::buffer(add_client_msg));
+        //        session_->write(add_client_msg.data());
 
+        //        std::string session_message;
+        //        do {
+        //            async_ioc_.poll();
+        //            session_message = session_->read();
+        //        } while(session_message.size() == 0);
+
+        //        DEBUG() << "session message " << session_message;
+
+        // FIXME: 0x9d is hardcoded. Find a way to do this dynamically
         for(int i = 1; i < 0x9d; ++i) {
             boost::beast::multi_buffer buffer;
             wstream_.read(buffer);
@@ -146,14 +217,14 @@ void Sage_handler::internal_start()
             std::stringstream ss;
             ss << boost::beast::buffers(buffer.data());
             json.read(ss);
-            std::cout << json.get("d.listener") << std::endl;
+            INFO() << "RX: " << json.get("d.listener");
         }
 
-        std::cout << "Sending subscribe messages\n";
+        INFO() << "Sending subscribe messages";
 
         for(const auto& handler : handler_map_) {
             const auto msg = handler.second->generate_registration_message();
-            std::cout << "TX: " << msg;
+            INFO() << "TX: " << msg;
             wstream_.write(boost::asio::buffer(msg));
         }
     }
@@ -169,7 +240,7 @@ void Sage_handler::internal_start()
         handler->dispatch(json);
     }
 
-    std::cout << "Shutting down ...";
+    INFO() << "Shutting down SAGE2 handler...";
 }
 
 void Sage_handler::apply_transform(const sage::Sage_element& /*element*/)
