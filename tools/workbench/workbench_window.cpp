@@ -24,7 +24,10 @@ Workbench_window::Workbench_window(QWidget* parent)
 
 Workbench_window::~Workbench_window()
 {
-    delete ui;
+    if(ui) {
+        delete ui;
+        ui = nullptr;
+    }
 }
 
 void Workbench_window::on_button_launch_analysis_window_clicked()

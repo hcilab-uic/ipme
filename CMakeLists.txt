@@ -6,29 +6,31 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "-D__LINUX__ -DBOOST_ALL_DYN_LINK -Wall -Wextra -Werror")
 
-set(THIRD_PARTY_DIR "${CMAKE_CURRENT_BINARY_DIR}/third_party/install"
-  CACHE PATH "Path to the third-party build directory")
+# set some ridiculous parameters so we don't get ridiculous errors
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-parentheses")
+
+set(THIRD_PARTY_ROOT "${CMAKE_CURRENT_BINARY_DIR}/third_party" CACHE PATH
+    "Path of the 3rd party root directory")
+
+set(third_party_dir "${THIRD_PARTY_ROOT}/install")
+set(CMAKE_INSTALL_RPATH "${third_party_dir}/lib")
 
 set(QT5_ROOT CACHE PATH "Path to Qt5 installation")
 
-set(BOOST_ROOT ${THIRD_PARTY_DIR})
-set(VTK_DIR ${THIRD_PARTY_DIR}/lib/cmake/vtk-8.1)
-set(OpenCV_DIR ${THIRD_PARTY_DIR}/share/OpenCV)
-set(Protobuf_INCLUDE_DIR ${THIRD_PARTY_DIR}/include)
-set(Protobuf_LIBRARY ${THIRD_PARTY_DIR}/lib/libprotobuf.so)
-set(OMICRON_SOURCE_PATH
-  ${CMAKE_CURRENT_BINARY_DIR}/third_party/omicron/src/Omicron)
-set(Qt5Core_DIR "${QT5_ROOT}/gcc_64/lib/cmake/Qt5Core")
-set(Qt5Widgets_DIR "${QT5_ROOT}/gcc_64/lib/cmake/Qt5Widgets")
+set(BOOST_ROOT ${third_party_dir})
+set(VTK_DIR ${third_party_dir}/lib/cmake/vtk-8.1)
+set(OpenCV_DIR ${third_party_dir}/share/OpenCV)
+
+set(OMICRON_SOURCE_PATH ${THIRD_PARTY_ROOT}/omicron/src/Omicron)
+set(Qt5Core_DIR "${QT5_ROOT}/lib/cmake/Qt5Core")
+set(Qt5Widgets_DIR "${QT5_ROOT}/lib/cmake/Qt5Widgets")
 
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message("BOOST_ROOT=${BOOST_ROOT}")
 message("VTK_DIR=${VTK_DIR}")
 message("OpenCV_DIR=${OpenCV_DIR}")
 message("OMICRON_SOURCE_PATH=${OMICRON_SOURCE_PATH}")
-
-find_package(Protobuf REQUIRED)
-include_directories(${Protobuf_INCLUDE_DIRS})
 
 set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")
@@ -40,7 +42,6 @@ set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-set(BUILD_SHARED_LIBS ON)
 
 find_package(Boost REQUIRED COMPONENTS system filesystem log_setup log
     program_options thread)

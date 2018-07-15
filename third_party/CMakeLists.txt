@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.11)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS
@@ -18,17 +21,17 @@ include(CheckIncludeFileCXX)
 include(CheckIncludeFiles)
 include(ExternalProject)
 
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 set(EXT_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/install)
+set(CMAKE_INSTALL_RPATH ${EXT_INSTALL_DIR}/lib)
 
 include(boost.cmake)
 include(protobuf.cmake)
 include(vtk.cmake)
 include(opencv.cmake)
 include(omicron.cmake)
-
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(CMAKE_INSTALL_RPATH)
 
 message("Important: Third-party install directory: ${EXT_INSTALL_DIR}")

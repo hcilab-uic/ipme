@@ -24,6 +24,9 @@ public:
     }
 
 private:
+    // This is monotonically increasing, does not decrease on delete
+    size_t element_add_counter_ = 0;
+
     Container_type elements_;
 };
 

@@ -42,7 +42,7 @@ add_library(workbench_ui SHARED
     mainwindow.cpp
     workbench_window.cpp
     live_window.cpp ${UI_SOURCES})
-target_link_libraries(workbench_ui Qt5::Core Qt5::Widgets Qt5::Gui)
+target_link_libraries(workbench_ui ipme Qt5::Core Qt5::Widgets Qt5::Gui)
 
 add_executable(${TARGET} ${SOURCES} resources.qrc)
 target_link_libraries(${TARGET}

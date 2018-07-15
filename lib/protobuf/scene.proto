@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package ipme.scene;
+
+message Position {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}
+
+message Quaternion {
+    double w = 1;
+    double x = 2;
+    double y = 3;
+    double z = 4;
+}
+
+message Pose {
+    Position position = 1;
+    Quaternion orientation = 2;
+}
+
+// This message represents single sensor point that has a position and a
+// rotation. If there is a person on the scene with multiple sensors, this
+// object represents one such sensor
+message Object {
+    uint32 id = 1;
+    string name = 2;
+
+    // This timestamp usually comes from the sensor
+    uint64 timestamp = 3;
+
+    Pose pose = 4;
+}
+
+message Vrpn_object {
+    uint32 source_id = 1;
+    uint64 timestamp = 2;
+    uint32 device_tag = 3;
+    uint32 service_type = 4;
+    uint32 type = 5;
+    uint32 flags = 6;
+
+    Pose pose = 7;
+}
+
+message Frame {
+    uint32 id = 1;
+
+    // This field is different from the timestamp specified by the sensor but
+    // refers to the one that gets assigned at the time of constructing the
+    // frame
+    uint64 timestamp = 2;
+
+    // We can also represent individual simple objects such as UI elements that
+    // don't aggregate into a higher compound object. For eg. a single UI
+    // window, or a laptop with a single rigid-body marker
+    repeated Object simple_objects = 3;
+
+    repeated Vrpn_object vrpn_objects = 4;
+}
+
+message Compound_object_config {
+    // Name of the compound object. Eg: subject 1
+    // This field is read from the configuration file
+    string name = 1;
+    repeated uint32 object_ids = 2;
+}
+
+message Scene_config {
+    // Different configured entitied
+    repeated Compound_object_config entities = 1;
+}
+
+// Object representing multiple frames with a starting configuration
+message Scene {
+    Scene_config config = 1;
+    repeated Frame frames = 2;
+}

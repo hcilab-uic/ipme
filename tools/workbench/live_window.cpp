@@ -12,13 +12,16 @@
 #include <QStatusBar>
 #include <opencv2/core/mat.hpp>
 
+#include "data/scene.h"
 #include "sensor/vicon_csvwriter.h"
 #include "sensor/vicon_listener.h"
+#include "sensor/vrpn_handler.h"
 #include "utils/utils.h"
 
 Live_window::Live_window(QWidget* parent)
     : QDialog{parent}, ui{new Ui::Live_window}, output_dir_{QDir::homePath()},
-      status_bar_{parent}
+      status_bar_{parent}, scene_{std::make_shared<ipme::data::Scene>()},
+      sage_handler_{scene_}
 {
     ui->setupUi(this);
     set_start_button_init();
@@ -44,6 +47,7 @@ Live_window::~Live_window()
     set_state(ipme::wb::State_machine::State::uninitialized);
     if(ui) {
         delete ui;
+        ui = nullptr;
     }
 }
 
@@ -145,7 +149,11 @@ void Live_window::process_video()
         if(state() == ipme::wb::State_machine::State::running) {
             // If experiment is in running state, then record
             ++frame_number_;
+
             update_frame_number(frame_number_);
+
+            add_new_frame();
+
             ui->frame_num_value_label->setText(QString::number(frame_number_));
 
             cv::circle(frame, cv::Point{100, 100}, 50, cv::Scalar{255, 0, 0});
@@ -157,12 +165,15 @@ bool Live_window::initialize_vrpn()
 {
     std::string file_basename{
         "vrpn_record_" + ipme::utils::create_timestamp_string("%Y%m%d-%H%M%S") +
-        ".csv"};
+        ".pb"};
     std::string filepath{output_dir_.toStdString() + "/" + file_basename};
+    scene_->set_output_file_path(filepath);
 
     show_message("Writing output to " + QString{filepath.c_str()});
+    //    ipme::sensor::Vicon_listener listener{
+    //        std::make_unique<ipme::sensor::Vicon_csvwriter>(filepath, false)};
     ipme::sensor::Vicon_listener listener{
-        std::make_unique<ipme::sensor::Vicon_csvwriter>(filepath, false)};
+        std::make_unique<ipme::sensor::Vrpn_handler>(scene_)};
     omicron_client_ =
         std::make_unique<omicronConnector::OmicronConnectorClient>(&listener);
 
@@ -231,7 +242,7 @@ void Live_window::shutdown()
 
 void Live_window::shutdown_vrpn()
 {
-    omicron_client_->dispose();
+    //    omicron_client_->dispose();
 }
 
 void Live_window::set_start_button_state(std::string_view text,
@@ -287,6 +298,15 @@ int Live_window::frame_number() const
 {
     std::shared_lock<std::shared_mutex> lock{frame_number_mutex_};
     return frame_number_;
+}
+
+void Live_window::add_new_frame()
+{
+    auto frame_index = frame_number();
+    auto timestamp = frame_index * capture_timer_->interval();
+    sage_handler_.flush();
+
+    scene_->add_new_frame(frame_index, timestamp);
 }
 
 void Live_window::set_status_indicator(QWidget* widget, bool status)
