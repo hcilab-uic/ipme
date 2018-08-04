@@ -11,7 +11,7 @@ if(${BUILD_VISUALIZATION_TOOLS})
             boost_system pthread)
     endfunction(build_viz_demo)
 
-    add_subdirectory(camera_zoom)
+#    add_subdirectory(camera_zoom)
     add_subdirectory(vtk)
 endif()
 
