@@ -64,43 +64,7 @@ Sage_handler::Sage_handler(std::shared_ptr<data::Scene> scene)
           std::make_shared<ipme::wb::sage::Sage_element_container>()},
       scene_{scene}
 {
-    namespace sage = ipme::wb::sage;
-    //    handler_map_.insert(create_default("0002",
-    //    "registerInteractionClient"));
-    //    handler_map_.insert(create_default("0003", "getActiveClients"));
-    //    handler_map_.insert(create_default("0004", "getRbac"));
-    //    handler_map_.insert(create_default("0005", "updateAppState"));
-    //    handler_map_.insert(create_default("0006", "updateStateOptions"));
-    handler_map_.insert(create_default("0007", "appResize"));
-    handler_map_.insert(create_default("0008", "appFullscreen"));
-    handler_map_.insert(create_default("0009", "clearDisplay"));
-
-    handler_map_.insert(create<sage::Create_app_window_handler>("000a"));
-    //    handler_map_.insert(create<sage::Update_item_order_handler>("000b"));
-
-    handler_map_.insert(create_default("000c", "deleteAllApplications"));
-    handler_map_.insert(create_default("000d", "tileApplications"));
-    //    handler_map_.insert(create_default("000e", "addNewWebElement"));
-    //    handler_map_.insert(create_default("000f", "openNewWebpage"));
-    //    handler_map_.insert(create_default("0010", "startApplicationMove"));
-    //    handler_map_.insert(create_default("0011", "startApplicationResize"));
-    //    handler_map_.insert(create_default("0012",
-    //    "updateApplicationPosition")); handler_map_.insert(
-    //        create_default("0013", "updateApplicationPositionAndSize"));
-    //    handler_map_.insert(create_default("0014", "finishApplicationMove"));
-    //    handler_map_.insert(create_default("0015",
-    //    "finishApplicationResize"));
-    //    handler_map_.insert(create_default("0016", "deleteApplication"));
-    //    handler_map_.insert(create_default("0017", "updateApplicationState"));
-    handler_map_.insert(create_default("0018", "startSagePointer"));
-    handler_map_.insert(create_default("0019", "createSagePointer"));
-    handler_map_.insert(create_default("0020", "setItemPosition"));
-    handler_map_.insert(create_default("0021", "setItemPositionAndSize"));
-    handler_map_.insert(create_default("0022", "deleteElement"));
-
-    for(auto& handler : handler_map_) {
-        handler.second->set_element_container(element_container_);
-    }
+    initialize_handler_map();
 }
 
 Sage_handler::~Sage_handler()
@@ -249,6 +213,47 @@ void Sage_handler::internal_start()
     }
 
     INFO() << "Shutting down SAGE2 handler...";
+}
+
+void Sage_handler::initialize_handler_map()
+{
+    namespace sage = ipme::wb::sage;
+    //    handler_map_.insert(create_default("0002",
+    //    "registerInteractionClient"));
+    //    handler_map_.insert(create_default("0003", "getActiveClients"));
+    //    handler_map_.insert(create_default("0004", "getRbac"));
+    //    handler_map_.insert(create_default("0005", "updateAppState"));
+    //    handler_map_.insert(create_default("0006", "updateStateOptions"));
+    handler_map_.insert(create_default("0007", "appResize"));
+    handler_map_.insert(create_default("0008", "appFullscreen"));
+    handler_map_.insert(create_default("0009", "clearDisplay"));
+
+    handler_map_.insert(create<sage::Create_app_window_handler>("000a"));
+    //    handler_map_.insert(create<sage::Update_item_order_handler>("000b"));
+
+    handler_map_.insert(create_default("000c", "deleteAllApplications"));
+    handler_map_.insert(create_default("000d", "tileApplications"));
+    //    handler_map_.insert(create_default("000e", "addNewWebElement"));
+    //    handler_map_.insert(create_default("000f", "openNewWebpage"));
+    //    handler_map_.insert(create_default("0010", "startApplicationMove"));
+    //    handler_map_.insert(create_default("0011", "startApplicationResize"));
+    //    handler_map_.insert(create_default("0012",
+    //    "updateApplicationPosition")); handler_map_.insert(
+    //        create_default("0013", "updateApplicationPositionAndSize"));
+    //    handler_map_.insert(create_default("0014", "finishApplicationMove"));
+    //    handler_map_.insert(create_default("0015",
+    //    "finishApplicationResize"));
+    //    handler_map_.insert(create_default("0016", "deleteApplication"));
+    //    handler_map_.insert(create_default("0017", "updateApplicationState"));
+    handler_map_.insert(create_default("0018", "startSagePointer"));
+    handler_map_.insert(create_default("0019", "createSagePointer"));
+    handler_map_.insert(create_default("0020", "setItemPosition"));
+    handler_map_.insert(create_default("0021", "setItemPositionAndSize"));
+    handler_map_.insert(create_default("0022", "deleteElement"));
+
+    for(auto& handler : handler_map_) {
+        handler.second->set_element_container(element_container_);
+    }
 }
 
 void Sage_handler::apply_transform(const sage::Sage_element& /*element*/)

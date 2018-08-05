@@ -38,6 +38,7 @@ public:
 
 private:
     void internal_start();
+    void initialize_handler_map();
 
     void apply_transform(const sage::Sage_element& element);
 
