@@ -1,0 +1,99 @@
+{
+  "screen_offsets": {
+    "x": 3.6,
+    "y": 2.3,
+    "z": 3.6
+  },
+  "vrpn": {
+    "host": "thor.evl.uic.edu",
+    "port": 28000,
+    "data_port": 7000
+  },
+  "sage": {
+    "host": "canopus.evl.uic.edu",
+    "port": 80
+  },
+  "video_device_index": 1,
+  "vrpn_objects": [
+    {
+      "name": "object_1",
+      "id": 24
+    },
+    {
+      "name": "object_2",
+      "id": 25
+    },
+    {
+      "name": "object_3",
+      "id": 26
+    },
+    {
+      "name": "object_4",
+      "id": 27
+    },
+    {
+      "name": "object_5",
+      "id": 28
+    },
+    {
+      "name": "object_6",
+      "id": 29
+    },
+    {
+      "name": "object_7",
+      "id": 30
+    },
+    {
+      "name": "object_8",
+      "id": 31
+    },
+    {
+      "name": "object_9",
+      "id": 32
+    },
+    {
+      "name": "object_10",
+      "id": 33
+    },
+    {
+      "name": "object_11",
+      "id": 34
+    },
+    {
+      "name": "object_12",
+      "id": 35
+    },
+    {
+      "name": "object_13",
+      "id": 36
+    },
+    {
+      "name": "object_14",
+      "id": 37
+    },
+    {
+      "name": "object_15",
+      "id": 38
+    },
+    {
+      "name": "object_16",
+      "id": 39
+    },
+    {
+      "name": "object_17",
+      "id": 40
+    },
+    {
+      "name": "object_18",
+      "id": 41
+    },
+    {
+      "name": "object_19",
+      "id": 42
+    },
+    {
+      "name": "object_20",
+      "id": 43
+    }
+  ]
+}

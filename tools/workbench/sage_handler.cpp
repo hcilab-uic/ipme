@@ -198,7 +198,7 @@ void Sage_handler::internal_start()
 
     utils::Json json;
     if(state_machine_->is_running()) {
-        //        wstream_.write(boost::asio::buffer(add_client_msg));
+        wstream_.write(boost::asio::buffer(add_client_msg));
         //        session_->write(add_client_msg.data());
 
         //        std::string session_message;
@@ -212,7 +212,12 @@ void Sage_handler::internal_start()
         // FIXME: 0x9d is hardcoded. Find a way to do this dynamically
         for(int i = 1; i < 0x9d; ++i) {
             boost::beast::multi_buffer buffer;
-            wstream_.read(buffer);
+            try {
+                wstream_.read(buffer);
+            } catch(const boost::system::system_error& err) {
+                ERROR() << err.what();
+                return;
+            }
 
             std::stringstream ss;
             ss << boost::beast::buffers(buffer.data());
@@ -227,6 +232,9 @@ void Sage_handler::internal_start()
             INFO() << "TX: " << msg;
             wstream_.write(boost::asio::buffer(msg));
         }
+    } else {
+        WARN() << "State machine is not running, returning";
+        return;
     }
 
     while(state_machine_->is_running()) {

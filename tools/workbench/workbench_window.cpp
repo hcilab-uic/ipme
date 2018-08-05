@@ -5,14 +5,17 @@
 #include <QDebug>
 #include <QDesktopWidget>
 
+#include "config.h"
 #include "live_window.h"
 #include "mainwindow.h"
+#include "utils/logger.h"
 
-Workbench_window::Workbench_window(QWidget* parent)
+Workbench_window::Workbench_window(const ipme::wb::Config& config,
+                                   QWidget* parent)
     : QMainWindow(parent),
       // clang-format off
       ui(new Ui::Workbench_window),
-      live_window_{std::make_shared<Live_window>(this)},
+      live_window_{std::make_shared<Live_window>(config, this)},
       main_window_{std::make_shared<MainWindow>(this)}
 // clang-format on
 {

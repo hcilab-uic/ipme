@@ -1,6 +1,7 @@
 #include "live_window.h"
 #include "ui_live_window.h"
 
+#include <filesystem>
 #include <mutex>
 #include <shared_mutex>
 #include <sstream>
@@ -12,6 +13,7 @@
 #include <QStatusBar>
 #include <opencv2/core/mat.hpp>
 
+#include "config.h"
 #include "data/scene.h"
 #include "sensor/vicon_csvwriter.h"
 #include "sensor/vicon_listener.h"
@@ -19,37 +21,34 @@
 #include "utils/logger.h"
 #include "utils/utils.h"
 
-Live_window::Live_window(QWidget* parent)
-    : QDialog{parent}, ui{new Ui::Live_window},
-      output_root_dir_{QDir::homePath()}, status_bar_{parent},
+namespace {
+QString get_default_rootdir()
+{
+    return QDir::homePath() + "/ipme_experiments";
+}
+} // namespace
+
+Live_window::Live_window(const ipme::wb::Config& config, QWidget* parent)
+    : QDialog{parent}, ui{new Ui::Live_window}, config_{config},
+      output_root_dir_{get_default_rootdir()}, status_bar_{parent},
       omicron_thread_{nullptr}, scene_{std::make_shared<ipme::data::Scene>()},
       sage_handler_{scene_},
       vrpn_listener_{std::make_unique<ipme::sensor::Vrpn_handler>(scene_)}
 {
     ui->setupUi(this);
     set_start_button_init();
-    ui->video_device_index_edit->setText("0");
+    ui->video_device_index_edit->setText(
+        QString::number(config_.video_device_index()));
 
-    // FIXME: This should come from elsewhere, not hard-coded here
-    //    ui->vrpn_host_edit->setText("cave2tracker.evl.uic.edu");
-    ui->vrpn_host_edit->setText("thor.evl.uic.edu");
-    ui->vrpn_port_edit->setText("28000");
-    ui->vrpn_data_port_edit->setText("7000");
+    ui->vrpn_host_edit->setText(config_.vrpn_host().c_str());
+    ui->vrpn_port_edit->setText(QString::number(config_.vrpn_port()));
+    ui->vrpn_data_port_edit->setText(QString::number(config_.vrpn_data_port()));
 
-    //    ui->sage_host_edit->setText("localhost");
-    //    ui->sage_port_edit->setText("9292");
-
-    //    ui->sage_host_edit->setText("sage2rtt.evl.uic.edu");
-    //    ui->sage_port_edit->setText("1099");
-
-    ui->sage_host_edit->setText("canopus.evl.uic.edu");
-    ui->sage_port_edit->setText("80");
+    ui->sage_host_edit->setText(config_.sage_host().c_str());
+    ui->sage_port_edit->setText(QString::number(config_.sage_port()));
 
     ui->bottom_layout->addWidget(&status_bar_);
     set_status("Ready");
-
-    //    std::filesystem::create_directories(output_dir_);
-    //    INFO() << "Output directory " << output_dir_;
 }
 
 Live_window::~Live_window()
@@ -141,8 +140,8 @@ void Live_window::process_video()
 
             auto display_time = QString{"%1:%2:%3"}
                                     .arg(hours, 2, 10, QLatin1Char{'0'})
-                                    .arg(minutes, 2, 10, QLatin1Char{'0'})
-                                    .arg(seconds, 2, 10, QLatin1Char{'0'});
+                                    .arg(minutes % 60, 2, 10, QLatin1Char{'0'})
+                                    .arg(seconds % 60, 2, 10, QLatin1Char{'0'});
 
             ui->elapsed_time_value_label->setText(display_time);
 
@@ -207,12 +206,15 @@ void Live_window::init_file_setup()
 
 bool Live_window::reset_camera()
 {
-    int video_device_index = ui->video_device_index_edit->text().toInt();
+    const int video_device_index = config_.video_device_index();
     capture_.open(video_device_index);
-    int frame_width = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_WIDTH));
-    int frame_height = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
 
-    int fps = static_cast<int>(capture_.get(CV_CAP_PROP_FPS));
+    const int frame_width =
+        static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_WIDTH));
+    const int frame_height =
+        static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
+    const int fps = static_cast<int>(capture_.get(CV_CAP_PROP_FPS));
+
     if(fps == 0) {
         ERROR() << "Error: could not get FPS information from camera";
         return false;
@@ -381,21 +383,48 @@ void Live_window::initialize_experiment()
 {
     init_file_setup();
 
+    // Update config object from the UI entries because we expect the UI to
+    // contain the most recent configuration
+
+    // Screen offset
+    double screen_offset_x = ui->screen_offset_x_edit->text().toDouble();
+    double screen_offset_y = ui->screen_offset_y_edit->text().toDouble();
+    double screen_offset_z = ui->screen_offset_z_edit->text().toDouble();
+
+    config_.set_screen_offset(screen_offset_x, screen_offset_y,
+                              screen_offset_z);
+
+    // VRPN
+    config_.set_vrpn_host(ui->vrpn_host_edit->text().toStdString());
+    config_.set_vrpn_port(ui->vrpn_port_edit->text().toShort());
+    config_.set_vrpn_data_port(ui->vrpn_data_port_edit->text().toShort());
+
+    // SAGE2
+    config_.set_sage_host(ui->sage_host_edit->text().toStdString());
+    config_.set_sage_port(ui->sage_port_edit->text().toShort());
+
+    // Video
+    config_.set_video_device_index(ui->video_device_index_edit->text().toInt());
+
     // initialization code
-    auto camera_status = initialize_camera();
+    auto camera_on = ui->on_camera_checkbox->isChecked();
+    auto camera_status = camera_on ? initialize_camera() : !camera_on;
     if(!camera_status) {
         ERROR() << "Could not initialize camera";
         show_message("Could not initialize camera");
         return;
     }
 
-    auto vrpn_status = initialize_vrpn();
+    auto vrpn_on = ui->on_vrpn_checkbox->isChecked();
+    auto vrpn_status = vrpn_on ? initialize_vrpn() : !vrpn_on;
 
     bool sage_status{false};
     try {
+        auto sage_on = ui->on_sage_checkbox->isChecked();
         sage_status =
-            sage_handler_.connect(ui->sage_host_edit->text().toStdString(),
-                                  ui->sage_port_edit->text().toStdString());
+            sage_on ? sage_handler_.connect(config_.sage_host(),
+                                            std::to_string(config_.sage_port()))
+                    : !sage_on;
         set_status_indicator(ui->sage_status_indicator_label, sage_status);
         sage_handler_.set_state_machine(shared_from_this());
     } catch(const boost::system::system_error& err) {
@@ -408,28 +437,36 @@ void Live_window::initialize_experiment()
         set_state(ipme::wb::State_machine::State::initialized);
         show_message("Initialized");
 
-        double screen_offset_x = ui->screen_offset_x_edit->text().toDouble();
-        double screen_offset_y = ui->screen_offset_y_edit->text().toDouble();
-        double screen_offset_z = ui->screen_offset_z_edit->text().toDouble();
-
-        scene_->set_config(screen_offset_x, screen_offset_y, screen_offset_z);
+        scene_->set_config(config_.scene_config());
     } else {
         WARN() << "Did not initialize correctly";
 
         if(camera_status) {
             stop_camera();
             WARN() << "Shutting down camera";
+        } else {
+            std::string msg{"Video stream initialization error"};
+            show_message(msg.c_str());
+            ERROR() << msg;
         }
 
         if(vrpn_status) {
             shutdown_vrpn();
             WARN() << "Shutting down VRPN";
+        } else {
+            std::string msg{"VRPN initialization error"};
+            show_message(msg.c_str());
+            ERROR() << msg;
         }
 
         if(sage_status) {
             sage_handler_.disconnect();
             set_status_indicator(ui->sage_status_indicator_label, false);
             WARN() << "Shutting down SAGE2";
+        } else {
+            std::string msg{"SAGE2 initialization error"};
+            show_message(msg.c_str());
+            ERROR() << msg;
         }
     }
 }

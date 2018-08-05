@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <memory>
 #include <string_view>
+#include <unordered_set>
 
 #include "connector/omicronConnectorClient.h"
 #include "protobuf/scene.pb.h"
@@ -17,11 +18,11 @@ public:
 
     virtual ~Scene();
 
-    void set_config(double offset_x, double offset_y, double offset_z);
+    void set_config(const scene::Scene_config& config);
 
     void add_object(const omicronConnector::EventData& event);
     void add_object(std::shared_ptr<scene::Object> object);
-    void add_object(size_t id, double top, double left, double width,
+    void add_object(uint32_t id, double top, double left, double width,
                     double height);
 
     void add_new_frame(uint32_t id, uint64_t timestamp);
@@ -53,6 +54,7 @@ private:
     scene::Frame* current_frame_ = nullptr;
     scene::Scene scene_;
     std::filesystem::path output_path_;
+    std::unordered_set<uint32_t> valid_ids_;
 };
 } // namespace data
 } // namespace ipme

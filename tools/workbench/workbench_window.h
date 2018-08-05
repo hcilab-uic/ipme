@@ -5,6 +5,7 @@
 
 #include <QMainWindow>
 
+#include "config.h"
 #include "live_window.h"
 #include "mainwindow.h"
 
@@ -16,7 +17,8 @@ class Workbench_window : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit Workbench_window(QWidget* parent = 0);
+    explicit Workbench_window(const ipme::wb::Config& config,
+                              QWidget* parent = 0);
     ~Workbench_window();
 
 private slots:

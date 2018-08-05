@@ -6,6 +6,12 @@ namespace ipme {
 namespace utils {
 namespace pt = boost::property_tree;
 
+void Json::read(const std::filesystem::__cxx11::path& path)
+{
+    std::ifstream in{path};
+    read(in);
+}
+
 void Json::read(std::istream& in)
 {
     pt::read_json(in, ptree_);

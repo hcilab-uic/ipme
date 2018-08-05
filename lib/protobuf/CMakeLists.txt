@@ -11,11 +11,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
 
 set(proto_srcs scene.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${proto_srcs})
+#protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS EXPORT_MACRO DLL_EXPORT ${proto_srcs})
 protobuf_generate_python(PROTO_PY ${proto_srcs})
 
 message("INC ${PROTOBUF_INCLUDE_DIRS}")
 message("LIB ${PROTOBUF_LIBRARIES}")
 message("PROTOC ${PROTOBUF_PROTOC_EXECUTABLE}")
+message("PROTO_PY=${PROTO_PY}")
 
 set(protobuf_dir "${CMAKE_BINARY_DIR}/lib")
 message("protobuf_dir ${protobuf_dir}")

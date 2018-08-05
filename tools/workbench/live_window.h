@@ -14,6 +14,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "config.h"
 #include "connector/omicronConnectorClient.h"
 #include "data/scene.h"
 #include "sage_handler.h"
@@ -30,7 +31,7 @@ class Live_window : public QDialog,
     Q_OBJECT
 
 public:
-    explicit Live_window(QWidget* parent = 0);
+    explicit Live_window(const ipme::wb::Config& config, QWidget* parent = 0);
     virtual ~Live_window() override;
 
     virtual State state() const override;
@@ -101,6 +102,7 @@ private:
     void set_status_indicator(QWidget* widget, bool status);
 
     Ui::Live_window* ui;
+    ipme::wb::Config config_;
     cv::VideoCapture capture_;
     QTimer* capture_timer_;
     QString output_root_dir_;

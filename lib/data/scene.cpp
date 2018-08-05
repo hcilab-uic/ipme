@@ -2,7 +2,9 @@
 
 #include <fstream>
 #include <memory>
+#include <sstream>
 
+#include "google/protobuf/util/json_util.h"
 #include "protobuf/scene.pb.h"
 #include "utils/logger.h"
 
@@ -14,13 +16,22 @@ Scene::~Scene()
     finalize();
 }
 
-void Scene::set_config(double offset_x, double offset_y, double offset_z)
+void Scene::set_config(const scene::Scene_config& config)
 {
-    auto config = scene_.mutable_config();
-    auto screen_offset = config->mutable_screen_offset();
-    screen_offset->set_x(offset_x);
-    screen_offset->set_y(offset_y);
-    screen_offset->set_z(offset_z);
+    scene_.mutable_config()->CopyFrom(config);
+
+    std::string config_string;
+    google::protobuf::util::JsonPrintOptions print_options;
+    print_options.add_whitespace = true;
+    google::protobuf::util::MessageToJsonString(scene_.config(), &config_string,
+                                                print_options);
+
+    valid_ids_.clear();
+    for(const auto& object : scene_.config().registered_objects()) {
+        valid_ids_.insert(object.id());
+    }
+
+    INFO() << "New scene config\n" << config_string;
 }
 
 void Scene::add_object(const omicronConnector::EventData& event)
@@ -32,9 +43,14 @@ void Scene::add_object(const omicronConnector::EventData& event)
         return;
     }
 
+    if(valid_ids_.find(event.sourceId) == std::end(valid_ids_)) {
+        WARN() << "Unregistered VRPN device ID " << event.sourceId
+               << ", ignoring";
+    }
+
     auto object = current_frame_->add_vrpn_objects();
     object->set_timestamp(static_cast<uint64_t>(event.timestamp));
-    object->set_source_id(event.sourceId);
+    object->set_vrpn_source_id(event.sourceId);
     object->set_device_tag(event.deviceTag);
     object->set_service_type(event.serviceType);
     object->set_type(event.type);
@@ -43,15 +59,15 @@ void Scene::add_object(const omicronConnector::EventData& event)
     auto pose = object->mutable_pose();
 
     auto position = pose->mutable_position();
-    position->set_x(event.posx);
-    position->set_y(event.posy);
-    position->set_z(event.posz);
+    position->set_x(static_cast<double>(event.posx));
+    position->set_y(static_cast<double>(event.posy));
+    position->set_z(static_cast<double>(event.posz));
 
     auto orientation = pose->mutable_orientation();
-    orientation->set_w(event.orw);
-    orientation->set_x(event.orx);
-    orientation->set_y(event.ory);
-    orientation->set_z(event.orz);
+    orientation->set_w(static_cast<double>(event.orw));
+    orientation->set_x(static_cast<double>(event.orx));
+    orientation->set_y(static_cast<double>(event.ory));
+    orientation->set_z(static_cast<double>(event.orz));
 
     DEBUG() << "Added object with source id: " << event.sourceId;
 }
@@ -64,7 +80,7 @@ void Scene::add_object(std::shared_ptr<scene::Object> object)
 
     // There is lot of duplicate work here. Please fix
     auto simple_object = current_frame_->add_simple_objects();
-    simple_object->set_id(object->id());
+    simple_object->set_object_id(object->object_id());
     simple_object->set_name(object->name());
     simple_object->set_timestamp(object->timestamp());
 
@@ -82,7 +98,7 @@ void Scene::add_object(std::shared_ptr<scene::Object> object)
     orientation->set_z(simple_object->pose().orientation().z());
 }
 
-void Scene::add_object(size_t id, double top, double left, double width,
+void Scene::add_object(uint32_t id, double top, double left, double width,
                        double height)
 {
     if(!current_frame_) {
@@ -91,7 +107,7 @@ void Scene::add_object(size_t id, double top, double left, double width,
 
     auto screen_object = current_frame_->add_screen_objects();
 
-    screen_object->set_id(id);
+    screen_object->set_screen_object_id(id);
 
     auto position = screen_object->mutable_position();
     position->set_x(left);
@@ -109,7 +125,7 @@ void Scene::add_object(size_t id, double top, double left, double width,
 void Scene::add_new_frame(uint32_t id, uint64_t timestamp)
 {
     current_frame_ = scene_.add_frames();
-    current_frame_->set_id(id);
+    current_frame_->set_frame_id(id);
     current_frame_->set_timestamp(timestamp);
     DEBUG() << "Current frame id set to " << id << " timestamp set to "
             << timestamp;

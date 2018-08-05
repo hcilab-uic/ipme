@@ -81,6 +81,32 @@ font-size: 24px;</string>
        </item>
        <item>
         <layout class="QGridLayout" name="connection_settings_layout">
+         <item row="1" column="3">
+          <widget class="QLineEdit" name="sage_port_edit">
+           <property name="maximumSize">
+            <size>
+             <width>75</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Port</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QLineEdit" name="vrpn_data_port_edit">
+           <property name="maximumSize">
+            <size>
+             <width>75</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string> Data Port</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
           <widget class="QLineEdit" name="vrpn_host_edit">
            <property name="sizePolicy">
@@ -100,7 +126,14 @@ font-size: 24px;</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="1" column="0">
+          <widget class="QLineEdit" name="sage_host_edit">
+           <property name="text">
+            <string>SAGE2 Host</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
           <widget class="QLineEdit" name="vrpn_port_edit">
            <property name="maximumSize">
             <size>
@@ -113,36 +146,23 @@ font-size: 24px;</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLineEdit" name="sage_host_edit">
-           <property name="text">
-            <string>SAGE2 Host</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="1">
-          <widget class="QLineEdit" name="sage_port_edit">
-           <property name="maximumSize">
-            <size>
-             <width>75</width>
-             <height>16777215</height>
-            </size>
-           </property>
+          <widget class="QCheckBox" name="on_sage_checkbox">
            <property name="text">
-            <string>Port</string>
+            <string>ON</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
-          <widget class="QLineEdit" name="vrpn_data_port_edit">
-           <property name="maximumSize">
-            <size>
-             <width>75</width>
-             <height>16777215</height>
-            </size>
-           </property>
+         <item row="0" column="1">
+          <widget class="QCheckBox" name="on_vrpn_checkbox">
            <property name="text">
-            <string> Data Port</string>
+            <string>ON</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -308,14 +328,7 @@ border-style: outset;</string>
        </item>
        <item>
         <layout class="QGridLayout" name="camera_settings_grid">
-         <item row="0" column="0">
-          <widget class="QLabel" name="video_device_index_label">
-           <property name="text">
-            <string>Video Device Index</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
+         <item row="3" column="2">
           <widget class="QLabel" name="frame_num_value_label">
            <property name="minimumSize">
             <size>
@@ -334,20 +347,24 @@ border-style: outset;</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="video_device_index_edit">
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
+         <item row="2" column="0">
+          <widget class="QLabel" name="frame_rate_label">
+           <property name="text">
+            <string>Frame Rate:</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
+          <widget class="QCheckBox" name="on_camera_checkbox">
+           <property name="text">
+            <string>ON</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
           <widget class="QLabel" name="frame_rate_value_label">
            <property name="styleSheet">
             <string notr="true">font-weight: bold;</string>
@@ -360,7 +377,14 @@ border-style: outset;</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="4" column="0">
+          <widget class="QLabel" name="elapsed_time_label">
+           <property name="text">
+            <string>Elapsed Time</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
           <widget class="QLabel" name="frame_num_label">
            <property name="text">
             <string>Frame Number:</string>
@@ -368,26 +392,32 @@ border-style: outset;</string>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="frame_rate_label">
+          <widget class="QLabel" name="video_device_index_label">
            <property name="text">
-            <string>Frame Rate:</string>
+            <string>Video Device Index</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="elapsed_time_label">
-           <property name="text">
-            <string>Elapsed Time</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
+         <item row="4" column="2">
           <widget class="QLabel" name="elapsed_time_value_label">
            <property name="styleSheet">
             <string notr="true">font-weight: bold;</string>
            </property>
            <property name="text">
             <string>00:00:00</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLineEdit" name="video_device_index_edit">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>

@@ -29,7 +29,7 @@ message Pose {
 // rotation. If there is a person on the scene with multiple sensors, this
 // object represents one such sensor
 message Object {
-    uint32 id = 1;
+    uint32 object_id = 1;
     string name = 2;
 
     // This timestamp usually comes from the sensor
@@ -39,13 +39,13 @@ message Object {
 }
 
 message Screen_object {
-    uint32 id = 1;
+    uint32 screen_object_id = 1;
     Position position = 2;
     Size_2d size = 3;
 }
 
 message Vrpn_object {
-    uint32 source_id = 1;
+    uint32 vrpn_source_id = 1;
     uint64 timestamp = 2;
     uint32 device_tag = 3;
     uint32 service_type = 4;
@@ -56,7 +56,7 @@ message Vrpn_object {
 }
 
 message Frame {
-    uint32 id = 1;
+    uint32 frame_id = 1;
 
     // This field is different from the timestamp specified by the sensor but
     // refers to the one that gets assigned at the time of constructing the
@@ -80,10 +80,14 @@ message Compound_object_config {
     repeated uint32 object_ids = 2;
 }
 
+message Registered_object {
+    string name = 1;
+    uint32 id = 2;
+}
+
 message Scene_config {
-    // Different configured entitied
-    repeated Compound_object_config entities = 1;
-    Position screen_offset = 2;
+    Position screen_offset = 1;
+    repeated Registered_object registered_objects = 2;
 }
 
 // Object representing multiple frames with a starting configuration

@@ -19,3 +19,5 @@ add_subdirectory(data_collection)
 if(${BUILD_WORKBENCH})
     add_subdirectory(workbench)
 endif()
+
+add_subdirectory(utilities)
