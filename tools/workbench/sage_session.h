@@ -14,7 +14,7 @@
 
 namespace ipme {
 namespace wb {
-class Sage_session: public std::enable_shared_from_this<Sage_session> {
+class Sage_session : public std::enable_shared_from_this<Sage_session> {
 public:
     using tcp = boost::asio::ip::tcp;
 
@@ -23,8 +23,8 @@ public:
     {
     }
 
-    void run(const std::string &host, const std::string &port,
-             const std::string &text);
+    void run(const std::string& host, const std::string& port,
+             const std::string& init_message);
 
     std::string read();
     void write(const std::string& text);
@@ -49,7 +49,7 @@ private:
     boost::beast::websocket::stream<tcp::socket> ws_;
     boost::beast::multi_buffer buffer_;
     std::string host_;
-    std::string text_;
+    std::string init_message_;
 };
 
 } // namespace wb

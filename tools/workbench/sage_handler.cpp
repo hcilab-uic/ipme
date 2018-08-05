@@ -59,7 +59,7 @@ create(std::string_view alias)
 }
 
 Sage_handler::Sage_handler(std::shared_ptr<data::Scene> scene)
-    : resolver_{ioc_}, wstream_{ioc_}, sage_thread_{nullptr},
+    : /*resolver_{ioc_}, wstream_{ioc_},*/ sage_thread_{nullptr},
       element_container_{
           std::make_shared<ipme::wb::sage::Sage_element_container>()},
       scene_{scene}
@@ -69,36 +69,37 @@ Sage_handler::Sage_handler(std::shared_ptr<data::Scene> scene)
 
 Sage_handler::~Sage_handler()
 {
-    if(wstream_.is_open()) {
-        wstream_.close(websocket::close_code::normal);
-    }
+    //    if(wstream_.is_open()) {
+    //        wstream_.close(websocket::close_code::normal);
+    //    }
 }
 
 bool Sage_handler::connect(std::string_view host, std::string_view port)
 {
-    auto results = resolver_.resolve(host, port);
-    auto connect = boost::asio::connect(wstream_.next_layer(), results.begin(),
-                                        results.end());
-    if(connect == results.end()) {
-        throw std::runtime_error{"Connect failed"};
-    }
+    //    auto results = resolver_.resolve(host, port);
+    //    auto connect = boost::asio::connect(wstream_.next_layer(),
+    //    results.begin(),
+    //                                        results.end());
+    //    if(connect == results.end()) {
+    //        throw std::runtime_error{"Connect failed"};
+    //    }
 
-    // throws system_error on failure
-    wstream_.handshake(host.data(), "/");
+    //    // throws system_error on failure
+    //    wstream_.handshake(host.data(), "/");
 
-    boost::beast::multi_buffer buffer;
-    wstream_.read(buffer);
-    INFO() << boost::beast::buffers(buffer.data());
+    //    boost::beast::multi_buffer buffer;
+    //    wstream_.read(buffer);
+    //    INFO() << boost::beast::buffers(buffer.data());
 
-    //    session_ = std::make_shared<Sage_session>(async_ioc_);
-    //    session_->run(host.data(), port.data(), add_client_msg.data());
+    session_ = std::make_shared<Sage_session>(async_ioc_);
+    session_->run(host.data(), port.data(), add_client_msg.data());
 
     return true;
 }
 
 void Sage_handler::disconnect()
 {
-    wstream_.close(websocket::close_reason{websocket::close_code::normal});
+    //    wstream_.close(websocket::close_reason{websocket::close_code::normal});
 }
 
 bool Sage_handler::start()
@@ -152,18 +153,18 @@ void Sage_handler::flush()
 
 void Sage_handler::internal_start()
 {
-    //    async_ioc_.run();
+    async_ioc_.run();
 
-    if(!wstream_.is_open()) {
-        throw std::runtime_error{"Connection is not open"};
-    }
+    //    if(!wstream_.is_open()) {
+    //        throw std::runtime_error{"Connection is not open"};
+    //    }
 
     INFO() << "Sending initial message to SAGE2";
 
     utils::Json json;
     if(state_machine_->is_running()) {
-        wstream_.write(boost::asio::buffer(add_client_msg));
-        //        session_->write(add_client_msg.data());
+        //        wstream_.write(boost::asio::buffer(add_client_msg));
+        session_->write(add_client_msg.data());
 
         //        std::string session_message;
         //        do {
@@ -174,42 +175,48 @@ void Sage_handler::internal_start()
         //        DEBUG() << "session message " << session_message;
 
         // FIXME: 0x9d is hardcoded. Find a way to do this dynamically
-        for(int i = 1; i < 0x9d; ++i) {
-            boost::beast::multi_buffer buffer;
-            try {
-                wstream_.read(buffer);
-            } catch(const boost::system::system_error& err) {
-                ERROR() << err.what();
-                return;
-            }
+        //        for(int i = 1; i < 0x9d; ++i) {
+        //            boost::beast::multi_buffer buffer;
+        //            try {
+        //                //                wstream_.read(buffer);
+        //            } catch(const boost::system::system_error& err) {
+        //                ERROR() << err.what();
+        //                return;
+        //            }
 
-            std::stringstream ss;
-            ss << boost::beast::buffers(buffer.data());
-            json.read(ss);
-            INFO() << "RX: " << json.get("d.listener");
-        }
+        //            std::stringstream ss;
+        //            ss << boost::beast::buffers(buffer.data());
+        //            json.read(ss);
+        //            INFO() << "RX: " << json.get("d.listener");
+        //        }
 
-        INFO() << "Sending subscribe messages";
+        //        INFO() << "Sending subscribe messages";
 
-        for(const auto& handler : handler_map_) {
-            const auto msg = handler.second->generate_registration_message();
-            INFO() << "TX: " << msg;
-            wstream_.write(boost::asio::buffer(msg));
-        }
-    } else {
-        WARN() << "State machine is not running, returning";
-        return;
+        //        for(const auto& handler : handler_map_) {
+        //            const auto msg =
+        //            handler.second->generate_registration_message(); INFO() <<
+        //            "TX: " << msg;
+        //            //            wstream_.write(boost::asio::buffer(msg));
+        //        }
+        //    } else {
+        //        WARN() << "State machine is not running, returning";
+        //        return;
+        //    }
+
+        //    while(state_machine_->is_running()) {
+        //        boost::beast::multi_buffer buffer;
+        //        //        wstream_.read(buffer);
+
+        //        std::stringstream ss;
+        //        ss << boost::beast::buffers(buffer.data());
+        //        json.read(ss);
+        //        const auto& handler = handler_map_[json.get("f")];
+        //        handler->dispatch(json);
     }
 
-    while(state_machine_->is_running()) {
-        boost::beast::multi_buffer buffer;
-        wstream_.read(buffer);
-
-        std::stringstream ss;
-        ss << boost::beast::buffers(buffer.data());
-        json.read(ss);
-        const auto& handler = handler_map_[json.get("f")];
-        handler->dispatch(json);
+    session_->read();
+    while(true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     INFO() << "Shutting down SAGE2 handler...";
