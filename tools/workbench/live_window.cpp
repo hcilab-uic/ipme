@@ -421,10 +421,9 @@ void Live_window::initialize_experiment()
     bool sage_status{false};
     try {
         auto sage_on = ui->on_sage_checkbox->isChecked();
-        sage_status =
-            sage_on ? sage_handler_.connect(config_.sage_host(),
-                                            std::to_string(config_.sage_port()))
-                    : !sage_on;
+        sage_status = sage_on ? sage_handler_.connect(config_.sage_host(),
+                                                      config_.sage_port())
+                              : !sage_on;
         set_status_indicator(ui->sage_status_indicator_label, sage_status);
         sage_handler_.set_state_machine(shared_from_this());
     } catch(const boost::system::system_error& err) {

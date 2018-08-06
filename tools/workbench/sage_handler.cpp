@@ -18,6 +18,11 @@
 
 namespace ipme {
 namespace wb {
+
+using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
+namespace websocket =
+    boost::beast::websocket; // from <boost/beast/websocket.hpp>
+
 constexpr std::string_view add_client_msg =
     R"(
 {
@@ -59,10 +64,10 @@ create(std::string_view alias)
 }
 
 Sage_handler::Sage_handler(std::shared_ptr<data::Scene> scene)
-    : /*resolver_{ioc_}, wstream_{ioc_},*/ sage_thread_{nullptr},
+    : resolver_{ioc_}, /* wstream_{ioc_},*/ sage_thread_{nullptr},
       element_container_{
           std::make_shared<ipme::wb::sage::Sage_element_container>()},
-      scene_{scene}
+      scene_{scene}, acceptor_{async_ioc_}, socket_{async_ioc_}
 {
     initialize_handler_map();
 }
@@ -74,9 +79,9 @@ Sage_handler::~Sage_handler()
     //    }
 }
 
-bool Sage_handler::connect(std::string_view host, std::string_view port)
+bool Sage_handler::connect(std::string_view host, unsigned short port)
 {
-    //    auto results = resolver_.resolve(host, port);
+    //    auto results = resolver_.resolve(host, std::to_string(port));
     //    auto connect = boost::asio::connect(wstream_.next_layer(),
     //    results.begin(),
     //                                        results.end());
@@ -91,8 +96,37 @@ bool Sage_handler::connect(std::string_view host, std::string_view port)
     //    wstream_.read(buffer);
     //    INFO() << boost::beast::buffers(buffer.data());
 
-    session_ = std::make_shared<Sage_session>(async_ioc_);
-    session_->run(host.data(), port.data(), add_client_msg.data());
+    //    session_ = std::make_shared<Sage_session>(async_ioc_);
+    //    session_->run(host.data(), port.data(), add_client_msg.data());
+    //    results->endpoint()
+    const auto address = boost::asio::ip::make_address("0.0.0.0");
+    boost::asio::ip::address add;
+    tcp::endpoint endpoint{address, 54321};
+
+    boost::system::error_code ec;
+    acceptor_.open(endpoint.protocol(), ec);
+    if(ec) {
+        ERROR() << "connect(): open " << ec.category().name();
+        return false;
+    }
+
+    acceptor_.set_option(boost::asio::socket_base::reuse_address(true), ec);
+    if(ec) {
+        ERROR() << "connect(): set_option " << ec.category().name();
+        return false;
+    }
+
+    acceptor_.bind(endpoint, ec);
+    if(ec) {
+        ERROR() << "connect(): bind " << ec.category().name();
+        return false;
+    }
+
+    acceptor_.listen(boost::asio::socket_base::max_connections, ec);
+    if(ec) {
+        ERROR() << "connect(): listen " << ec.category().name();
+        return false;
+    }
 
     return true;
 }
@@ -153,73 +187,15 @@ void Sage_handler::flush()
 
 void Sage_handler::internal_start()
 {
+    if(!acceptor_.is_open()) {
+        throw "acceptor is not open";
+    }
+
+    acceptor_.async_accept(socket_, std::bind(&Sage_handler::on_accept,
+                                              shared_from_this(),
+                                              std::placeholders::_1));
+
     async_ioc_.run();
-
-    //    if(!wstream_.is_open()) {
-    //        throw std::runtime_error{"Connection is not open"};
-    //    }
-
-    INFO() << "Sending initial message to SAGE2";
-
-    utils::Json json;
-    if(state_machine_->is_running()) {
-        //        wstream_.write(boost::asio::buffer(add_client_msg));
-        session_->write(add_client_msg.data());
-
-        //        std::string session_message;
-        //        do {
-        //            async_ioc_.poll();
-        //            session_message = session_->read();
-        //        } while(session_message.size() == 0);
-
-        //        DEBUG() << "session message " << session_message;
-
-        // FIXME: 0x9d is hardcoded. Find a way to do this dynamically
-        //        for(int i = 1; i < 0x9d; ++i) {
-        //            boost::beast::multi_buffer buffer;
-        //            try {
-        //                //                wstream_.read(buffer);
-        //            } catch(const boost::system::system_error& err) {
-        //                ERROR() << err.what();
-        //                return;
-        //            }
-
-        //            std::stringstream ss;
-        //            ss << boost::beast::buffers(buffer.data());
-        //            json.read(ss);
-        //            INFO() << "RX: " << json.get("d.listener");
-        //        }
-
-        //        INFO() << "Sending subscribe messages";
-
-        //        for(const auto& handler : handler_map_) {
-        //            const auto msg =
-        //            handler.second->generate_registration_message(); INFO() <<
-        //            "TX: " << msg;
-        //            //            wstream_.write(boost::asio::buffer(msg));
-        //        }
-        //    } else {
-        //        WARN() << "State machine is not running, returning";
-        //        return;
-        //    }
-
-        //    while(state_machine_->is_running()) {
-        //        boost::beast::multi_buffer buffer;
-        //        //        wstream_.read(buffer);
-
-        //        std::stringstream ss;
-        //        ss << boost::beast::buffers(buffer.data());
-        //        json.read(ss);
-        //        const auto& handler = handler_map_[json.get("f")];
-        //        handler->dispatch(json);
-    }
-
-    session_->read();
-    while(true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
-
-    INFO() << "Shutting down SAGE2 handler...";
 }
 
 void Sage_handler::initialize_handler_map()
@@ -266,6 +242,16 @@ void Sage_handler::initialize_handler_map()
 void Sage_handler::apply_transform(const sage::Sage_element& /*element*/)
 {
     // not exactly sure what this should do
-} // namespace wb
+}
+
+void Sage_handler::on_accept(boost::system::error_code ec)
+{
+    if(ec) {
+        throw "on_accept";
+    }
+
+    auto session = std::make_shared<Sage_session>(std::move(socket_));
+    session->set_initial_message(add_client_msg.data());
+}
 } // namespace wb
 } // namespace ipme

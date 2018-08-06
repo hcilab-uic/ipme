@@ -20,12 +20,12 @@ public:
         return vrpn_host_;
     }
 
-    inline short vrpn_port() const
+    inline unsigned short vrpn_port() const
     {
         return vrpn_port_;
     }
 
-    inline short vrpn_data_port() const
+    inline unsigned short vrpn_data_port() const
     {
         return vrpn_data_port_;
     }
@@ -35,7 +35,7 @@ public:
         return sage_host_;
     }
 
-    inline short sage_port() const
+    inline unsigned short sage_port() const
     {
         return sage_port_;
     }
@@ -68,11 +68,11 @@ public:
     void set_screen_offset(double x, double y, double z);
 
     void set_vrpn_host(const std::string& host);
-    void set_vrpn_port(short port);
-    void set_vrpn_data_port(short port);
+    void set_vrpn_port(unsigned short port);
+    void set_vrpn_data_port(unsigned short port);
 
     void set_sage_host(const std::string& host);
-    void set_sage_port(short port);
+    void set_sage_port(unsigned short port);
 
     void set_video_device_index(int index);
 
@@ -87,11 +87,11 @@ private:
     utils::Json json_;
 
     std::string vrpn_host_ = "thor.evl.uic.edu";
-    short vrpn_port_ = 28000;
-    short vrpn_data_port_ = 7000;
+    unsigned short vrpn_port_ = 28000;
+    unsigned short vrpn_data_port_ = 7000;
 
     std::string sage_host_ = "localhost";
-    short sage_port_ = 9292;
+    unsigned short sage_port_ = 9292;
 
     int video_device_index_ = 0;
 

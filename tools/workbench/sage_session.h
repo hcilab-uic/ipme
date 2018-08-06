@@ -7,8 +7,10 @@
 #include <string>
 #include <string_view>
 
+#include <boost/asio/bind_executor.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/strand.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 
@@ -18,13 +20,24 @@ class Sage_session : public std::enable_shared_from_this<Sage_session> {
 public:
     using tcp = boost::asio::ip::tcp;
 
-    explicit inline Sage_session(boost::asio::io_context& ioc)
-        : resolver_{ioc}, ws_{ioc}
+    //    explicit inline Sage_session(boost::asio::io_context& ioc)
+    //        : resolver_{ioc}, ws_{ioc}
+    //    {
+    //    }
+
+    explicit inline Sage_session(tcp::socket socket)
+        : ws_{std::move(socket)}, strand_{ws_.get_executor()}
     {
     }
 
-    void run(const std::string& host, const std::string& port,
-             const std::string& init_message);
+    inline void set_initial_message(const std::string& initial_message)
+    {
+        init_message_ = initial_message;
+    }
+
+    //    void run(const std::string& host, const std::string& port,
+    //             const std::string& init_message);
+    void run();
 
     std::string read();
     void write(const std::string& text);
@@ -32,6 +45,10 @@ public:
     void close();
 
 private:
+    void do_read();
+
+    void on_accept(boost::system::error_code ec);
+
     void on_resolve(boost::system::error_code ec,
                     tcp::resolver::results_type results);
 
@@ -45,8 +62,9 @@ private:
 
     void on_close(boost::system::error_code ec);
 
-    tcp::resolver resolver_;
     boost::beast::websocket::stream<tcp::socket> ws_;
+    boost::asio::strand<boost::asio::io_context::executor_type> strand_;
+    //    tcp::resolver resolver_;
     boost::beast::multi_buffer buffer_;
     std::string host_;
     std::string init_message_;

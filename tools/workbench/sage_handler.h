@@ -20,12 +20,12 @@
 
 namespace ipme {
 namespace wb {
-class Sage_handler {
+class Sage_handler : public std::enable_shared_from_this<Sage_handler> {
 public:
     Sage_handler(std::shared_ptr<data::Scene> scene);
     ~Sage_handler();
 
-    bool connect(std::string_view host, std::string_view port);
+    bool connect(std::string_view host, unsigned short port);
     void disconnect();
 
     bool start();
@@ -42,8 +42,10 @@ private:
 
     void apply_transform(const sage::Sage_element& element);
 
-    //    boost::asio::io_context ioc_;
-    //    boost::asio::ip::tcp::resolver resolver_;
+    void on_accept(boost::system::error_code ec);
+
+    boost::asio::io_context ioc_;
+    boost::asio::ip::tcp::resolver resolver_;
     //    boost::beast::websocket::stream<boost::asio::ip::tcp::socket>
     //    wstream_;
     std::unique_ptr<std::thread> sage_thread_;
@@ -55,6 +57,9 @@ private:
 
     std::shared_ptr<Sage_session> session_;
     boost::asio::io_context async_ioc_;
+
+    boost::asio::ip::tcp::acceptor acceptor_;
+    boost::asio::ip::tcp::socket socket_;
 };
 
 } // namespace wb
