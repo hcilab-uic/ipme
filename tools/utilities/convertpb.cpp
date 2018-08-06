@@ -19,6 +19,9 @@ int main(int argc, char** argv)
     std::string json_message;
     google::protobuf::util::JsonPrintOptions print_options;
     print_options.add_whitespace = true;
+    print_options.always_print_primitive_fields = true;
+    print_options.preserve_proto_field_names = true;
+
     google::protobuf::util::MessageToJsonString(scene, &json_message,
                                                 print_options);
     std::ofstream out{output_file};

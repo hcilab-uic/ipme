@@ -1,6 +1,7 @@
 #include "sage_handler.h"
 
 #include <memory>
+#include <regex>
 #include <string_view>
 
 #include <boost/asio.hpp>
@@ -18,7 +19,7 @@
 
 namespace ipme {
 namespace wb {
-constexpr std::string_view add_client_msg =
+constexpr const char* add_client_msg_template =
     R"(
 {
     "f":"0001",
@@ -32,9 +33,9 @@ constexpr std::string_view add_client_msg =
             "time":true,
             "console":false
         },
-            "clientID":"0",
-            "browser":"",
-            "session":""
+        "clientID":"0",
+        "browser":"",
+        "session":"%s"
     }
 }
 )";
@@ -110,7 +111,8 @@ Sage_handler::~Sage_handler()
     }
 }
 
-bool Sage_handler::connect(std::string_view host, std::string_view port)
+bool Sage_handler::connect(std::string_view host, std::string_view port,
+                           std::string_view session_token)
 {
     auto results = resolver_.resolve(host, port);
     auto connect = boost::asio::connect(wstream_.next_layer(), results.begin(),
@@ -123,11 +125,60 @@ bool Sage_handler::connect(std::string_view host, std::string_view port)
     wstream_.handshake(host.data(), "/");
 
     boost::beast::multi_buffer buffer;
+    DEBUG() << "Doing first SAGE read";
     wstream_.read(buffer);
     INFO() << boost::beast::buffers(buffer.data());
 
     //    session_ = std::make_shared<Sage_session>(async_ioc_);
     //    session_->run(host.data(), port.data(), add_client_msg.data());
+    int size = std::snprintf(nullptr, 0, add_client_msg_template,
+                             session_token.data());
+    if(size < 0) {
+        throw std::runtime_error{"error in adding token"};
+    }
+
+    std::vector<char> buf(static_cast<size_t>(size + 1));
+    std::snprintf(&buf[0], buf.size(), add_client_msg_template,
+                  session_token.data());
+    std::string add_client_msg{std::begin(buf), std::end(buf) - 1};
+
+    if(!wstream_.is_open()) {
+        throw std::runtime_error{"Connection is not open"};
+    }
+
+    DEBUG() << "Sending add client message: " << add_client_msg;
+
+    //    if(state_machine_->is_running()) {
+    wstream_.write(boost::asio::buffer(add_client_msg));
+
+    utils::Json json;
+    // FIXME: 0x9d is hardcoded. Find a way to do this dynamically
+    for(int i = 1; i < 0x9d; ++i) {
+        boost::beast::multi_buffer buffer;
+        try {
+            wstream_.read(buffer);
+        } catch(const boost::system::system_error& err) {
+            ERROR() << err.what();
+            return false;
+        }
+
+        std::stringstream ss;
+        ss << boost::beast::buffers(buffer.data());
+        json.read(ss);
+        INFO() << "RX: " << json.get("d.listener");
+    }
+
+    INFO() << "Sending subscribe messages";
+
+    for(const auto& handler : handler_map_) {
+        const auto msg = handler.second->generate_registration_message();
+        INFO() << "TX: " << msg;
+        wstream_.write(boost::asio::buffer(msg));
+    }
+    //    } else {
+    //        WARN() << "State machine is not running, returning";
+    //        return false;
+    //    }
 
     return true;
 }
@@ -190,59 +241,14 @@ void Sage_handler::internal_start()
 {
     //    async_ioc_.run();
 
-    if(!wstream_.is_open()) {
-        throw std::runtime_error{"Connection is not open"};
-    }
-
-    INFO() << "Sending initial message to SAGE2";
-
-    utils::Json json;
-    if(state_machine_->is_running()) {
-        wstream_.write(boost::asio::buffer(add_client_msg));
-        //        session_->write(add_client_msg.data());
-
-        //        std::string session_message;
-        //        do {
-        //            async_ioc_.poll();
-        //            session_message = session_->read();
-        //        } while(session_message.size() == 0);
-
-        //        DEBUG() << "session message " << session_message;
-
-        // FIXME: 0x9d is hardcoded. Find a way to do this dynamically
-        for(int i = 1; i < 0x9d; ++i) {
-            boost::beast::multi_buffer buffer;
-            try {
-                wstream_.read(buffer);
-            } catch(const boost::system::system_error& err) {
-                ERROR() << err.what();
-                return;
-            }
-
-            std::stringstream ss;
-            ss << boost::beast::buffers(buffer.data());
-            json.read(ss);
-            INFO() << "RX: " << json.get("d.listener");
-        }
-
-        INFO() << "Sending subscribe messages";
-
-        for(const auto& handler : handler_map_) {
-            const auto msg = handler.second->generate_registration_message();
-            INFO() << "TX: " << msg;
-            wstream_.write(boost::asio::buffer(msg));
-        }
-    } else {
-        WARN() << "State machine is not running, returning";
-        return;
-    }
-
     while(state_machine_->is_running()) {
         boost::beast::multi_buffer buffer;
         wstream_.read(buffer);
 
         std::stringstream ss;
         ss << boost::beast::buffers(buffer.data());
+
+        utils::Json json;
         json.read(ss);
         const auto& handler = handler_map_[json.get("f")];
         handler->dispatch(json);

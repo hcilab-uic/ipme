@@ -166,6 +166,9 @@ font-size: 24px;</string>
            </property>
           </widget>
          </item>
+         <item row="1" column="4">
+          <widget class="QLineEdit" name="sage_session_token_edit"/>
+         </item>
         </layout>
        </item>
        <item>
@@ -179,7 +182,7 @@ font-size: 24px;</string>
             <x>0</x>
             <y>20</y>
             <width>311</width>
-            <height>46</height>
+            <height>48</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">

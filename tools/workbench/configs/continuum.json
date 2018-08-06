@@ -1,8 +1,8 @@
 {
   "screen_offsets": {
-    "x": 3.6,
+    "x": -3.6,
     "y": 2.3,
-    "z": 3.6
+    "z": -3.6
   },
   "vrpn": {
     "host": "thor.evl.uic.edu",
@@ -11,9 +11,10 @@
   },
   "sage": {
     "host": "canopus.evl.uic.edu",
-    "port": 80
+    "port": 80,
+    "session_token": ""
   },
-  "video_device_index": 1,
+  "video_device_index": 0,
   "vrpn_objects": [
     {
       "name": "object_1",

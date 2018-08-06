@@ -25,7 +25,8 @@ public:
     Sage_handler(std::shared_ptr<data::Scene> scene);
     ~Sage_handler();
 
-    bool connect(std::string_view host, std::string_view port);
+    bool connect(std::string_view host, std::string_view port,
+                 std::string_view session_token);
     void disconnect();
 
     bool start();

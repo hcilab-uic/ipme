@@ -34,6 +34,7 @@ void Config::parse_config(const std::filesystem::path& path)
     auto sage_node = json_.get_node("sage");
     set_sage_host(sage_node.get<std::string>("host"));
     set_sage_port(sage_node.get<short>("port"));
+    set_sage_session_token(sage_node.get<std::string>("session_token"));
 
     set_video_device_index(json_.get<int>("video_device_index"));
 }
@@ -56,12 +57,12 @@ void Config::set_vrpn_host(const std::string& host)
     vrpn_host_ = host;
 }
 
-void Config::set_vrpn_port(short port)
+void Config::set_vrpn_port(unsigned short port)
 {
     vrpn_port_ = port;
 }
 
-void Config::set_vrpn_data_port(short port)
+void Config::set_vrpn_data_port(unsigned short port)
 {
     vrpn_data_port_ = port;
 }
@@ -71,9 +72,14 @@ void Config::set_sage_host(const std::string& host)
     sage_host_ = host;
 }
 
-void Config::set_sage_port(short port)
+void Config::set_sage_port(unsigned short port)
 {
     sage_port_ = port;
+}
+
+void Config::set_sage_session_token(std::string_view token)
+{
+    sage_session_token_ = token;
 }
 
 void Config::set_video_device_index(int index)
