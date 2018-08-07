@@ -81,8 +81,14 @@ message Compound_object_config {
 }
 
 message Registered_object {
+    enum Type {
+        HUMAN = 0;
+        DEVICE = 1;
+    }
+
     string name = 1;
     uint32 id = 2;
+    Type type = 3;
 }
 
 message Scene_config {
