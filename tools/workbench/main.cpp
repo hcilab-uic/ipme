@@ -16,12 +16,14 @@ int main(int argc, char* argv[])
     std::string logfile_prefix{"log/" +
                                std::string{program_invocation_short_name}};
     std::filesystem::path config_path;
+    int screen_number = 0;
     // clang-format off
     desc.add_options()
         ("help", "help message")
         ("log-prefix,l", po::value(&logfile_prefix), "log file prefix")
         ("config,c", po::value(&config_path)->default_value("config.json"),
          "path to config file")
+        ("screen,s", po::value(&screen_number), "screen to launch the app on")
     ;
     // clang-format on
 
@@ -44,7 +46,7 @@ int main(int argc, char* argv[])
 
     QApplication app{argc, argv};
 
-    Workbench_window workbench{config};
+    Workbench_window workbench{config, screen_number};
     workbench.show();
 
     return app.exec();

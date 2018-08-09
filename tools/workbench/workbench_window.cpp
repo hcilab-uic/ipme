@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QDesktopWidget>
+#include <QScreen>
 
 #include "config.h"
 #include "live_window.h"
@@ -11,7 +12,7 @@
 #include "utils/logger.h"
 
 Workbench_window::Workbench_window(const ipme::wb::Config& config,
-                                   QWidget* parent)
+                                   int screen_index, QWidget* parent)
     : QMainWindow(parent),
       // clang-format off
       ui(new Ui::Workbench_window),
@@ -20,9 +21,10 @@ Workbench_window::Workbench_window(const ipme::wb::Config& config,
 // clang-format on
 {
     ui->setupUi(this);
-    setGeometry(
-        QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(),
-                            QApplication::desktop()->availableGeometry()));
+
+    auto geometry = QApplication::screens()[screen_index]->availableGeometry();
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(),
+                                    geometry));
 }
 
 Workbench_window::~Workbench_window()

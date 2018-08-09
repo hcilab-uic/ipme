@@ -17,7 +17,7 @@ class Workbench_window : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit Workbench_window(const ipme::wb::Config& config,
+    explicit Workbench_window(const ipme::wb::Config& config, int screen_index,
                               QWidget* parent = 0);
     ~Workbench_window();
 
