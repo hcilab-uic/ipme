@@ -70,6 +70,21 @@ public:
         return scene_config_;
     }
 
+    inline double offset_x() const
+    {
+        return scene_config_.screen_offset().x();
+    }
+
+    inline double offset_y() const
+    {
+        return scene_config_.screen_offset().y();
+    }
+
+    inline double offset_z() const
+    {
+        return scene_config_.screen_offset().z();
+    }
+
     void set_screen_offset(double x, double y, double z);
 
     void set_vrpn_host(const std::string& host);

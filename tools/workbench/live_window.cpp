@@ -48,6 +48,10 @@ Live_window::Live_window(const ipme::wb::Config& config, QWidget* parent)
     ui->sage_port_edit->setText(QString::number(config_.sage_port()));
     ui->sage_session_token_edit->setText(config_.sage_session_token().c_str());
 
+    ui->screen_offset_x_edit->setText(QString::number(config_.offset_x()));
+    ui->screen_offset_y_edit->setText(QString::number(config_.offset_y()));
+    ui->screen_offset_z_edit->setText(QString::number(config_.offset_z()));
+
     ui->bottom_layout->addWidget(&status_bar_);
     set_status("Ready");
 }

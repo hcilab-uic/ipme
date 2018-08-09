@@ -47,6 +47,7 @@ void Config::create_default_config()
 void Config::set_screen_offset(double x, double y, double z)
 {
     auto screen_offset = scene_config_.mutable_screen_offset();
+
     screen_offset->set_x(x);
     screen_offset->set_y(y);
     screen_offset->set_z(z);
