@@ -25,7 +25,7 @@ constexpr const char* add_client_msg_template =
     "f":"0001",
     "d":
     {
-        "clientType":"display",
+        "clientType":"sageUI",
         "requests":
         {
             "config":true,
