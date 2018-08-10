@@ -22,6 +22,9 @@
 #include "utils/utils.h"
 
 namespace {
+constexpr std::string_view tracking_data_filename = "tracking.pb";
+constexpr std::string_view video_filename = "video.avi";
+
 QString get_default_rootdir()
 {
     return QDir::homePath() + "/ipme_experiments";
@@ -205,8 +208,8 @@ void Live_window::init_file_setup()
                                  output_dir_.string()};
     }
 
-    video_filename_ = output_dir_ / "video.avi";
-    scene_->set_output_file_path(output_dir_ / "vrpn.pb");
+    video_filename_ = output_dir_ / video_filename;
+    scene_->set_output_file_path(output_dir_ / tracking_data_filename);
 }
 
 bool Live_window::reset_camera()
