@@ -23,7 +23,7 @@ void Sage_element::update(double left, double top, double width, double height)
     height_ = height;
 
     DEBUG() << "UPDATE [" << id_ << "] to L:" << left_ << " T: " << top_
-            << " W:" << width_ << " H:" << height_ << "\n";
+            << " W:" << width_ << " H:" << height_;
 }
 
 std::string Sage_element::to_string() const

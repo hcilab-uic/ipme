@@ -11,9 +11,16 @@ void Sage_element_container::add_element(const ipme::utils::Json& message)
     auto width = message.get<double>("d.width");
     auto height = message.get<double>("d.height");
 
-    elements_.emplace(id, Sage_element{id, left, top, width, height});
+    add_element(id, left, top, width, height);
+}
 
-    // INFO() << "Added element " << elements_[id];
+void Sage_element_container::add_element(const std::string& id, double left,
+                                         double top, double width,
+                                         double height)
+{
+    auto itr =
+        elements_.emplace(id, Sage_element{id, left, top, width, height});
+    INFO() << "Added element " << itr.second;
 }
 
 void Sage_element_container::update_element(const std::string& id, double left,
@@ -24,6 +31,9 @@ void Sage_element_container::update_element(const std::string& id, double left,
     if(itr != std::end(elements_)) {
         itr->second.update(left, top, width, height);
         DEBUG() << "Updated element " << itr->second;
+    } else {
+        INFO() << "Update received from an unknown element " << id << " adding";
+        add_element(id, left, top, width, height);
     }
 }
 

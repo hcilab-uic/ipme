@@ -38,6 +38,7 @@ public:
     void flush();
 
 private:
+    void init_handlers();
     void internal_start();
 
     void apply_transform(const sage::Sage_element& element);
