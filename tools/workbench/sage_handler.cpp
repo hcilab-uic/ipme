@@ -248,7 +248,12 @@ void Sage_handler::internal_start()
 
     while(state_machine_->is_running()) {
         boost::beast::multi_buffer buffer;
-        wstream_.read(buffer);
+        try {
+            wstream_.read(buffer);
+        } catch(const boost::exception&) {
+            ERROR() << "could not read websocket stream, bailing";
+            break;
+        }
 
         std::stringstream ss;
         ss << boost::beast::buffers(buffer.data());
