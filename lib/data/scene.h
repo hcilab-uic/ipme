@@ -8,6 +8,7 @@
 
 #include "connector/omicronConnectorClient.h"
 #include "protobuf/scene.pb.h"
+#include "utils/logger.h"
 
 namespace ipme {
 namespace data {
@@ -33,7 +34,11 @@ public:
     /// save to the scene to a file
     inline void save()
     {
-        write(shared_from_this(), output_path_);
+        try {
+            write(shared_from_this(), output_path_);
+        } catch(const std::exception& ex) {
+            ERROR() << "Could not complete saving the file: " << ex.what();
+        }
     }
 
     /// Reset scene -> save scene and then clear all frames
