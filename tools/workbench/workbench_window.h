@@ -8,6 +8,7 @@
 #include "config.h"
 #include "live_window.h"
 #include "mainwindow.h"
+#include "visualization_window.h"
 
 namespace Ui {
 class Workbench_window;
@@ -30,6 +31,7 @@ private:
     Ui::Workbench_window* ui;
     std::shared_ptr<Live_window> live_window_;
     std::shared_ptr<MainWindow> main_window_;
+    std::shared_ptr<Visualization_window> visualization_window_;
     cv::VideoCapture capture_;
 };
 

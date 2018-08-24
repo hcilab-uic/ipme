@@ -33,6 +33,7 @@ set(SOURCES
 
 set(UI_SOURCES
     mainwindow.ui
+    visualization_window.ui
     workbench_window.ui
     live_window.ui
 )
@@ -42,6 +43,7 @@ include_directories(${Boost_INCLUDE_DIR})
 
 add_library(workbench_ui SHARED
     mainwindow.cpp
+    visualization_window.cpp
     workbench_window.cpp
     live_window.cpp ${UI_SOURCES})
 target_link_libraries(workbench_ui ipme Qt5::Core Qt5::Widgets Qt5::Gui)
