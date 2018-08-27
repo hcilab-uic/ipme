@@ -3,6 +3,8 @@ set(TARGET proxemics-wb)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Gui REQUIRED)
+find_package(Qt53DCore REQUIRED)
+find_package(Qt53DExtras REQUIRED)
 find_package(OpenGL REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
@@ -12,6 +14,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(SOURCES
     color.cpp
     config.cpp
+    frame.cpp
     frame_model.cpp
     geometry.cpp
     main.cpp
@@ -24,6 +27,7 @@ set(SOURCES
     sage_session.cpp
     scene_object.cpp
     scene_widget.cpp
+    scene_modifier.cpp
 
     color.h
     frame_model.h
@@ -46,7 +50,8 @@ add_library(workbench_ui SHARED
     visualization_window.cpp
     workbench_window.cpp
     live_window.cpp ${UI_SOURCES})
-target_link_libraries(workbench_ui ipme Qt5::Core Qt5::Widgets Qt5::Gui)
+target_link_libraries(workbench_ui ipme Qt5::Core Qt5::Widgets Qt5::Gui
+    Qt5::3DCore Qt5::3DExtras Qt5::3DRender Qt5::3DInput)
 
 add_executable(${TARGET} ${SOURCES} resources.qrc)
 target_link_libraries(${TARGET}

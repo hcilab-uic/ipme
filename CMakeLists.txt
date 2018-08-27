@@ -31,12 +31,16 @@ set(OpenCV_DIR ${third_party_dir}/share/OpenCV)
 set(OMICRON_SOURCE_PATH ${THIRD_PARTY_ROOT}/omicron/src/Omicron)
 set(Qt5Core_DIR "${QT5_ROOT}/lib/cmake/Qt5Core")
 set(Qt5Widgets_DIR "${QT5_ROOT}/lib/cmake/Qt5Widgets")
+set(Qt53DCore_DIR "${QT5_ROOT}/lib/cmake/Qt53DCore")
+set(Qt53DExtras_DIR "${QT5_ROOT}/lib/cmake/Qt53DExtras")
 
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message("BOOST_ROOT=${BOOST_ROOT}")
 message("VTK_DIR=${VTK_DIR}")
 message("OpenCV_DIR=${OpenCV_DIR}")
 message("OMICRON_SOURCE_PATH=${OMICRON_SOURCE_PATH}")
+
+message("XXXXXX Qt53DCore_DIR=${Qt53DCore_DIR}")
 
 set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")
