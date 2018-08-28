@@ -37,6 +37,7 @@ void Scene_modifier::add_frame(const Frame& frame)
     //    add_sphere(0, 0, 0, center_color);
     for(const auto& person : frame.persons) {
         add_sphere(person);
+        add_gaze(person);
     }
 
     for(const auto& device : frame.devices) {
@@ -47,6 +48,37 @@ void Scene_modifier::add_frame(const Frame& frame)
         QVector3D extents{screen_object.width, screen_object.width, 0.05f};
         add_cuboid(screen_object.pose, extents, ui_color);
     }
+}
+
+void Scene_modifier::add_screen()
+{
+    static constexpr float x_extent = 7.36f;
+    static constexpr float y_extent = 2.4f;
+    static constexpr float z_extent = 0.001f;
+
+    auto cuboid = new Qt3DExtras::QCuboidMesh;
+    cuboid->setXExtent(x_extent * scale_factor);
+    cuboid->setYExtent(y_extent * scale_factor);
+    cuboid->setZExtent(z_extent);
+
+    auto cuboid_transform = new Qt3DCore::QTransform;
+    cuboid_transform->setScale(1.f);
+
+    QVector3D offset{(screen_offset_.x() + (x_extent / 2)) * scale_factor,
+                     (screen_offset_.y() + (y_extent / 2)) * scale_factor,
+                     screen_offset_.z() * scale_factor};
+    cuboid_transform->setTranslation(offset);
+    cuboid_transform->setScale(1.f);
+
+    auto cuboid_material = new Qt3DExtras::QPhongMaterial;
+    cuboid_material->setDiffuse(0xffffff);
+
+    entities_.emplace_back(new Qt3DCore::QEntity{root_entity_});
+    auto& cuboid_entity = entities_.back();
+
+    cuboid_entity->addComponent(cuboid);
+    cuboid_entity->addComponent(cuboid_material);
+    cuboid_entity->addComponent(cuboid_transform);
 }
 
 void Scene_modifier::clear()
@@ -75,6 +107,13 @@ void Scene_modifier::clear()
         entity = nullptr;
     }
     entities_.clear();
+}
+
+void Scene_modifier::set_screen_offset(const ipme::scene::Position& offset)
+{
+    screen_offset_.setX(offset.x());
+    screen_offset_.setY(offset.y());
+    screen_offset_.setZ(offset.z());
 }
 
 void Scene_modifier::add_sphere(const ipme::scene::Pose& pose,
@@ -123,6 +162,37 @@ void Scene_modifier::add_cuboid(const ipme::scene::Pose& pose,
     cuboid_entity->addComponent(cuboid);
     cuboid_entity->addComponent(cuboid_material);
     cuboid_entity->addComponent(cuboid_transform);
+}
+
+void Scene_modifier::add_gaze(const ipme::scene::Pose& pose)
+{
+    constexpr float length = 2.f;
+    auto cylinder = new Qt3DExtras::QCylinderMesh;
+    cylinder->setRadius(0.03f);
+    cylinder->setLength(length);
+
+    auto cylinder_transform = new Qt3DCore::QTransform;
+    cylinder_transform->setScale(1.f);
+
+    auto rotation = make_rotation(pose.orientation());
+    auto offset = rotation.rotatedVector(QVector3D{0, length / 2, 0});
+
+    auto translation = make_position_vector(pose.position());
+    auto translation_with_offset =
+        QVector3D{translation.x() + offset.x(), translation.y() + offset.y(),
+                  translation.z() + offset.z()};
+    cylinder_transform->setTranslation(translation_with_offset);
+    cylinder_transform->setRotation(rotation);
+
+    auto cylinder_material = new Qt3DExtras::QPhongMaterial;
+    cylinder_material->setDiffuse(QColor{QRgb{0xffffff}});
+
+    entities_.emplace_back(new Qt3DCore::QEntity{root_entity_});
+    auto& cylinder_entity = entities_.back();
+
+    cylinder_entity->addComponent(cylinder);
+    cylinder_entity->addComponent(cylinder_material);
+    cylinder_entity->addComponent(cylinder_transform);
 }
 
 } // namespace ipme::wb

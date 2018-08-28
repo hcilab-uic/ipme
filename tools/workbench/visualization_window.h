@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <QMainWindow>
+#include <QVector3D>
 #include <Qt3DExtras/Qt3DWindow>
 
 #include "frame.h"
@@ -22,6 +23,12 @@ class Visualization_window : public QMainWindow {
 public:
     explicit Visualization_window(QWidget* parent = 0);
     ~Visualization_window();
+
+private slots:
+    void on_action_show_top_view_triggered();
+
+private slots:
+    void on_action_show_front_view_triggered();
 
 private slots:
     void on_action_previous_triggered();
