@@ -14,15 +14,16 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="central_widget">
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>228</x>
-      <y>0</y>
-      <width>113</width>
-      <height>24</height>
+      <x>0</x>
+      <y>50</y>
+      <width>2</width>
+      <height>2</height>
      </rect>
     </property>
+    <layout class="QVBoxLayout" name="scene_vertical_layout"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menu_bar">
@@ -31,7 +32,7 @@
      <x>0</x>
      <y>0</y>
      <width>987</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_file">
@@ -62,9 +63,20 @@
     <bool>false</bool>
    </attribute>
    <addaction name="file_open"/>
+   <addaction name="separator"/>
    <addaction name="action_previous"/>
    <addaction name="action_next"/>
    <addaction name="separator"/>
+   <addaction name="action_show_top_view"/>
+   <addaction name="action_show_front_view"/>
+   <addaction name="separator"/>
+   <addaction name="action_zoom_in"/>
+   <addaction name="action_zoom_out"/>
+   <addaction name="separator"/>
+   <addaction name="action_pitch_clockwise"/>
+   <addaction name="action_pitch_counterclockwise"/>
+   <addaction name="separator"/>
+   <addaction name="action_launch_video"/>
   </widget>
   <action name="file_open">
    <property name="text">
@@ -82,6 +94,50 @@
   <action name="action_next">
    <property name="text">
     <string>Next</string>
+   </property>
+  </action>
+  <action name="action_show_front_view">
+   <property name="text">
+    <string>Front View</string>
+   </property>
+  </action>
+  <action name="action_show_top_view">
+   <property name="text">
+    <string>Top View</string>
+   </property>
+  </action>
+  <action name="action_zoom_in">
+   <property name="text">
+    <string>+</string>
+   </property>
+  </action>
+  <action name="action_zoom_out">
+   <property name="text">
+    <string>-</string>
+   </property>
+  </action>
+  <action name="action_pitch_clockwise">
+   <property name="text">
+    <string>X-C</string>
+   </property>
+   <property name="toolTip">
+    <string>Pitch Clockwise</string>
+   </property>
+  </action>
+  <action name="action_pitch_counterclockwise">
+   <property name="text">
+    <string>X-CC</string>
+   </property>
+   <property name="toolTip">
+    <string>Pitch Counter-Clockwise</string>
+   </property>
+  </action>
+  <action name="action_launch_video">
+   <property name="text">
+    <string>Video</string>
+   </property>
+   <property name="toolTip">
+    <string>Launch Video</string>
    </property>
   </action>
  </widget>

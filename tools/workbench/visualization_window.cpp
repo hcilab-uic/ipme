@@ -18,16 +18,24 @@
 #include "data/scene.h"
 #include "scene_modifier.h"
 #include "utils/logger.h"
+#include "video_window.h"
 
 #include "protobuf/scene.pb.h"
 
 Visualization_window::Visualization_window(QWidget* parent)
     : QMainWindow{parent}, ui{new Ui::Visualization_window},
-      root_entity_{new Qt3DCore::QEntity}, view_{new Qt3DExtras::Qt3DWindow}
+      root_entity_{new Qt3DCore::QEntity}, view_{new Qt3DExtras::Qt3DWindow},
+      video_window_{std::make_unique<Video_window>(this)}
 {
     ui->setupUi(this);
+
+    ui->action_pitch_clockwise->setIcon(QIcon{":/icons/cw-x.png"});
+
     setWindowTitle("Visualization Window");
     make_axes();
+
+    scene_modifier_ = std::make_unique<ipme::wb::Scene_modifier>(root_entity_);
+
     init();
 }
 
@@ -48,6 +56,9 @@ void Visualization_window::on_file_open_triggered()
     scene_pb.ParseFromIstream(&ifs);
 
     const auto config = scene_pb.config();
+
+    scene_modifier_->set_screen_offset(config.screen_offset());
+
     std::unordered_map<uint32_t, std::string> registered_objects;
     for(const auto& object : config.registered_objects()) {
         registered_objects[object.id()] = object.name();
@@ -159,9 +170,7 @@ void Visualization_window::init()
     auto camera_entity = view_->camera();
     camera_entity->lens()->setPerspectiveProjection(90.f, 16.f / 9.f, .1f,
                                                     1000.f);
-    camera_entity->setPosition(QVector3D{0, 25.f, 0});
-    camera_entity->setUpVector(QVector3D{0, 0, -1.f});
-    camera_entity->setViewCenter(QVector3D{0, 0, 0});
+    on_action_show_top_view_triggered();
 
     auto light_entity = new Qt3DCore::QEntity{root_entity_};
     auto light = new Qt3DRender::QPointLight{light_entity};
@@ -178,10 +187,9 @@ void Visualization_window::init()
     controller->setLookSpeed(100.f);
     controller->setCamera(camera_entity);
 
-    scene_modifier_ = std::make_unique<ipme::wb::Scene_modifier>(root_entity_);
-
     view_->setRootEntity(root_entity_);
 
+    //    ui->scene_vertical_layout->addWidget(widget);
     setCentralWidget(widget);
 }
 
@@ -189,6 +197,7 @@ void Visualization_window::show_current_frame()
 {
     if(frame_index_ > 0) {
         scene_modifier_->clear();
+        scene_modifier_->add_screen();
         scene_modifier_->add_frame(frames_[frame_index_ - 1]);
     }
 }
@@ -209,4 +218,23 @@ void Visualization_window::on_action_previous_triggered()
     }
 
     show_current_frame();
+}
+
+void Visualization_window::on_action_show_front_view_triggered()
+{
+    view_->camera()->setPosition(QVector3D{0, 0, 25.f});
+    view_->camera()->setUpVector(QVector3D{0, 1, 0});
+    view_->camera()->setViewCenter(QVector3D{0, 0, 0});
+}
+
+void Visualization_window::on_action_show_top_view_triggered()
+{
+    view_->camera()->setPosition(QVector3D{0, 25.f, 0});
+    view_->camera()->setUpVector(QVector3D{0, 0, -1.f});
+    view_->camera()->setViewCenter(QVector3D{0, 0, 0});
+}
+
+void Visualization_window::on_action_launch_video_triggered()
+{
+    video_window_->show();
 }

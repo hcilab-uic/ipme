@@ -49,7 +49,9 @@ add_library(workbench_ui SHARED
     mainwindow.cpp
     visualization_window.cpp
     workbench_window.cpp
-    live_window.cpp ${UI_SOURCES})
+    live_window.cpp
+    video_window.cpp ${UI_SOURCES})
+
 target_link_libraries(workbench_ui ipme Qt5::Core Qt5::Widgets Qt5::Gui
     Qt5::3DCore Qt5::3DExtras Qt5::3DRender Qt5::3DInput)
 

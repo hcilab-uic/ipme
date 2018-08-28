@@ -18,8 +18,10 @@ public:
     explicit Scene_modifier(Qt3DCore::QEntity* root_entity);
 
     void add_frame(const Frame& frame);
-
+    void add_screen();
     void clear();
+
+    void set_screen_offset(const ipme::scene::Position& offset);
 
 private:
     static const QColor default_color;
@@ -33,10 +35,12 @@ private:
 
     void add_cuboid(const ipme::scene::Pose& pose, QVector3D extents,
                     const QColor& color);
+    void add_gaze(const ipme::scene::Pose& pose);
 
     Qt3DCore::QEntity* root_entity_;
     std::vector<Qt3DCore::QEntity*> spheres_;
     std::vector<Qt3DCore::QEntity*> entities_;
+    QVector3D screen_offset_;
 };
 
 } // namespace ipme::wb

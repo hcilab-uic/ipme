@@ -6,11 +6,13 @@
 #include <vector>
 
 #include <QMainWindow>
+#include <QVector3D>
 #include <Qt3DExtras/Qt3DWindow>
 
 #include "frame.h"
 #include "protobuf/scene.pb.h"
 #include "scene_modifier.h"
+#include "video_window.h"
 
 namespace Ui {
 class Visualization_window;
@@ -24,9 +26,17 @@ public:
     ~Visualization_window();
 
 private slots:
+    void on_action_show_top_view_triggered();
+
+private slots:
+    void on_action_show_front_view_triggered();
+
+private slots:
     void on_action_previous_triggered();
     void on_action_next_triggered();
     void on_file_open_triggered();
+
+    void on_action_launch_video_triggered();
 
 private:
     void make_axes();
@@ -43,6 +53,7 @@ private:
     Qt3DExtras::Qt3DWindow* view_ = nullptr;
     std::unique_ptr<ipme::wb::Scene_modifier> scene_modifier_;
     std::vector<ipme::wb::Frame> frames_;
+    std::unique_ptr<Video_window> video_window_;
 };
 
 #endif // VISUALIZATION_WINDOW_H
