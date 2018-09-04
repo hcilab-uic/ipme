@@ -18,14 +18,19 @@
 #include "data/scene.h"
 #include "scene_modifier.h"
 #include "utils/logger.h"
+#include "video_window.h"
 
 #include "protobuf/scene.pb.h"
 
 Visualization_window::Visualization_window(QWidget* parent)
     : QMainWindow{parent}, ui{new Ui::Visualization_window},
-      root_entity_{new Qt3DCore::QEntity}, view_{new Qt3DExtras::Qt3DWindow}
+      root_entity_{new Qt3DCore::QEntity}, view_{new Qt3DExtras::Qt3DWindow},
+      video_window_{std::make_unique<Video_window>(this)}
 {
     ui->setupUi(this);
+
+    ui->action_pitch_clockwise->setIcon(QIcon{":/icons/cw-x.png"});
+
     setWindowTitle("Visualization Window");
     make_axes();
 
@@ -45,6 +50,8 @@ void Visualization_window::on_file_open_triggered()
         this, "tracking.pb", "/home/harish/ipme_experiments/study_20180810");
     DEBUG() << dir_path.toStdString() << "\n";
 
+    video_window_->set_dirpath(dir_path);
+
     std::ifstream ifs{dir_path.toStdString() + "/tracking.pb"};
 
     ipme::scene::Scene scene_pb;
@@ -60,13 +67,29 @@ void Visualization_window::on_file_open_triggered()
     }
 
     for(const auto& frame : scene_pb.frames()) {
-        if(frame.screen_objects().size() == 0) {
-            continue;
-        }
+        //        if(frame.screen_objects().size() == 0) {
+        //            continue;
+        //        }
+
+        frame_index_map_.emplace(frame.frame_id(), frames_.size());
         frames_.emplace_back(ipme::wb::Frame::create_from_pb(
             frame, config.screen_offset(), registered_objects));
     }
+
+    on_action_next_triggered();
 }
+
+void Visualization_window::show_frame(int frame_index)
+{
+    auto itr = frame_index_map_.find(frame_index);
+    if(itr == std::end(frame_index_map_)) {
+        return;
+    }
+
+    frame_index_ = itr->second;
+    show_current_frame();
+}
+
 void Visualization_window::make_axis(float x, float y, float z, float length,
                                      const QColor& color)
 {
@@ -184,6 +207,7 @@ void Visualization_window::init()
 
     view_->setRootEntity(root_entity_);
 
+    //    ui->scene_vertical_layout->addWidget(widget);
     setCentralWidget(widget);
 }
 
@@ -226,4 +250,10 @@ void Visualization_window::on_action_show_top_view_triggered()
     view_->camera()->setPosition(QVector3D{0, 25.f, 0});
     view_->camera()->setUpVector(QVector3D{0, 0, -1.f});
     view_->camera()->setViewCenter(QVector3D{0, 0, 0});
+}
+
+void Visualization_window::on_action_launch_video_triggered()
+{
+    video_window_->show();
+    video_window_->set_scene_visualization(shared_from_this());
 }

@@ -33,10 +33,9 @@ namespace ipme::wb {
     }
 
     for(const auto& screen_object : scene_frame.screen_objects()) {
-        frame.screen_objects.emplace_back(
-            Screen_object{screen_object.position(), offset,
-                          static_cast<float>(screen_object.size().width()),
-                          static_cast<float>(screen_object.size().height())});
+        frame.screen_objects.emplace_back(Screen_object{
+            screen_object.position(), offset, screen_object.size().width(),
+            screen_object.size().height()});
     }
 
     INFO() << "Loaded " << people_count << " people and " << device_count
@@ -47,24 +46,32 @@ namespace ipme::wb {
 }
 
 Screen_object::Screen_object(const ipme::scene::Position& position,
-                             const ipme::scene::Position& offset, float width_,
-                             float height_)
+                             const ipme::scene::Position& offset, double width_,
+                             double height_)
 {
     auto mutable_position = pose.mutable_position();
-    mutable_position->set_x(position.x() / 1000.f + offset.x());
-    mutable_position->set_y(position.y() / 1000.f + offset.y());
-    mutable_position->set_z(position.z() / 1000.f + offset.z());
+    constexpr double scale_factor = 1000.0;
 
-    auto orientation = pose.mutable_orientation();
-    auto q = QQuaternion::fromAxisAndAngle(1, 0, 0, 90);
-    //    const QQuaternion q{1, 0, 0, 1};
+    const double half_width = width_ / 2.0;
+    const double position_x = (position.x() + half_width) / scale_factor;
+    mutable_position->set_x(position_x + offset.x());
+
+    const double half_height = height_ / 2.0;
+    const double position_y = -(position.y() + half_height) / scale_factor;
+    mutable_position->set_y(position_y + offset.y());
+
+    mutable_position->set_z(position.z() / scale_factor + offset.z());
+
+    const auto orientation = pose.mutable_orientation();
+    const auto q = QQuaternion::fromAxisAndAngle(1, 0, 0, 90);
+
     orientation->set_w(q.scalar());
     orientation->set_x(q.x());
     orientation->set_y(q.y());
     orientation->set_z(q.z());
 
-    width = width_ / 1000.f;
-    height = height_ / 1000.f;
+    width = width_ / scale_factor;
+    height = height_ / scale_factor;
 }
 
 } // namespace ipme::wb

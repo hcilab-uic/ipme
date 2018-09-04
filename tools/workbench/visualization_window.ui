@@ -13,7 +13,19 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="central_widget"/>
+  <widget class="QWidget" name="central_widget">
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>50</y>
+      <width>2</width>
+      <height>2</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="scene_vertical_layout"/>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menu_bar">
    <property name="geometry">
     <rect>
@@ -63,6 +75,8 @@
    <addaction name="separator"/>
    <addaction name="action_pitch_clockwise"/>
    <addaction name="action_pitch_counterclockwise"/>
+   <addaction name="separator"/>
+   <addaction name="action_launch_video"/>
   </widget>
   <action name="file_open">
    <property name="text">
@@ -103,21 +117,27 @@
    </property>
   </action>
   <action name="action_pitch_clockwise">
-   <property name="icon">
-    <iconset>
-     <normaloff>icons/turn_pitch_clockwise.png</normaloff>icons/turn_pitch_clockwise.png</iconset>
-   </property>
    <property name="text">
-    <string>PC</string>
+    <string>X-C</string>
+   </property>
+   <property name="toolTip">
+    <string>Pitch Clockwise</string>
    </property>
   </action>
   <action name="action_pitch_counterclockwise">
-   <property name="icon">
-    <iconset>
-     <normaloff>icons/turn_pitch_counterclockwise.png</normaloff>icons/turn_pitch_counterclockwise.png</iconset>
-   </property>
    <property name="text">
-    <string>PCC</string>
+    <string>X-CC</string>
+   </property>
+   <property name="toolTip">
+    <string>Pitch Counter-Clockwise</string>
+   </property>
+  </action>
+  <action name="action_launch_video">
+   <property name="text">
+    <string>Video</string>
+   </property>
+   <property name="toolTip">
+    <string>Launch Video</string>
    </property>
   </action>
  </widget>

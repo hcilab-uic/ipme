@@ -14,8 +14,8 @@ struct Screen_object {
     ipme::scene::Pose pose;
 
     Screen_object(const ipme::scene::Position& position,
-                  const ipme::scene::Position& offset, float width_,
-                  float height_);
+                  const ipme::scene::Position& offset, double width_,
+                  double height_);
 };
 
 struct Frame {

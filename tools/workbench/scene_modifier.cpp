@@ -45,40 +45,40 @@ void Scene_modifier::add_frame(const Frame& frame)
     }
 
     for(const auto& screen_object : frame.screen_objects) {
-        QVector3D extents{screen_object.width, screen_object.width, 0.05f};
+        QVector3D extents{screen_object.width * scale_factor,
+                          screen_object.height * scale_factor, 0.05f};
         add_cuboid(screen_object.pose, extents, ui_color);
     }
 }
 
 void Scene_modifier::add_screen()
 {
-    static constexpr float x_extent = 7.36f;
-    static constexpr float y_extent = 2.4f;
-    static constexpr float z_extent = 0.001f;
+    //    static constexpr float x_extent = 7.36f;
+    //    static constexpr float y_extent = 2.4f;
+    //    static constexpr float z_extent = 0.001f;
 
-    auto cuboid = new Qt3DExtras::QCuboidMesh;
-    cuboid->setXExtent(x_extent * scale_factor);
-    cuboid->setYExtent(y_extent * scale_factor);
-    cuboid->setZExtent(z_extent);
+    //    auto cuboid = new Qt3DExtras::QCuboidMesh;
+    //    cuboid->setXExtent(x_extent * scale_factor);
+    //    cuboid->setYExtent(y_extent * scale_factor);
+    //    cuboid->setZExtent(z_extent);
 
-    auto cuboid_transform = new Qt3DCore::QTransform;
-    cuboid_transform->setScale(1.f);
+    //    auto cuboid_transform = new Qt3DCore::QTransform;
 
-    QVector3D offset{(screen_offset_.x() + (x_extent / 2)) * scale_factor,
-                     (screen_offset_.y() + (y_extent / 2)) * scale_factor,
-                     screen_offset_.z() * scale_factor};
-    cuboid_transform->setTranslation(offset);
-    cuboid_transform->setScale(1.f);
+    //    QVector3D offset{(screen_offset_.x() + (x_extent / 2)) * scale_factor,
+    //                     (screen_offset_.y() + (y_extent / 2)) * scale_factor,
+    //                     screen_offset_.z() * scale_factor};
+    //    cuboid_transform->setTranslation(offset);
+    //    cuboid_transform->setScale(1.f);
 
-    auto cuboid_material = new Qt3DExtras::QPhongMaterial;
-    cuboid_material->setDiffuse(0xffffff);
+    //    auto cuboid_material = new Qt3DExtras::QPhongMaterial;
+    //    cuboid_material->setDiffuse(0xffffff);
 
-    entities_.emplace_back(new Qt3DCore::QEntity{root_entity_});
-    auto& cuboid_entity = entities_.back();
+    //    entities_.emplace_back(new Qt3DCore::QEntity{root_entity_});
+    //    auto& cuboid_entity = entities_.back();
 
-    cuboid_entity->addComponent(cuboid);
-    cuboid_entity->addComponent(cuboid_material);
-    cuboid_entity->addComponent(cuboid_transform);
+    //    cuboid_entity->addComponent(cuboid);
+    //    cuboid_entity->addComponent(cuboid_material);
+    //    cuboid_entity->addComponent(cuboid_transform);
 }
 
 void Scene_modifier::clear()
