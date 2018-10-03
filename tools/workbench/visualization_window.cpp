@@ -36,6 +36,12 @@ Visualization_window::Visualization_window(QWidget* parent)
 
     scene_modifier_ = std::make_unique<ipme::wb::Scene_modifier>(root_entity_);
 
+    connect(this, &Visualization_window::current_frame_number, this,
+            &Visualization_window::display_frame_number);
+
+    auto& box = ui->vrpn_filter_policy_combobox;
+    box->addItems(QStringList{"Average", "First", "Middle", "Last"});
+
     init();
 }
 
@@ -75,6 +81,8 @@ void Visualization_window::on_file_open_triggered()
         frames_.emplace_back(ipme::wb::Frame::create_from_pb(
             frame, config.screen_offset(), registered_objects));
     }
+
+    ui->end_frame_edit->setText(QString::number(scene_pb.frames().size()));
 
     on_action_next_triggered();
 }
@@ -148,6 +156,15 @@ void Visualization_window::make_axis(const QQuaternion& rotation, float length,
     cone_entity->addComponent(cone_transform);
 }
 
+ipme::wb::Frame Visualization_window::filter(const ipme::wb::Frame& frame)
+{
+    if(ui->vrpn_filter_policy_combobox->currentText() != "First") {
+        WARN() << "Only First is implemented";
+    }
+
+    return frame;
+}
+
 void Visualization_window::make_axes()
 {
     //    auto x_axis = QQuaternion::fromAxisAndAngle(0, 0, 1, -90);
@@ -207,8 +224,8 @@ void Visualization_window::init()
 
     view_->setRootEntity(root_entity_);
 
-    //    ui->scene_vertical_layout->addWidget(widget);
-    setCentralWidget(widget);
+    ui->scene_vertical_layout->addWidget(widget);
+    //    setCentralWidget(widget);
 }
 
 void Visualization_window::show_current_frame()
@@ -217,6 +234,8 @@ void Visualization_window::show_current_frame()
         scene_modifier_->clear();
         scene_modifier_->add_screen();
         scene_modifier_->add_frame(frames_[frame_index_ - 1]);
+
+        emit current_frame_number(frame_index_);
     }
 }
 
@@ -256,4 +275,44 @@ void Visualization_window::on_action_launch_video_triggered()
 {
     video_window_->show();
     video_window_->set_scene_visualization(shared_from_this());
+}
+
+void Visualization_window::display_frame_number(int frame_number)
+{
+    const auto value = QString::number(frame_number);
+    ui->frame_index_lcd->display(value);
+    ui->end_frame_edit->setText(value);
+}
+
+void Visualization_window::on_save_outcome_button_clicked()
+{
+    if(labeled_file_path_.isEmpty()) {
+        labeled_file_path_ = QFileDialog::getSaveFileName(
+            this, tr("Export Labeled File"), "labeled.csv", "CSV file (*.csv)");
+    }
+
+    std::ofstream ofs{labeled_file_path_.toStdString(), std::ios::app};
+
+    const auto record_vrpn_object = [&ofs](auto vrpn_object) {
+        const auto pos = vrpn_object.position();
+        const auto rot = vrpn_object.orientation();
+        ofs << pos.x() << "," << pos.y() << "," << pos.z() << "," << rot.w()
+            << "," << rot.x() << "," << rot.y() << "," << rot.z() << ",";
+    };
+
+    const int label = ui->outcome_label_edit->text().toInt();
+    const size_t begin = ui->start_frame_edit->text().toULong();
+    const size_t end = ui->end_frame_edit->text().toULong();
+    for(size_t i = begin; i < end; ++i) {
+        const auto frame = filter(frames_[i]);
+        for(const auto& person : frame.persons) {
+            record_vrpn_object(person);
+        }
+
+        for(const auto& device : frame.devices) {
+            record_vrpn_object(device);
+        }
+
+        ofs << label << "\n";
+    }
 }

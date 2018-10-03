@@ -43,6 +43,12 @@ private slots:
     void on_file_open_triggered();
 
     void on_action_launch_video_triggered();
+    void display_frame_number(int frame_number);
+
+    void on_save_outcome_button_clicked();
+
+signals:
+    void current_frame_number(int);
 
 private:
     void make_axes();
@@ -53,6 +59,8 @@ private:
     void make_axis(const QQuaternion& rotation, float length,
                    const QColor& color);
 
+    ipme::wb::Frame filter(const ipme::wb::Frame& frame);
+
     int64_t frame_index_{0};
     Ui::Visualization_window* ui;
     Qt3DCore::QEntity* root_entity_ = nullptr;
@@ -61,6 +69,7 @@ private:
     std::vector<ipme::wb::Frame> frames_;
     std::unique_ptr<Video_window> video_window_;
     std::unordered_map<uint32_t, size_t> frame_index_map_;
+    QString labeled_file_path_;
 };
 
 #endif // VISUALIZATION_WINDOW_H

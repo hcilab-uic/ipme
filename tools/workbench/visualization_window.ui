@@ -18,12 +18,116 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>50</y>
-      <width>2</width>
-      <height>2</height>
+      <y>88</y>
+      <width>985</width>
+      <height>573</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="scene_vertical_layout"/>
+   </widget>
+   <widget class="QGroupBox" name="settings_group_box">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>985</width>
+      <height>85</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <widget class="QWidget" name="gridLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>4</x>
+       <y>24</y>
+       <width>596</width>
+       <height>59</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="settings_grid">
+      <item row="1" column="2">
+       <widget class="QLabel" name="vrpn_filter_policy_label">
+        <property name="text">
+         <string>VRPN Objects Filter Policy</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLCDNumber" name="frame_index_lcd">
+        <property name="digitCount">
+         <number>28</number>
+        </property>
+        <property name="segmentStyle">
+         <enum>QLCDNumber::Flat</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <layout class="QGridLayout" name="frame_range_grid">
+        <item row="0" column="0">
+         <widget class="QLineEdit" name="start_frame_edit">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLineEdit" name="outcome_label_edit">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="end_frame_edit">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="save_outcome_button">
+          <property name="text">
+           <string>Save</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="frame_index_label">
+        <property name="text">
+         <string>Frame Index</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="frame_range_label">
+        <property name="text">
+         <string>Frame Range</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QComboBox" name="vrpn_filter_policy_combobox">
+        <property name="currentText">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menu_bar">
@@ -32,7 +136,7 @@
      <x>0</x>
      <y>0</y>
      <width>987</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_file">
@@ -41,7 +145,7 @@
     </property>
     <addaction name="file_open"/>
    </widget>
-   <widget class="QMenu" name="menuNavigate">
+   <widget class="QMenu" name="menu_navigate">
     <property name="title">
      <string>Navigate</string>
     </property>
@@ -49,7 +153,7 @@
     <addaction name="action_next"/>
    </widget>
    <addaction name="menu_file"/>
-   <addaction name="menuNavigate"/>
+   <addaction name="menu_navigate"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="tool_bar">
