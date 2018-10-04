@@ -98,6 +98,10 @@
         </item>
         <item row="0" column="3">
          <widget class="QPushButton" name="save_outcome_button">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(0, 85, 0);
+font-weight: bold;</string>
+          </property>
           <property name="text">
            <string>Save</string>
           </property>
@@ -125,6 +129,16 @@
          <string/>
         </property>
        </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="frame_policy_label">
+        <property name="text">
+         <string>Frame Policy</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QComboBox" name="frame_policy_combobox"/>
       </item>
      </layout>
     </widget>

@@ -42,6 +42,10 @@ Visualization_window::Visualization_window(QWidget* parent)
     auto& box = ui->vrpn_filter_policy_combobox;
     box->addItems(QStringList{"Average", "First", "Middle", "Last"});
 
+    for(const auto& policy : ipme::wb::Frame::policy_map.left) {
+        ui->frame_policy_combobox->addItem(policy.second.c_str());
+    }
+
     init();
 }
 
@@ -67,21 +71,7 @@ void Visualization_window::on_file_open_triggered()
 
     scene_modifier_->set_screen_offset(config.screen_offset());
 
-    std::unordered_map<uint32_t, std::string> registered_objects;
-    for(const auto& object : config.registered_objects()) {
-        registered_objects[object.id()] = object.name();
-    }
-
-    for(const auto& frame : scene_pb.frames()) {
-        //        if(frame.screen_objects().size() == 0) {
-        //            continue;
-        //        }
-
-        frame_index_map_.emplace(frame.frame_id(), frames_.size());
-        frames_.emplace_back(ipme::wb::Frame::create_from_pb(
-            frame, config.screen_offset(), registered_objects));
-    }
-
+    frames_.load(scene_pb);
     ui->end_frame_edit->setText(QString::number(scene_pb.frames().size()));
 
     on_action_next_triggered();
@@ -89,12 +79,11 @@ void Visualization_window::on_file_open_triggered()
 
 void Visualization_window::show_frame(int frame_index)
 {
-    auto itr = frame_index_map_.find(frame_index);
-    if(itr == std::end(frame_index_map_)) {
+    if(!frames_.exists(frame_index)) {
         return;
     }
 
-    frame_index_ = itr->second;
+    frame_index_ = frames_.get_frame_id(frame_index);
     show_current_frame();
 }
 
@@ -177,18 +166,12 @@ void Visualization_window::make_axes()
 
 void Visualization_window::init()
 {
-    //    auto view_ = new Qt3DExtras::Qt3DWindow;
     view_->defaultFrameGraph()->setClearColor(QColor{QRgb{0x4d4d4f}});
-    //    view->defaultFrameGraph()->setClearColor(QColor{QRgb{0x000000}});
     auto container = QWidget::createWindowContainer(view_);
     auto screen_size = view_->screen()->size();
     container->setMinimumSize(QSize{200, 100});
-    //    container->setGeometry(0, 50, screen_size.width(),
-    //    screen_size.height());
     container->setMaximumSize(screen_size);
     auto widget = new QWidget;
-    //    QLineEdit* edit = new QLineEdit{widget};
-    //    edit->setGeometry(0, 0, 100, 25);
 
     auto h_layout = new QHBoxLayout{widget};
     auto v_layout = new QVBoxLayout;
@@ -201,7 +184,6 @@ void Visualization_window::init()
 
     auto input = new Qt3DInput::QInputAspect;
     view_->registerAspect(input);
-    //    auto root_entity = new Qt3DCore::QEntity;
     auto camera_entity = view_->camera();
     camera_entity->lens()->setPerspectiveProjection(90.f, 16.f / 9.f, .1f,
                                                     1000.f);
@@ -225,7 +207,6 @@ void Visualization_window::init()
     view_->setRootEntity(root_entity_);
 
     ui->scene_vertical_layout->addWidget(widget);
-    //    setCentralWidget(widget);
 }
 
 void Visualization_window::show_current_frame()

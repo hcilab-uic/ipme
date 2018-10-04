@@ -2,9 +2,23 @@
 
 #include <QQuaternion>
 
+#include <boost/assign.hpp>
+
 #include "utils/logger.h"
 
 namespace ipme::wb {
+// const boost::bimap<Frame::Policy, std::string> Frame::policy_map = {
+//    {Frame::Policy::fill_zeros, "Fill Zeros"},
+//    {Frame::Policy::all_registered, "All Registered"},
+//};
+
+// clang-format off
+const Frame::map_type Frame::policy_map =
+    boost::assign::list_of<Frame::map_type::relation>
+        (Frame::Policy::fill_zeros, "Fill Zeros")
+        (Frame::Policy::all_registered, "All Registered");
+// clang-format on
+
 /* static */ Frame Frame::create_from_pb(
     const ipme::scene::Frame& scene_frame, const ipme::scene::Position& offset,
     const std::unordered_map<uint32_t, std::string>& registered_objects)
@@ -43,6 +57,22 @@ namespace ipme::wb {
            << " screen objects";
 
     return frame;
+}
+
+Frame::container Frame::load_scene_pb(const ipme::scene::Scene& scene_pb)
+{
+    container frames;
+    const auto& config = scene_pb.config();
+    std::unordered_map<uint32_t, std::string> registered_objects;
+    for(const auto& object : config.registered_objects()) {
+        registered_objects[object.id()] = object.name();
+    }
+
+    for(const auto& frame : scene_pb.frames()) {
+        frames.emplace_back(
+            create_from_pb(frame, config.screen_offset(), registered_objects));
+    }
+    return frames;
 }
 
 Screen_object::Screen_object(const ipme::scene::Position& position,

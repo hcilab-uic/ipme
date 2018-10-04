@@ -15,6 +15,7 @@ set(SOURCES
     color.cpp
     config.cpp
     frame.cpp
+    frame_collection.cpp
     frame_model.cpp
     geometry.cpp
     main.cpp

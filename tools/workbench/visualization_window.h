@@ -10,6 +10,7 @@
 #include <Qt3DExtras/Qt3DWindow>
 
 #include "frame.h"
+#include "frame_collection.h"
 #include "protobuf/scene.pb.h"
 #include "scene_modifier.h"
 #include "scene_visualization.h"
@@ -66,10 +67,11 @@ private:
     Qt3DCore::QEntity* root_entity_ = nullptr;
     Qt3DExtras::Qt3DWindow* view_ = nullptr;
     std::unique_ptr<ipme::wb::Scene_modifier> scene_modifier_;
-    std::vector<ipme::wb::Frame> frames_;
+    //    std::vector<ipme::wb::Frame> frames_;
     std::unique_ptr<Video_window> video_window_;
-    std::unordered_map<uint32_t, size_t> frame_index_map_;
+    //    std::unordered_map<uint32_t, size_t> frame_index_map_;
     QString labeled_file_path_;
+    ipme::wb::Frame_collection frames_;
 };
 
 #endif // VISUALIZATION_WINDOW_H
