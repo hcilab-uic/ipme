@@ -52,12 +52,12 @@ public:
         return frames_[index];
     }
 
-    inline bool exists(size_t frame_index) const
+    inline bool exists(int frame_index) const
     {
         return frame_index_map_.find(frame_index) != std::end(frame_index_map_);
     }
 
-    size_t get_frame_id(size_t frame_index) const;
+    size_t get_frame_id(int frame_index) const;
 
     void apply_filter(std::string_view filter_name);
 

@@ -16,7 +16,7 @@ void Frame_collection::load(const ipme::scene::Scene& scene)
     }
 }
 
-size_t Frame_collection::get_frame_id(size_t frame_index) const
+size_t Frame_collection::get_frame_id(int frame_index) const
 {
     if(!exists(frame_index)) {
         throw std::runtime_error{"frame index " + std::to_string(frame_index) +

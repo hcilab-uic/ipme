@@ -8,6 +8,7 @@ ElementValue Json::get(std::string_view path) const
         value = ptree_.get<ElementValue>(path.data());
     } catch(const boost::property_tree::ptree_bad_path& ex) {
         std::cout << ex.what() << std::endl;
+        value = ElementValue{};
     }
 
     return value;

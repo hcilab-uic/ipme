@@ -154,35 +154,37 @@ float compute_furthest_point_distance(const core::Polygon2f& polygon,
     return max_distance;
 }
 
-void Scene_widget::show_intersections(size_t object_index1,
-                                      size_t object_index2,
-                                      const Color& color) const
+void Scene_widget::show_intersections(size_t /*object_index1*/,
+                                      size_t /*object_index2*/,
+                                      const Color& /*color*/) const
 {
-    auto p1 = flatten_polygon(objects_[object_index1].transaction_segment());
-    auto p2 = flatten_polygon(objects_[object_index2].transaction_segment());
-    auto intersections = core::compute_intersection(p1, p2);
+    //    auto p1 =
+    //    flatten_polygon(objects_[object_index1].transaction_segment()); auto
+    //    p2 = flatten_polygon(objects_[object_index2].transaction_segment());
+    //    auto intersections = core::compute_intersection(p1, p2);
 
-    qInfo() << "intersection count =  " << intersections.size()
-            << " for indices " << object_index1 << ", " << object_index2;
+    //    qInfo() << "intersection count =  " << intersections.size()
+    //            << " for indices " << object_index1 << ", " << object_index2;
 
-    auto circle_polygon =
-        Geometry::construct_circle_as_polygon(core::Point3f{0, 0, 0}, 1.f);
+    //    auto circle_polygon =
+    //        Geometry::construct_circle_as_polygon(core::Point3f{0, 0,
+    //        0}, 1.f);
 
-    for(const auto& polygon : intersections) {
-        auto clipped_polygons = core::compute_intersection(
-            flatten_polygon(circle_polygon), polygon);
+    //    for(const auto& polygon : intersections) {
+    //        auto clipped_polygons = core::compute_intersection(
+    //            flatten_polygon(circle_polygon), polygon);
 
-        for(const auto& clipped_polygon : clipped_polygons) {
-            auto clipped_center =
-                boost::geometry::return_centroid<core::Point2f>(
-                    clipped_polygon);
-            float clipped_radius = compute_furthest_point_distance(
-                clipped_polygon, clipped_center);
-            Geometry::draw_circle(
-                core::Point3f{clipped_center.x(), clipped_center.y(), 0.f},
-                clipped_radius, color);
-        }
-    }
+    //        for(const auto& clipped_polygon : clipped_polygons) {
+    //            auto clipped_center =
+    //                boost::geometry::return_centroid<core::Point2f>(
+    //                    clipped_polygon);
+    //            float clipped_radius = compute_furthest_point_distance(
+    //                clipped_polygon, clipped_center);
+    //            Geometry::draw_circle(
+    //                core::Point3f{clipped_center.x(), clipped_center.y(),
+    //                0.f}, clipped_radius, color);
+    //        }
+    //    }
 }
 
 } // namespace ipme::wb
