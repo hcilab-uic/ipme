@@ -48,6 +48,8 @@ private slots:
 
     void on_save_outcome_button_clicked();
 
+    void on_frame_policy_combobox_currentIndexChanged(const QString& arg1);
+
 signals:
     void current_frame_number(int);
 
@@ -59,6 +61,7 @@ private:
                    const QColor& color);
     void make_axis(const QQuaternion& rotation, float length,
                    const QColor& color);
+    void apply_frames_filter();
 
     ipme::wb::Frame filter(const ipme::wb::Frame& frame);
 

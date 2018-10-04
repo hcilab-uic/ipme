@@ -72,6 +72,7 @@ void Visualization_window::on_file_open_triggered()
     scene_modifier_->set_screen_offset(config.screen_offset());
 
     frames_.load(scene_pb);
+    apply_frames_filter();
     ui->end_frame_edit->setText(QString::number(scene_pb.frames().size()));
 
     on_action_next_triggered();
@@ -143,6 +144,12 @@ void Visualization_window::make_axis(const QQuaternion& rotation, float length,
     cone_entity->addComponent(cone);
     cone_entity->addComponent(cone_material);
     cone_entity->addComponent(cone_transform);
+}
+
+void Visualization_window::apply_frames_filter()
+{
+    const auto filter_name = ui->frame_policy_combobox->currentText();
+    frames_.apply_filter(filter_name.toStdString());
 }
 
 ipme::wb::Frame Visualization_window::filter(const ipme::wb::Frame& frame)
@@ -296,4 +303,12 @@ void Visualization_window::on_save_outcome_button_clicked()
 
         ofs << label << "\n";
     }
+
+    ui->start_frame_edit->setText(QString::number(end));
+}
+
+void Visualization_window::on_frame_policy_combobox_currentIndexChanged(
+    const QString& /*arg1*/)
+{
+    apply_frames_filter();
 }

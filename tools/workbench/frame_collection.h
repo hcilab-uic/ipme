@@ -1,6 +1,7 @@
 #ifndef IPME_WB_FRAME_COLLECTION_H
 #define IPME_WB_FRAME_COLLECTION_H
 
+#include <string_view>
 #include <unordered_map>
 
 #include "frame.h"
@@ -58,6 +59,8 @@ public:
 
     size_t get_frame_id(size_t frame_index) const;
 
+    void apply_filter(std::string_view filter_name);
+
 private:
     void add(const ipme::scene::Frame& frame);
 
@@ -65,6 +68,7 @@ private:
     ipme::scene::Position screen_offset_;
     std::unordered_map<uint32_t, size_t> frame_index_map_;
     std::unordered_map<uint32_t, std::string> registered_objects_;
+    std::vector<uint32_t> registered_objects_ids_;
 };
 
 } // namespace ipme::wb

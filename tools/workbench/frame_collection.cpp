@@ -8,6 +8,7 @@ void Frame_collection::load(const ipme::scene::Scene& scene)
 
     for(const auto& object : config.registered_objects()) {
         registered_objects_[object.id()] = object.name();
+        registered_objects_ids_.push_back(object.id());
     }
 
     for(const auto& frame : scene.frames()) {
@@ -23,6 +24,26 @@ size_t Frame_collection::get_frame_id(size_t frame_index) const
     }
 
     return frame_index_map_.find(frame_index)->second;
+}
+
+void Frame_collection::apply_filter(std::string_view filter_name)
+{
+    const auto filter =
+        Frame::policy_map.right.at(std::string{filter_name.data()});
+    if(filter == Frame::Policy::all_registered) {
+        auto itr = std::begin(frames_);
+        const auto itr_end = std::end(frames_);
+        while(itr != itr_end) {
+            if(!itr->has_all_vrpn_ids(registered_objects_ids_)) {
+                std::cout << "removing \n";
+                itr = frames_.erase(itr);
+            }
+        }
+    } else {
+        for(auto& frame : frames_) {
+            frame.apply_filter(filter_name);
+        }
+    }
 }
 
 void Frame_collection::add(const ipme::scene::Frame& frame)

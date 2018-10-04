@@ -20,7 +20,8 @@ struct Screen_object {
                   double height_);
 };
 
-struct Frame {
+class Frame {
+public:
     enum class Policy : unsigned short
     {
         fill_zeros,
@@ -35,13 +36,26 @@ struct Frame {
     std::vector<ipme::scene::Pose> devices;
     std::vector<Screen_object> screen_objects;
 
+    void apply_filter(Policy policy_value);
+    void apply_filter(std::string_view policy_name);
+
+    void apply_fill_zeros();
+    void apply_all_registered();
+
+    template <typename Container>
+    bool has_all_vrpn_ids(Container&& ids);
+
     static Frame create_from_pb(
         const ipme::scene::Frame& frame, const ipme::scene::Position& offset,
         const std::unordered_map<uint32_t, std::string>& registered_objects);
 
     static container load_scene_pb(const ipme::scene::Scene& scene_pb);
-};
 
+private:
+    std::unordered_set<uint32_t> vrpn_ids_;
+};
 } // namespace ipme::wb
+
+#include "frame.ipp"
 
 #endif // IPME_WB_FRAME_H

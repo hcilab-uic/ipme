@@ -7,11 +7,6 @@
 #include "utils/logger.h"
 
 namespace ipme::wb {
-// const boost::bimap<Frame::Policy, std::string> Frame::policy_map = {
-//    {Frame::Policy::fill_zeros, "Fill Zeros"},
-//    {Frame::Policy::all_registered, "All Registered"},
-//};
-
 // clang-format off
 const Frame::map_type Frame::policy_map =
     boost::assign::list_of<Frame::map_type::relation>
@@ -19,11 +14,40 @@ const Frame::map_type Frame::policy_map =
         (Frame::Policy::all_registered, "All Registered");
 // clang-format on
 
-/* static */ Frame Frame::create_from_pb(
+/* static */ void Frame::apply_filter(Frame::Policy policy_value)
+{
+    switch(policy_value) {
+    case Policy::fill_zeros:
+        return apply_fill_zeros();
+
+    case Policy::all_registered:
+        return apply_all_registered();
+
+    default:
+        throw std::runtime_error{"invalid policy"};
+    }
+}
+
+void Frame::apply_filter(std::string_view policy_name)
+{
+    apply_filter(policy_map.right.at(std::string{policy_name.data()}));
+}
+
+void Frame::apply_fill_zeros()
+{
+}
+
+void Frame::apply_all_registered()
+{
+    throw std::runtime_error{"apply_all_registered() unimplemented"};
+}
+
+Frame Frame::create_from_pb(
     const ipme::scene::Frame& scene_frame, const ipme::scene::Position& offset,
     const std::unordered_map<uint32_t, std::string>& registered_objects)
 {
     Frame frame;
+
     size_t device_count{0};
     size_t people_count{0};
     for(const auto& vrpn_object : scene_frame.vrpn_objects()) {
@@ -36,11 +60,17 @@ const Frame::map_type Frame::policy_map =
 
         const auto type = itr->second;
         if(type.find("person") != std::string::npos) {
-            frame.persons.push_back(vrpn_object.pose());
-            ++device_count;
+            if(frame.vrpn_ids_.find(source_id) == std::end(frame.vrpn_ids_)) {
+                frame.persons.push_back(vrpn_object.pose());
+                ++people_count;
+                frame.vrpn_ids_.insert(source_id);
+            }
         } else if(type.find("computer") != std::string::npos) {
-            frame.devices.push_back(vrpn_object.pose());
-            ++people_count;
+            if(frame.vrpn_ids_.find(source_id) == std::end(frame.vrpn_ids_)) {
+                frame.devices.push_back(vrpn_object.pose());
+                ++device_count;
+                frame.vrpn_ids_.insert(source_id);
+            }
         } else {
             ERROR() << "Unknown type " << type;
         }
