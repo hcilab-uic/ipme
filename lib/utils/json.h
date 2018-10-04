@@ -28,6 +28,11 @@ public:
 
     std::string to_string() const;
 
+    inline const boost::property_tree::ptree& root() const
+    {
+        return ptree_;
+    }
+
 private:
     boost::property_tree::ptree ptree_;
 };

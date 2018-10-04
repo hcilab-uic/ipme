@@ -47,6 +47,7 @@ Frame Frame::create_from_pb(
     const std::unordered_map<uint32_t, std::string>& registered_objects)
 {
     Frame frame;
+    frame.frame_id_ = scene_frame.frame_id();
 
     size_t device_count{0};
     size_t people_count{0};
@@ -85,6 +86,16 @@ Frame Frame::create_from_pb(
     INFO() << "Loaded " << people_count << " people and " << device_count
            << " devices " << scene_frame.screen_objects().size()
            << " screen objects";
+
+    bool found{true};
+    for(const auto& ro : registered_objects) {
+        if(frame.vrpn_ids_.find(ro.first) == std::end(frame.vrpn_ids_)) {
+            found = false;
+            break;
+        }
+    }
+
+    frame.has_all_registered_ids_ = found;
 
     return frame;
 }

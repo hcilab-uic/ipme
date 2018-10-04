@@ -1,6 +1,7 @@
 #ifndef IPME_WB_FRAME_H
 #define IPME_WB_FRAME_H
 
+#include <limits>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -36,6 +37,16 @@ public:
     std::vector<ipme::scene::Pose> devices;
     std::vector<Screen_object> screen_objects;
 
+    inline bool has_all_registered_ids() const
+    {
+        return has_all_registered_ids_;
+    }
+
+    inline uint32_t frame_id() const
+    {
+        return frame_id_;
+    }
+
     void apply_filter(Policy policy_value);
     void apply_filter(std::string_view policy_name);
 
@@ -52,6 +63,8 @@ public:
     static container load_scene_pb(const ipme::scene::Scene& scene_pb);
 
 private:
+    uint32_t frame_id_{std::numeric_limits<uint32_t>::infinity()};
+    bool has_all_registered_ids_{false};
     std::unordered_set<uint32_t> vrpn_ids_;
 };
 } // namespace ipme::wb

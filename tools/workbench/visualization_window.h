@@ -50,6 +50,8 @@ private slots:
 
     void on_frame_policy_combobox_currentIndexChanged(const QString& arg1);
 
+    void on_action_load_labels_triggered();
+
 signals:
     void current_frame_number(int);
 
@@ -75,6 +77,7 @@ private:
     //    std::unordered_map<uint32_t, size_t> frame_index_map_;
     QString labeled_file_path_;
     ipme::wb::Frame_collection frames_;
+    std::unordered_map<std::string, int> outcome_labels_;
 };
 
 #endif // VISUALIZATION_WINDOW_H

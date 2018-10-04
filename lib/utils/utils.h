@@ -3,6 +3,8 @@
 
 #include <string>
 
+#define UNUSED(x) (__attribute__((unused))(x))
+
 namespace ipme {
 namespace utils {
 /*!

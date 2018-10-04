@@ -8,7 +8,7 @@ void Frame_collection::load(const ipme::scene::Scene& scene)
 
     for(const auto& object : config.registered_objects()) {
         registered_objects_[object.id()] = object.name();
-        registered_objects_ids_.push_back(object.id());
+        registered_objects_ids_.insert(object.id());
     }
 
     for(const auto& frame : scene.frames()) {

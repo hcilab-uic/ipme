@@ -4,23 +4,26 @@
 #include <fstream>
 #include <unordered_map>
 
+#include <boost/tokenizer.hpp>
+
 #include <QDir>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QLineEdit>
 #include <QQuaternion>
 #include <QVBoxLayout>
 #include <Qt3DCore>
 #include <Qt3DExtras>
 #include <Qt3DRender/QCamera>
 
-#include <QLineEdit>
-
 #include "data/scene.h"
-#include "scene_modifier.h"
-#include "utils/logger.h"
-#include "video_window.h"
-
 #include "protobuf/scene.pb.h"
+#include "scene_modifier.h"
+#include "utils/json.h"
+#include "utils/logger.h"
+#include "utils/string_utils.h"
+#include "utils/utils.h"
+#include "video_window.h"
 
 Visualization_window::Visualization_window(QWidget* parent)
     : QMainWindow{parent}, ui{new Ui::Visualization_window},
@@ -288,11 +291,17 @@ void Visualization_window::on_save_outcome_button_clicked()
             << "," << rot.x() << "," << rot.y() << "," << rot.z() << ",";
     };
 
-    const int label = ui->outcome_label_edit->text().toInt();
+    const auto selected_label =
+        ui->outcome_label_combobox->currentText().toStdString();
+    const int label = outcome_labels_[selected_label];
     const size_t begin = ui->start_frame_edit->text().toULong();
     const size_t end = ui->end_frame_edit->text().toULong();
     for(size_t i = begin; i < end; ++i) {
         const auto frame = filter(frames_[i]);
+        if(!frame.has_all_registered_ids()) {
+            continue;
+        }
+        ofs << frame.frame_id() << ",";
         for(const auto& person : frame.persons) {
             record_vrpn_object(person);
         }
@@ -311,4 +320,17 @@ void Visualization_window::on_frame_policy_combobox_currentIndexChanged(
     const QString& /*arg1*/)
 {
     apply_frames_filter();
+}
+
+void Visualization_window::on_action_load_labels_triggered()
+{
+    const auto label_config_file = QFileDialog::getOpenFileName(
+        this, tr("Label config file"), "label.csv", "JSON file (*.csv)");
+    std::ifstream ifs{label_config_file.toStdString()};
+    std::string line;
+    while(std::getline(ifs, line)) {
+        const auto tokens = ipme::utils::split_string(line, ",");
+        outcome_labels_.emplace(tokens[0], std::atoi(tokens[1].c_str()));
+        ui->outcome_label_combobox->addItem(QString{tokens[0].c_str()});
+    }
 }

@@ -76,16 +76,6 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QLineEdit" name="outcome_label_edit">
-          <property name="text">
-           <string>0</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
          <widget class="QLineEdit" name="end_frame_edit">
           <property name="text">
@@ -106,6 +96,9 @@ font-weight: bold;</string>
            <string>Save</string>
           </property>
          </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QComboBox" name="outcome_label_combobox"/>
         </item>
        </layout>
       </item>
@@ -158,6 +151,7 @@ font-weight: bold;</string>
      <string>File</string>
     </property>
     <addaction name="file_open"/>
+    <addaction name="action_load_labels"/>
    </widget>
    <widget class="QMenu" name="menu_navigate">
     <property name="title">
@@ -195,6 +189,7 @@ font-weight: bold;</string>
    <addaction name="action_pitch_counterclockwise"/>
    <addaction name="separator"/>
    <addaction name="action_launch_video"/>
+   <addaction name="action_load_labels"/>
   </widget>
   <action name="file_open">
    <property name="text">
@@ -256,6 +251,11 @@ font-weight: bold;</string>
    </property>
    <property name="toolTip">
     <string>Launch Video</string>
+   </property>
+  </action>
+  <action name="action_load_labels">
+   <property name="text">
+    <string>Load Labels</string>
    </property>
   </action>
  </widget>
