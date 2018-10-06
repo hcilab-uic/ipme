@@ -12,7 +12,7 @@ set(boost_build
 )
 
 set(boost_url
-  "https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.gz")
+  "https://dl.bintray.com/boostorg/release/1.68.0/source/boost_1_68_0.tar.gz")
 
 ExternalProject_Add(Boost
   PREFIX                boost
