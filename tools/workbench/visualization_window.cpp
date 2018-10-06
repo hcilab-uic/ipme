@@ -278,8 +278,13 @@ void Visualization_window::display_frame_number(int frame_number)
 void Visualization_window::on_save_outcome_button_clicked()
 {
     if(labeled_file_path_.isEmpty()) {
-        labeled_file_path_ = QFileDialog::getSaveFileName(
-            this, tr("Export Labeled File"), "labeled.csv", "CSV file (*.csv)");
+        std::string file_name{
+            "labeled-" + ipme::utils::create_timestamp_string("%Y%m%d-%H%M%S") +
+            "-.csv"};
+
+        labeled_file_path_ =
+            QFileDialog::getSaveFileName(this, tr("Export Labeled File"),
+                                         file_name.c_str(), "CSV file (*.csv)");
     }
 
     std::ofstream ofs{labeled_file_path_.toStdString(), std::ios::app};
