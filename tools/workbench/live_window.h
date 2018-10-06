@@ -130,7 +130,7 @@ private:
     ipme::wb::Sage_handler sage_handler_;
     ipme::sensor::Vicon_listener vrpn_listener_;
 
-    std::unique_ptr<omicronConnector::OmicronConnectorClient> omicron_client_;
+    std::shared_ptr<omicronConnector::OmicronConnectorClient> omicron_client_;
 };
 
 #endif // LIVE_WINDOW_H

@@ -70,10 +70,11 @@ private:
     int64_t frame_index_{0};
     Ui::Visualization_window* ui;
     Qt3DCore::QEntity* root_entity_ = nullptr;
-    Qt3DExtras::Qt3DWindow* view_ = nullptr;
+    //    Qt3DExtras::Qt3DWindow* view_ = nullptr;
+    std::shared_ptr<Qt3DExtras::Qt3DWindow> view_;
     std::unique_ptr<ipme::wb::Scene_modifier> scene_modifier_;
     //    std::vector<ipme::wb::Frame> frames_;
-    std::unique_ptr<Video_window> video_window_;
+    std::shared_ptr<Video_window> video_window_;
     //    std::unordered_map<uint32_t, size_t> frame_index_map_;
     QString labeled_file_path_;
     ipme::wb::Frame_collection frames_;

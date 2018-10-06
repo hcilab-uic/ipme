@@ -27,8 +27,9 @@
 
 Visualization_window::Visualization_window(QWidget* parent)
     : QMainWindow{parent}, ui{new Ui::Visualization_window},
-      root_entity_{new Qt3DCore::QEntity}, view_{new Qt3DExtras::Qt3DWindow},
-      video_window_{std::make_unique<Video_window>(this)}
+      root_entity_{new Qt3DCore::QEntity},
+      view_{std::make_shared<Qt3DExtras::Qt3DWindow>()},
+      video_window_{std::make_shared<Video_window>(this)}
 {
     ui->setupUi(this);
 
@@ -54,9 +55,16 @@ Visualization_window::Visualization_window(QWidget* parent)
 
 Visualization_window::~Visualization_window()
 {
-    if(ui) {
-        delete ui;
-    }
+    const auto cleanup = [](auto object) {
+        if(object) {
+            delete object;
+            object = nullptr;
+        }
+    };
+
+    cleanup(root_entity_);
+    //    cleanup(view_);
+    cleanup(ui);
 }
 
 void Visualization_window::on_file_open_triggered()
@@ -179,7 +187,7 @@ void Visualization_window::make_axes()
 void Visualization_window::init()
 {
     view_->defaultFrameGraph()->setClearColor(QColor{QRgb{0x4d4d4f}});
-    auto container = QWidget::createWindowContainer(view_);
+    auto container = QWidget::createWindowContainer(view_.get());
     auto screen_size = view_->screen()->size();
     container->setMinimumSize(QSize{200, 100});
     container->setMaximumSize(screen_size);

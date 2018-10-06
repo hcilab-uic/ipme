@@ -12,11 +12,11 @@ namespace sensor {
 namespace oc = omicronConnector;
 
 class Vicon_listener : public oc::IOmicronConnectorClientListener {
-  public:
+public:
     /**
      * Constructor
      */
-    Vicon_listener(std::unique_ptr<Vicon_datahandler> handler);
+    Vicon_listener(std::shared_ptr<Vicon_datahandler> handler);
 
     /**
      * virtual destructor
@@ -36,9 +36,9 @@ class Vicon_listener : public oc::IOmicronConnectorClientListener {
      */
     virtual void onEvent(const oc::EventData& event) override;
 
-  private:
+private:
     unsigned int event_count_ = 0;
-    std::unique_ptr<Vicon_datahandler> handler_;
+    std::shared_ptr<Vicon_datahandler> handler_;
 };
 
 } // namespace sensor

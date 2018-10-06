@@ -62,6 +62,7 @@ Live_window::Live_window(const ipme::wb::Config& config, QWidget* parent)
 Live_window::~Live_window()
 {
     set_state(ipme::wb::State_machine::State::uninitialized);
+
     if(ui) {
         delete ui;
         ui = nullptr;
@@ -176,7 +177,7 @@ void Live_window::process_vrpn()
 bool Live_window::initialize_vrpn()
 {
     using omicron = omicronConnector::OmicronConnectorClient;
-    omicron_client_ = std::make_unique<omicron>(&vrpn_listener_);
+    omicron_client_ = std::make_shared<omicron>(&vrpn_listener_);
 
     const auto host = ui->vrpn_host_edit->text();
     const auto port = ui->vrpn_port_edit->text().toShort();
@@ -285,7 +286,7 @@ void Live_window::shutdown_vrpn()
 {
     if(omicron_client_) {
         omicron_client_->dispose();
-        omicron_client_.release();
+        //        omicron_client_.release();
     }
 
     set_status_indicator(ui->vrpn_status_indicator_label, false);

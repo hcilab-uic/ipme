@@ -4,7 +4,7 @@
 
 namespace ipme {
 namespace sensor {
-Vicon_listener::Vicon_listener(std::unique_ptr<Vicon_datahandler> handler)
+Vicon_listener::Vicon_listener(std::shared_ptr<Vicon_datahandler> handler)
     : handler_{std::move(handler)}
 {
 }
