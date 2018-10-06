@@ -54,7 +54,9 @@ Visualization_window::Visualization_window(QWidget* parent)
 
 Visualization_window::~Visualization_window()
 {
-    delete ui;
+    if(ui) {
+        delete ui;
+    }
 }
 
 void Visualization_window::on_file_open_triggered()
