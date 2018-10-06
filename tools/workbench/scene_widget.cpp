@@ -172,7 +172,7 @@ void Scene_widget::show_intersections(size_t object_index1,
         auto clipped_polygons = core::compute_intersection(
             flatten_polygon(circle_polygon), polygon);
 
-        for(const auto& clipped_polygon : clipped_polygons) {
+        for(const auto& clipped_polygon __attribute__((unused)) :
             // We are using the out-parameter version geometry::centroid()
             // instead of geometry::return_centroid() because of a GCC issue
             // that unnecessarily warns of an unused parameter in the function
@@ -181,11 +181,9 @@ void Scene_widget::show_intersections(size_t object_index1,
             boost::geometry::centroid<decltype(clipped_polygon), core::Point2f>(
                 clipped_polygon, clipped_center);
 
-            float clipped_radius = compute_furthest_point_distance(
-                clipped_polygon, clipped_center);
-            Geometry::draw_circle(
-                core::Point3f{clipped_center.x(), clipped_center.y(), 0.f},
-                clipped_radius, color);
+            //            Geometry::draw_circle(
+            //                core::Point3f{clipped_center.x(),
+            //                clipped_center.y(), 0.f}, clipped_radius, color);
         }
     }
 }
