@@ -52,6 +52,8 @@ private slots:
 
     void on_action_load_labels_triggered();
 
+    void on_Visualization_window_destroyed();
+
 signals:
     void current_frame_number(int);
 

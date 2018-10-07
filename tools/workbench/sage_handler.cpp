@@ -44,12 +44,11 @@ using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 namespace websocket =
     boost::beast::websocket; // from <boost/beast/websocket.hpp>
 
-std::pair<std::string_view, std::shared_ptr<Sage_message_handler>>
-create_default(std::string_view alias, std::string_view name)
+std::pair<std::string, std::shared_ptr<Sage_message_handler>>
+create_default(const std::string& alias, const std::string& name)
 {
-    return std::make_pair(
-        alias, std::make_shared<ipme::wb::sage::Default_sage_message_handler>(
-                   name, alias));
+    using handler_type = ipme::wb::sage::Default_sage_message_handler;
+    return std::make_pair(alias, std::make_shared<handler_type>(name, alias));
 }
 
 template <typename Handler>
@@ -204,6 +203,7 @@ void Sage_handler::flush()
 void Sage_handler::init_handlers()
 {
     namespace sage = ipme::wb::sage;
+    handler_map_.insert(create_default("0000", "partitionsGrabAllContent"));
     //    handler_map_.insert(create_default("0002",
     //    "registerInteractionClient"));
     //    handler_map_.insert(create_default("0003", "getActiveClients"));
@@ -259,9 +259,14 @@ void Sage_handler::internal_start()
         ss << boost::beast::buffers(buffer.data());
 
         utils::Json json;
-        json.read(ss);
-        const auto& handler = handler_map_[json.get("f")];
-        handler->dispatch(json);
+        try {
+            json.read(ss);
+            std::string name = json.get("f");
+            const auto& handler = handler_map_[name];
+            handler->dispatch(json);
+        } catch(const std::exception&) {
+            WARN() << "could not process " << ss.str();
+        }
     }
 
     INFO() << "Shutting down SAGE2 handler...";

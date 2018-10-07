@@ -349,3 +349,8 @@ void Visualization_window::on_action_load_labels_triggered()
         ui->outcome_label_combobox->addItem(QString{tokens[0].c_str()});
     }
 }
+
+void Visualization_window::on_Visualization_window_destroyed()
+{
+    INFO() << "Shutting down visualization window";
+}

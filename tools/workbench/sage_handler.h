@@ -48,7 +48,7 @@ private:
     boost::beast::websocket::stream<boost::asio::ip::tcp::socket> wstream_;
     std::unique_ptr<std::thread> sage_thread_;
     std::shared_ptr<State_machine> state_machine_;
-    std::unordered_map<std::string_view, std::shared_ptr<Sage_message_handler>>
+    std::unordered_map<std::string, std::shared_ptr<Sage_message_handler>>
         handler_map_;
     std::shared_ptr<ipme::wb::sage::Sage_element_container> element_container_;
     std::shared_ptr<data::Scene> scene_;
