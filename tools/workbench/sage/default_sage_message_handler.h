@@ -9,8 +9,8 @@
 namespace ipme::wb::sage {
 class Default_sage_message_handler : public ipme::wb::Sage_message_handler {
 public:
-    inline Default_sage_message_handler(std::string_view name,
-                                        std::string_view alias)
+    inline Default_sage_message_handler(const std::string& name,
+                                        const std::string& alias)
         : name_{name}, alias_{alias}
     {
     }
@@ -39,8 +39,8 @@ protected:
     std::shared_ptr<ipme::wb::sage::Sage_element_container> container_;
 
 private:
-    std::string_view name_;
-    std::string_view alias_;
+    std::string name_;
+    std::string alias_;
     ipme::utils::Json json_;
 };
 } // namespace ipme::wb::sage

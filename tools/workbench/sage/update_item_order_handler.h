@@ -6,7 +6,7 @@
 namespace ipme::wb::sage {
 class Update_item_order_handler : public Default_sage_message_handler {
 public:
-    inline Update_item_order_handler(std::string_view alias)
+    inline Update_item_order_handler(const std::string& alias)
         : Default_sage_message_handler{"updateItemOrder", alias}
     {
     }

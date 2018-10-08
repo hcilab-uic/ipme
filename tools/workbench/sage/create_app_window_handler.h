@@ -8,7 +8,7 @@
 namespace ipme::wb::sage {
 class Create_app_window_handler : public Default_sage_message_handler {
 public:
-    inline Create_app_window_handler(std::string_view alias)
+    inline Create_app_window_handler(const std::string& alias)
         : Default_sage_message_handler{"createAppWindow", alias}
     {
     }

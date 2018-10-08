@@ -52,8 +52,8 @@ create_default(const std::string& alias, const std::string& name)
 }
 
 template <typename Handler>
-std::pair<std::string_view, std::shared_ptr<Sage_message_handler>>
-create(std::string_view alias)
+std::pair<std::string, std::shared_ptr<Sage_message_handler>>
+create(const std::string& alias)
 {
     return std::make_pair(alias, std::make_shared<Handler>(alias));
 }
