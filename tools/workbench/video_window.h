@@ -28,7 +28,34 @@ public:
     void set_scene_visualization(
         std::shared_ptr<ipme::wb::Scene_visualization> handle);
 
-private slots:
+    void set_fps(int fps);
+
+    inline void set_fps(double fps)
+    {
+        set_fps(static_cast<int>(fps));
+    }
+
+    void set_speed_percent(int percent);
+
+    inline void set_frame_to(int index __attribute__((unused)))
+    {
+    }
+
+    inline void play_video()
+    {
+        play_video_ = true;
+    }
+
+    inline void pause_video()
+    {
+        play_video_ = false;
+    }
+
+    inline void stop_video()
+    {
+        play_video_ = false;
+    }
+public slots:
     void on_action_play_triggered();
 
     void on_action_pause_triggered();
@@ -46,6 +73,8 @@ private:
     QString dirpath_;
     int frame_width_ = 640;
     int frame_height_ = 360;
+    double original_fps_ = 30.0;
+    int frame_count_ = 0;
     cv::VideoCapture capture_;
     std::shared_ptr<ipme::wb::Scene_visualization> scene_handle_;
 };

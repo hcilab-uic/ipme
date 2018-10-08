@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>88</y>
+      <y>112</y>
       <width>985</width>
-      <height>573</height>
+      <height>549</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="scene_vertical_layout"/>
@@ -31,7 +31,7 @@
       <x>0</x>
       <y>0</y>
       <width>985</width>
-      <height>85</height>
+      <height>109</height>
      </rect>
     </property>
     <property name="title">
@@ -42,29 +42,12 @@
       <rect>
        <x>4</x>
        <y>24</y>
-       <width>596</width>
-       <height>59</height>
+       <width>977</width>
+       <height>80</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="settings_grid">
-      <item row="1" column="2">
-       <widget class="QLabel" name="vrpn_filter_policy_label">
-        <property name="text">
-         <string>VRPN Objects Filter Policy</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLCDNumber" name="frame_index_lcd">
-        <property name="digitCount">
-         <number>28</number>
-        </property>
-        <property name="segmentStyle">
-         <enum>QLCDNumber::Flat</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
+      <item row="2" column="2">
        <layout class="QGridLayout" name="frame_range_grid">
         <item row="0" column="0">
          <widget class="QLineEdit" name="start_frame_edit">
@@ -102,10 +85,31 @@ font-weight: bold;</string>
         </item>
        </layout>
       </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="video_speed_label">
+        <property name="text">
+         <string>Video Speed</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="frame_index_label">
         <property name="text">
          <string>Frame Index</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLabel" name="frame_policy_label">
+        <property name="text">
+         <string>Frame Policy</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QComboBox" name="vrpn_filter_policy_combobox">
+        <property name="currentText">
+         <string/>
         </property>
        </widget>
       </item>
@@ -117,21 +121,51 @@ font-weight: bold;</string>
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QComboBox" name="vrpn_filter_policy_combobox">
-        <property name="currentText">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QLabel" name="frame_policy_label">
+       <widget class="QLabel" name="vrpn_filter_policy_label">
         <property name="text">
-         <string>Frame Policy</string>
+         <string>VRPN Objects Filter Policy</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="3">
+      <item row="2" column="4">
        <widget class="QComboBox" name="frame_policy_combobox"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLCDNumber" name="frame_index_lcd">
+        <property name="digitCount">
+         <number>28</number>
+        </property>
+        <property name="segmentStyle">
+         <enum>QLCDNumber::Flat</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2">
+       <widget class="QSlider" name="video_speed_slider">
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>99</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QSlider" name="video_timeline_slider">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QLabel" name="video_timeline_label">
+        <property name="text">
+         <string>Timeline</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -190,6 +224,10 @@ font-weight: bold;</string>
    <addaction name="separator"/>
    <addaction name="action_launch_video"/>
    <addaction name="action_load_labels"/>
+   <addaction name="separator"/>
+   <addaction name="action_play"/>
+   <addaction name="action_pause"/>
+   <addaction name="action_stop"/>
   </widget>
   <action name="file_open">
    <property name="text">
@@ -258,7 +296,36 @@ font-weight: bold;</string>
     <string>Load Labels</string>
    </property>
   </action>
+  <action name="action_play">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/play-button.png</normaloff>:/icons/icons/play-button.png</iconset>
+   </property>
+   <property name="text">
+    <string>Play</string>
+   </property>
+  </action>
+  <action name="action_pause">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/pause.png</normaloff>:/icons/icons/pause.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="action_stop">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/icons/stop.png</normaloff>:/icons/icons/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

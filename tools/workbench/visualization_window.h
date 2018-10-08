@@ -54,8 +54,20 @@ private slots:
 
     void on_Visualization_window_destroyed();
 
+    void on_video_speed_slider_sliderMoved(int position);
+
+    void on_action_play_triggered();
+
+    void on_action_pause_triggered();
+
+    void on_action_stop_triggered();
+
 signals:
     void current_frame_number(int);
+
+    void video_play();
+    void video_pause();
+    void video_stop();
 
 private:
     void make_axes();

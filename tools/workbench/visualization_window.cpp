@@ -43,6 +43,9 @@ Visualization_window::Visualization_window(QWidget* parent)
     connect(this, &Visualization_window::current_frame_number, this,
             &Visualization_window::display_frame_number);
 
+    connect(this, &Visualization_window::video_play, video_window_.get(),
+            &Video_window::on_action_play_triggered);
+
     auto& box = ui->vrpn_filter_policy_combobox;
     box->addItems(QStringList{"Average", "First", "Middle", "Last"});
 
@@ -205,7 +208,7 @@ void Visualization_window::init()
     auto input = new Qt3DInput::QInputAspect;
     view_->registerAspect(input);
     auto camera_entity = view_->camera();
-    camera_entity->lens()->setPerspectiveProjection(90.f, 16.f / 9.f, .1f,
+    camera_entity->lens()->setPerspectiveProjection(60.f, 16.f / 9.f, .1f,
                                                     1000.f);
     on_action_show_top_view_triggered();
 
@@ -353,4 +356,26 @@ void Visualization_window::on_action_load_labels_triggered()
 void Visualization_window::on_Visualization_window_destroyed()
 {
     INFO() << "Shutting down visualization window";
+}
+
+void Visualization_window::on_video_speed_slider_sliderMoved(int position)
+{
+    int value = ui->video_speed_slider->value();
+    ui->video_speed_slider->setToolTip(QString::number(value));
+    video_window_->set_speed_percent(value);
+}
+
+void Visualization_window::on_action_play_triggered()
+{
+    emit video_play();
+}
+
+void Visualization_window::on_action_pause_triggered()
+{
+    emit video_pause();
+}
+
+void Visualization_window::on_action_stop_triggered()
+{
+    emit video_stop();
 }

@@ -5,5 +5,8 @@
         <file>icons/video-camera.png</file>
         <file>icons/ccw-x.png</file>
         <file>icons/cw-x.png</file>
+        <file>icons/play-button.png</file>
+        <file>icons/pause.png</file>
+        <file>icons/stop.png</file>
     </qresource>
 </RCC>

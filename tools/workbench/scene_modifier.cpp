@@ -42,6 +42,7 @@ void Scene_modifier::add_frame(const Frame& frame)
 
     for(const auto& device : frame.devices) {
         add_cuboid(device, QVector3D{1.f, 1.f, 0.05f}, device_color);
+        add_gaze(device);
     }
 
     for(const auto& screen_object : frame.screen_objects) {
@@ -111,9 +112,9 @@ void Scene_modifier::clear()
 
 void Scene_modifier::set_screen_offset(const ipme::scene::Position& offset)
 {
-    screen_offset_.setX(offset.x());
-    screen_offset_.setY(offset.y());
-    screen_offset_.setZ(offset.z());
+    screen_offset_.setX(static_cast<float>(offset.x()));
+    screen_offset_.setY(static_cast<float>(offset.y()));
+    screen_offset_.setZ(static_cast<float>(offset.z()));
 }
 
 void Scene_modifier::add_sphere(const ipme::scene::Pose& pose,

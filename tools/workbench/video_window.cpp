@@ -29,19 +29,35 @@ void Video_window::set_scene_visualization(
     scene_handle_ = handle;
 }
 
+void Video_window::set_fps(int fps)
+{
+    if(video_timer_->isActive()) {
+        video_timer_->stop();
+    }
+
+    int msec = static_cast<int>(1000.f / fps);
+    video_timer_->start(msec);
+    INFO() << "setting timer delay = " << msec;
+}
+
+void Video_window::set_speed_percent(int percent)
+{
+    set_fps(original_fps_ * percent * .01);
+}
+
 void Video_window::on_action_play_triggered()
 {
-    play_video_ = true;
+    play_video();
 }
 
 void Video_window::on_action_pause_triggered()
 {
-    play_video_ = false;
+    pause_video();
 }
 
 void Video_window::on_action_stop_triggered()
 {
-    play_video_ = false;
+    stop_video();
 }
 
 void Video_window::load_video()
@@ -50,15 +66,13 @@ void Video_window::load_video()
     capture_.open(video_path.toStdString());
     frame_width_ = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_WIDTH));
     frame_height_ = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
+    frame_count_ = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_COUNT));
     ui->label_video->resize(frame_width_, frame_height_);
 
-    double fps = capture_.get(CV_CAP_PROP_FPS) / 1.15;
-    INFO() << "FPS " << fps;
+    original_fps_ = capture_.get(CV_CAP_PROP_FPS);
+    set_fps(original_fps_);
 
-    int msec = static_cast<int>(1000.0 / fps);
-    video_timer_->start(msec);
-
-    INFO() << "setting timer delay = " << msec;
+    INFO() << "Original FPS " << original_fps_;
 }
 
 void Video_window::process_video()
