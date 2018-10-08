@@ -53,6 +53,10 @@ Visualization_window::Visualization_window(QWidget* parent)
         ui->frame_policy_combobox->addItem(policy.second.c_str());
     }
 
+    ui->action_play->setIcon(QIcon{QPixmap{":/icons/icons/play-button.png"}});
+    ui->action_pause->setIcon(QIcon{QPixmap{":/icons/icons/pause.png"}});
+    ui->action_stop->setIcon(QIcon{QPixmap{":/icons/icons/stop.png"}});
+
     init();
 }
 
