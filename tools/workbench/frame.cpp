@@ -123,12 +123,15 @@ Screen_object::Screen_object(const ipme::scene::Position& position,
     auto mutable_position = pose.mutable_position();
     constexpr double scale_factor = 1000.0;
 
-    const double half_width = width_ / 2.0;
-    const double position_x = (position.x() + half_width) / scale_factor;
+    [[maybe_unused]] const double half_width = width_ * 0.5;
+    //    const double position_x = (position.x() + half_width) / scale_factor;
+    const double position_x = position.x() / scale_factor;
     mutable_position->set_x(position_x + offset.x());
 
-    const double half_height = height_ / 2.0;
-    const double position_y = -(position.y() + half_height) / scale_factor;
+    [[maybe_unused]] const double half_height = height_ * 0.5;
+    //    const double position_y = -(position.y() + half_height) /
+    //    scale_factor;
+    const double position_y = -position.y() / scale_factor;
     mutable_position->set_y(position_y + offset.y());
 
     mutable_position->set_z(position.z() / scale_factor + offset.z());
@@ -136,10 +139,10 @@ Screen_object::Screen_object(const ipme::scene::Position& position,
     const auto orientation = pose.mutable_orientation();
     const auto q = QQuaternion::fromAxisAndAngle(1, 0, 0, 90);
 
-    orientation->set_w(q.scalar());
-    orientation->set_x(q.x());
-    orientation->set_y(q.y());
-    orientation->set_z(q.z());
+    orientation->set_w(static_cast<double>(q.scalar()));
+    orientation->set_x(static_cast<double>(q.x()));
+    orientation->set_y(static_cast<double>(q.y()));
+    orientation->set_z(static_cast<double>(q.z()));
 
     width = width_ / scale_factor;
     height = height_ / scale_factor;
