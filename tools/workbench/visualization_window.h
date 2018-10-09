@@ -44,7 +44,7 @@ private slots:
     void on_file_open_triggered();
 
     void on_action_launch_video_triggered();
-    void display_frame_number(int frame_number);
+    void on_frame_number_changed(int frame_number);
 
     void on_save_outcome_button_clicked();
 
@@ -62,8 +62,11 @@ private slots:
 
     void on_action_stop_triggered();
 
+    void on_video_timeline_slider_sliderReleased();
+
 signals:
     void current_frame_number(int);
+    void timeline_slider_moved(int);
 
     void video_play();
     void video_pause();

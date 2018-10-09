@@ -55,12 +55,22 @@ public:
     {
         play_video_ = false;
     }
+
+    inline int frame_count() const
+    {
+        return frame_count_;
+    }
+
+    inline double compute_timeline_percent() const;
+
 public slots:
     void on_action_play_triggered();
 
     void on_action_pause_triggered();
 
     void on_action_stop_triggered();
+
+    void on_timeline_slider_changed(int slider_value);
 
 private:
     void load_video();

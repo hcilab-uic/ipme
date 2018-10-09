@@ -41,7 +41,9 @@ Visualization_window::Visualization_window(QWidget* parent)
     scene_modifier_ = std::make_unique<ipme::wb::Scene_modifier>(root_entity_);
 
     connect(this, &Visualization_window::current_frame_number, this,
-            &Visualization_window::display_frame_number);
+            &Visualization_window::on_frame_number_changed);
+    connect(this, &Visualization_window::timeline_slider_moved,
+            video_window_.get(), &Video_window::on_timeline_slider_changed);
 
     connect(this, &Visualization_window::video_play, video_window_.get(),
             &Video_window::on_action_play_triggered);
@@ -62,22 +64,16 @@ Visualization_window::Visualization_window(QWidget* parent)
 
 Visualization_window::~Visualization_window()
 {
-    const auto cleanup = [](auto object) {
-        if(object) {
-            delete object;
-            object = nullptr;
-        }
-    };
-
-    cleanup(root_entity_);
-    //    cleanup(view_);
-    cleanup(ui);
+    if(ui) {
+        delete ui;
+        ui = nullptr;
+    }
 }
 
 void Visualization_window::on_file_open_triggered()
 {
-    QString dir_path = QFileDialog::getExistingDirectory(
-        this, "tracking.pb", "/home/harish/ipme_experiments/study_20180810");
+    QString dir_path = QFileDialog::getExistingDirectory(this, "tracking.pb",
+                                                         QDir::homePath());
     DEBUG() << dir_path.toStdString() << "\n";
 
     video_window_->set_dirpath(dir_path);
@@ -285,11 +281,19 @@ void Visualization_window::on_action_launch_video_triggered()
     video_window_->set_scene_visualization(shared_from_this());
 }
 
-void Visualization_window::display_frame_number(int frame_number)
+void Visualization_window::on_frame_number_changed(int frame_number)
 {
     const auto value = QString::number(frame_number);
     ui->frame_index_lcd->display(value);
     ui->end_frame_edit->setText(value);
+
+    auto frame_count = video_window_->frame_count();
+    if(frame_count > 0) {
+        int slider_value =
+            static_cast<int>(static_cast<double>(frame_number) /
+                             static_cast<double>(frame_count) * 100.0);
+        ui->video_timeline_slider->setValue(slider_value);
+    }
 }
 
 void Visualization_window::on_save_outcome_button_clicked()
@@ -364,9 +368,8 @@ void Visualization_window::on_Visualization_window_destroyed()
 
 void Visualization_window::on_video_speed_slider_sliderMoved(int position)
 {
-    int value = ui->video_speed_slider->value();
-    ui->video_speed_slider->setToolTip(QString::number(value));
-    video_window_->set_speed_percent(value);
+    ui->video_speed_slider->setToolTip(QString::number(position));
+    video_window_->set_speed_percent(position);
 }
 
 void Visualization_window::on_action_play_triggered()
@@ -382,4 +385,10 @@ void Visualization_window::on_action_pause_triggered()
 void Visualization_window::on_action_stop_triggered()
 {
     emit video_stop();
+}
+
+void Visualization_window::on_video_timeline_slider_sliderReleased()
+{
+    int value = ui->video_speed_slider->value();
+    emit timeline_slider_moved(value);
 }

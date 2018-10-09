@@ -60,6 +60,17 @@ void Video_window::on_action_stop_triggered()
     stop_video();
 }
 
+void Video_window::on_timeline_slider_changed(int slider_value)
+{
+    if(slider_value < 0)
+        return;
+
+    frame_index_ = static_cast<size_t>(
+        static_cast<double>(slider_value * frame_count_) / 100.0);
+    capture_.set(CV_CAP_PROP_POS_FRAMES, frame_index_);
+    DEBUG() << "Jumped to frame " << frame_index_;
+}
+
 void Video_window::load_video()
 {
     auto video_path = dirpath_ + "/video.avi";
