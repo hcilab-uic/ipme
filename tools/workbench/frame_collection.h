@@ -65,7 +65,8 @@ private:
     void add(const ipme::scene::Frame& frame);
 
     inner_container frames_;
-    ipme::scene::Position screen_offset_;
+    std::unordered_map<uint32_t, ipme::scene::Display> display_map_;
+    //    ipme::scene::Position screen_offset_;
     std::unordered_map<uint32_t, size_t> frame_index_map_;
     std::unordered_map<uint32_t, std::string> registered_objects_;
     std::unordered_set<uint32_t> registered_objects_ids_;

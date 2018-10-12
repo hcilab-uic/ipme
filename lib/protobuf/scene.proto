@@ -40,8 +40,9 @@ message Object {
 
 message Screen_object {
     uint32 screen_object_id = 1;
-    Position position = 2;
-    Size_2d size = 3;
+    uint32 screen_id = 2;
+    Position position = 3;
+    Size_2d size = 4;
 }
 
 message Vrpn_object {
@@ -71,6 +72,11 @@ message Frame {
     repeated Vrpn_object vrpn_objects = 4;
 
     repeated Screen_object screen_objects = 5;
+
+    // This field takes a label most probably as a result of a human labeler.
+    // This would typically mean that the particular formation or a construct
+    // has been identified for the frame.
+    uint32 label = 6;
 }
 
 message Compound_object_config {
@@ -91,8 +97,14 @@ message Registered_object {
     Type type = 3;
 }
 
+message Display {
+    uint32 display_id = 1;
+    Position offset = 2;
+    Size_2d dimensions = 3;
+}
+
 message Scene_config {
-    Position screen_offset = 1;
+    repeated Display displays = 1;
     repeated Registered_object registered_objects = 2;
 }
 

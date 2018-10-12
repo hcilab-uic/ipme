@@ -168,6 +168,27 @@ void Scene::write(std::shared_ptr<Scene> scene,
     }
 }
 
+Scene::Display_map Scene::build_display_map(const scene::Scene& scene)
+{
+    Display_map map;
+    for(const auto& display : scene.config().displays()) {
+        map.emplace(display.display_id(), display);
+    }
+
+    return map;
+}
+
+Scene Scene::load(std::ifstream& ifs)
+{
+    ipme::scene::Scene scene_pb;
+    scene_pb.ParseFromIstream(&ifs);
+
+    Scene scene;
+    scene.display_map_ = build_display_map(scene_pb);
+
+    return scene;
+}
+
 void Scene::finalize()
 {
     save();

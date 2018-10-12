@@ -56,6 +56,8 @@ public:
                       const std::filesystem::path& output_path);
 
     static Display_map build_display_map(const ipme::scene::Scene& scene);
+    
+    static 
 
     static Scene load(std::ifstream& ifs);
 

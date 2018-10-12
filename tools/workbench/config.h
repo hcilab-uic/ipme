@@ -2,7 +2,8 @@
 #define IPME_WB_CONFIG_H
 
 #include <filesystem>
-#include <string.h>
+#include <string>
+#include <unordered_map>
 
 #include "protobuf/scene.pb.h"
 #include "utils/json.h"
@@ -70,19 +71,19 @@ public:
         return scene_config_;
     }
 
-    inline double offset_x() const
+    inline double offset_x(uint32_t id) const
     {
-        return scene_config_.screen_offset().x();
+        return display_map_.at(id).offset().x();
     }
 
-    inline double offset_y() const
+    inline double offset_y(uint32_t id) const
     {
-        return scene_config_.screen_offset().y();
+        return display_map_.at(id).offset().y();
     }
 
-    inline double offset_z() const
+    inline double offset_z(uint32_t id) const
     {
-        return scene_config_.screen_offset().z();
+        return display_map_.at(id).offset().z();
     }
 
     void set_screen_offset(double x, double y, double z);
@@ -120,6 +121,8 @@ private:
     bool vrpn_on_ = true;
     bool sage_on_ = true;
     bool video_on_ = true;
+
+    std::unordered_map<uint32_t, ipme::scene::Display> display_map_;
 };
 
 } // namespace ipme::wb
