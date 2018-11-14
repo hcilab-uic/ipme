@@ -45,8 +45,9 @@ void Scene_modifier::add_frame(const Frame& frame)
     }
 
     for(const auto& screen_object : frame.screen_objects) {
-        QVector3D extents{screen_object.width * scale_factor,
-                          screen_object.height * scale_factor, 0.05f};
+        QVector3D extents{
+            static_cast<float>(screen_object.width) * scale_factor,
+            static_cast<float>(screen_object.height) * scale_factor, 0.05f};
         add_cuboid(screen_object.pose, extents, ui_color);
     }
 }
@@ -109,11 +110,20 @@ void Scene_modifier::clear()
     entities_.clear();
 }
 
-void Scene_modifier::set_screen_offset(const ipme::scene::Position& offset)
+void Scene_modifier::set_displays(const scene::Scene_config& config)
 {
-    screen_offset_.setX(offset.x());
-    screen_offset_.setY(offset.y());
-    screen_offset_.setZ(offset.z());
+    for(const auto& display : config.displays()) {
+        QVector3D offset;
+        offset.setX(static_cast<float>(display.offset().x()));
+        offset.setY(static_cast<float>(display.offset().y()));
+        offset.setZ(static_cast<float>(display.offset().z()));
+
+        QVector2D dimensions;
+        dimensions.setX(static_cast<float>(display.dimensions().width()));
+        dimensions.setY(static_cast<float>(display.dimensions().height()));
+        displays_.emplace_back(
+            Scene_display{display.display_id(), offset, dimensions});
+    }
 }
 
 void Scene_modifier::add_sphere(const ipme::scene::Pose& pose,

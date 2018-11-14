@@ -14,9 +14,13 @@ void Config::parse_config(const std::filesystem::path& path)
 
     json_.read(path);
 
-    set_screen_offset(json_.get<double>("screen_offsets.x"),
-                      json_.get<double>("screen_offsets.y"),
-                      json_.get<double>("screen_offsets.z"));
+    //    set_screen_offset(json_.get<double>("screen_offsets.x"),
+    //                      json_.get<double>("screen_offsets.y"),
+    //                      json_.get<double>("screen_offsets.z"));
+    auto sage_hosts = json_.get_node("sage");
+    for(const auto& sage_host : sage_hosts) {
+        Sage_config::create(sage_host.second);
+    }
 
     auto vrpn_objects = json_.get_node("vrpn_objects");
     for(const auto& vrpn_object : vrpn_objects) {
@@ -31,27 +35,22 @@ void Config::parse_config(const std::filesystem::path& path)
     set_vrpn_port(vrpn_node.get<short>("port"));
     set_vrpn_data_port(vrpn_node.get<short>("data_port"));
 
-    auto sage_node = json_.get_node("sage");
-    set_sage_host(sage_node.get<std::string>("host"));
-    set_sage_port(sage_node.get<short>("port"));
-    set_sage_session_token(sage_node.get<std::string>("session_token"));
-
     set_video_device_index(json_.get<int>("video_device_index"));
 }
 
-void Config::create_default_config()
-{
-    set_screen_offset(3.6, 2.3, 3.6);
-}
+// void Config::create_default_config()
+//{
+//    set_screen_offset(3.6, 2.3, 3.6);
+//}
 
-void Config::set_screen_offset(double x, double y, double z)
-{
-    auto screen_offset = scene_config_.mutable_screen_offset();
+// void Config::set_screen_offset(double x, double y, double z)
+//{
+//    auto screen_offset = scene_config_.mutable_screen_offset();
 
-    screen_offset->set_x(x);
-    screen_offset->set_y(y);
-    screen_offset->set_z(z);
-}
+//    screen_offset->set_x(x);
+//    screen_offset->set_y(y);
+//    screen_offset->set_z(z);
+//}
 
 void Config::set_vrpn_host(const std::string& host)
 {
@@ -92,11 +91,25 @@ std::string Config::to_string() const
 {
     std::stringstream ss;
     ss << "VRPN: " << vrpn_host_ << ":" << vrpn_port_ << "\n";
-    ss << "SAGE: " << sage_host_ << ":" << sage_port_ << "\n";
+    //    ss << "SAGE: " << sage_host_ << ":" << sage_port_ << "\n";
     ss << "Video index: " << video_device_index_ << "\n";
     ss << "Scene config:\n";
     ss << json_.to_string();
 
     return ss.str();
 }
+
+Config::Sage_config
+Config::Sage_config::create(const boost::property_tree::ptree& sage_node)
+{
+    Sage_config sage_config;
+    sage_config.sage_id = sage_node.get<uint32_t>("id");
+    //    auto sage_node = json_.get_node("sage");
+    //    set_sage_host(sage_node.get<std::string>("host"));
+    //    set_sage_port(sage_node.get<short>("port"));
+    //    set_sage_session_token(sage_node.get<std::string>("session_token"));
+
+    return sage_config;
+}
+
 } // namespace ipme::wb

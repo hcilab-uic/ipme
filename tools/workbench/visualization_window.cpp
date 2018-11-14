@@ -80,9 +80,7 @@ void Visualization_window::on_file_open_triggered()
     ipme::scene::Scene scene_pb;
     scene_pb.ParseFromIstream(&ifs);
 
-    const auto config = scene_pb.config();
-
-    scene_modifier_->set_screen_offset(config.screen_offset());
+    scene_modifier_->set_displays(scene_pb.config());
 
     frames_.load(scene_pb);
     apply_frames_filter();

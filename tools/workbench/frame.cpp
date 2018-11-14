@@ -43,7 +43,8 @@ void Frame::apply_all_registered()
 }
 
 Frame Frame::create_from_pb(
-    const ipme::scene::Frame& scene_frame, const ipme::scene::Position& offset,
+    const ipme::scene::Frame& scene_frame,
+    const std::unordered_map<uint32_t, ipme::scene::Display>& display_map,
     const std::unordered_map<uint32_t, std::string>& registered_objects)
 {
     Frame frame;
@@ -78,8 +79,9 @@ Frame Frame::create_from_pb(
     }
 
     for(const auto& screen_object : scene_frame.screen_objects()) {
+        const auto& display = display_map.at(screen_object.screen_id());
         frame.screen_objects.emplace_back(Screen_object{
-            screen_object.position(), offset, screen_object.size().width(),
+            screen_object.position(), display, screen_object.size().width(),
             screen_object.size().height()});
     }
 
@@ -100,28 +102,30 @@ Frame Frame::create_from_pb(
     return frame;
 }
 
-Frame::container Frame::load_scene_pb(const ipme::scene::Scene& scene_pb)
-{
-    container frames;
-    const auto& config = scene_pb.config();
-    std::unordered_map<uint32_t, std::string> registered_objects;
-    for(const auto& object : config.registered_objects()) {
-        registered_objects[object.id()] = object.name();
-    }
+// Frame::container Frame::load_scene_pb(const ipme::scene::Scene& scene_pb)
+//{
+//    container frames;
+//    const auto& config = scene_pb.config();
+//    std::unordered_map<uint32_t, std::string> registered_objects;
+//    for(const auto& object : config.registered_objects()) {
+//        registered_objects[object.id()] = object.name();
+//    }
 
-    for(const auto& frame : scene_pb.frames()) {
-        frames.emplace_back(
-            create_from_pb(frame, config.screen_offset(), registered_objects));
-    }
-    return frames;
-}
+//    for(const auto& frame : scene_pb.frames()) {
+//        frames.emplace_back(create_from_pb(frame, config,
+//        registered_objects));
+//    }
+//    return frames;
+//}
 
 Screen_object::Screen_object(const ipme::scene::Position& position,
-                             const ipme::scene::Position& offset, double width_,
+                             const scene::Display& config, double width_,
                              double height_)
 {
     auto mutable_position = pose.mutable_position();
     constexpr double scale_factor = 1000.0;
+
+    const auto offset = config.offset();
 
     const double half_width = width_ / 2.0;
     const double position_x = (position.x() + half_width) / scale_factor;
@@ -136,10 +140,10 @@ Screen_object::Screen_object(const ipme::scene::Position& position,
     const auto orientation = pose.mutable_orientation();
     const auto q = QQuaternion::fromAxisAndAngle(1, 0, 0, 90);
 
-    orientation->set_w(q.scalar());
-    orientation->set_x(q.x());
-    orientation->set_y(q.y());
-    orientation->set_z(q.z());
+    orientation->set_w(static_cast<double>(q.scalar()));
+    orientation->set_x(static_cast<double>(q.x()));
+    orientation->set_y(static_cast<double>(q.y()));
+    orientation->set_z(static_cast<double>(q.z()));
 
     width = width_ / scale_factor;
     height = height_ / scale_factor;

@@ -11,6 +11,17 @@
 namespace ipme::wb {
 class Config {
 public:
+    struct Sage_config {
+        uint32_t sage_id;
+        std::string host;
+        unsigned short port;
+        std::string session_token;
+        ipme::scene::Position offset;
+        ipme::scene::Size_2d dimensions;
+
+        static Sage_config create(const boost::property_tree::ptree& sage_node);
+    };
+
     inline Config(const std::filesystem::path& path)
     {
         parse_config(path);
@@ -86,7 +97,7 @@ public:
         return display_map_.at(id).offset().z();
     }
 
-    void set_screen_offset(double x, double y, double z);
+    //    void set_screen_offset(double x, double y, double z);
 
     void set_vrpn_host(const std::string& host);
     void set_vrpn_port(unsigned short port);

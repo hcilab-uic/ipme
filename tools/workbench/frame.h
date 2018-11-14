@@ -12,12 +12,12 @@
 
 namespace ipme::wb {
 struct Screen_object {
-    float width = 0;
-    float height = 0;
+    double width = 0;
+    double height = 0;
     ipme::scene::Pose pose;
 
     Screen_object(const ipme::scene::Position& position,
-                  const ipme::scene::Position& offset, double width_,
+                  const ipme::scene::Display& config, double width_,
                   double height_);
 };
 
@@ -57,7 +57,8 @@ public:
     bool has_all_vrpn_ids(Container&& ids);
 
     static Frame create_from_pb(
-        const ipme::scene::Frame& frame, const ipme::scene::Position& offset,
+        const ipme::scene::Frame& frame,
+        const std::unordered_map<uint32_t, scene::Display>& display_map,
         const std::unordered_map<uint32_t, std::string>& registered_objects);
 
     static container load_scene_pb(const ipme::scene::Scene& scene_pb);

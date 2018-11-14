@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <QObject>
+#include <QVector2D>
 #include <QVector3D>
 #include <Qt3DCore/QEntity>
 
@@ -15,13 +16,20 @@ namespace ipme::wb {
 class Scene_modifier : public QObject {
     Q_OBJECT
 public:
+    struct Scene_display {
+        uint32_t display_id;
+        QVector3D offset;
+        QVector2D dimensions;
+    };
+
     explicit Scene_modifier(Qt3DCore::QEntity* root_entity);
 
     void add_frame(const Frame& frame);
     void add_screen();
     void clear();
 
-    void set_screen_offset(const ipme::scene::Position& offset);
+    //    void set_screen_offset(const ipme::scene::Position& offset);
+    void set_displays(const ipme::scene::Scene_config& config);
 
 private:
     static const QColor default_color;
@@ -40,7 +48,8 @@ private:
     Qt3DCore::QEntity* root_entity_;
     std::vector<Qt3DCore::QEntity*> spheres_;
     std::vector<Qt3DCore::QEntity*> entities_;
-    QVector3D screen_offset_;
+
+    std::vector<Scene_display> displays_;
 };
 
 } // namespace ipme::wb
