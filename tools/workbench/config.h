@@ -12,7 +12,7 @@ namespace ipme::wb {
 class Config {
 public:
     struct Sage_config {
-        uint32_t sage_id;
+        uint32_t id;
         std::string host;
         unsigned short port;
         std::string session_token;
@@ -134,6 +134,8 @@ private:
     bool video_on_ = true;
 
     std::unordered_map<uint32_t, ipme::scene::Display> display_map_;
+
+    std::vector<Sage_config> sage_config_;
 };
 
 } // namespace ipme::wb
