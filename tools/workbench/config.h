@@ -22,6 +22,11 @@ public:
         static Sage_config create(const boost::property_tree::ptree& sage_node);
     };
 
+    const std::vector<Sage_config>& sage_configs() const
+    {
+        return sage_config_;
+    }
+
     inline Config(const std::filesystem::path& path)
     {
         parse_config(path);
@@ -42,20 +47,20 @@ public:
         return vrpn_data_port_;
     }
 
-    inline std::string sage_host() const
-    {
-        return sage_host_;
-    }
+    //    inline std::string sage_host() const
+    //    {
+    //        return sage_host_;
+    //    }
 
-    inline short sage_port() const
-    {
-        return sage_port_;
-    }
+    //    inline short sage_port() const
+    //    {
+    //        return sage_port_;
+    //    }
 
-    inline std::string sage_session_token() const
-    {
-        return sage_session_token_;
-    }
+    //    inline std::string sage_session_token() const
+    //    {
+    //        return sage_session_token_;
+    //    }
 
     inline int video_device_index() const
     {

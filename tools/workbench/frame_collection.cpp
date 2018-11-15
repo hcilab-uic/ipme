@@ -4,18 +4,8 @@ namespace ipme::wb {
 void Frame_collection::load(const ipme::scene::Scene& scene)
 {
     const auto& config = scene.config();
-    //    screen_offset_ = config.screen_offset();
-
-    //    for(const auto& screen : config.screens()) {
-    //        display_map_.emplace(screen.id(), screen.position());
-    //    }
-
     for(const auto& display : config.displays()) {
         display_map_.emplace(display.display_id(), display);
-    }
-
-    for(const auto& screen : config.screens()) {
-        display_map_.emplace(screen.id(), screen.position());
     }
 
     for(const auto& object : config.registered_objects()) {

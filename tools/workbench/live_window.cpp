@@ -47,9 +47,9 @@ Live_window::Live_window(const ipme::wb::Config& config, QWidget* parent)
     ui->vrpn_port_edit->setText(QString::number(config_.vrpn_port()));
     ui->vrpn_data_port_edit->setText(QString::number(config_.vrpn_data_port()));
 
-    ui->sage_host_edit->setText(config_.sage_host().c_str());
-    ui->sage_port_edit->setText(QString::number(config_.sage_port()));
-    ui->sage_session_token_edit->setText(config_.sage_session_token().c_str());
+    //    ui->sage_host_edit->setText(config_.sage_host().c_str());
+    //    ui->sage_port_edit->setText(QString::number(config_.sage_port()));
+    //    ui->sage_session_token_edit->setText(config_.sage_session_token().c_str());
 
     ui->bottom_layout->addWidget(&status_bar_);
     set_status("Ready");
@@ -402,10 +402,10 @@ void Live_window::initialize_experiment()
     config_.set_vrpn_data_port(ui->vrpn_data_port_edit->text().toUShort());
 
     // SAGE2
-    config_.set_sage_host(ui->sage_host_edit->text().toStdString());
-    config_.set_sage_port(ui->sage_port_edit->text().toUShort());
-    config_.set_sage_session_token(
-        ui->sage_session_token_edit->text().toStdString());
+    //    config_.set_sage_host(ui->sage_host_edit->text().toStdString());
+    //    config_.set_sage_port(ui->sage_port_edit->text().toUShort());
+    //    config_.set_sage_session_token(
+    //        ui->sage_session_token_edit->text().toStdString());
 
     // Video
     config_.set_video_device_index(ui->video_device_index_edit->text().toInt());
@@ -425,12 +425,21 @@ void Live_window::initialize_experiment()
     bool sage_status{false};
     try {
         auto sage_on = ui->on_sage_checkbox->isChecked();
-        sage_status =
-            sage_on ? sage_handler_.connect(config_.sage_host(),
-                                            std::to_string(config_.sage_port()),
-                                            config_.sage_session_token())
-                    : !sage_on;
-        set_status_indicator(ui->sage_status_indicator_label, sage_status);
+        if(sage_on) {
+            for(const auto& sage_config : config_.sage_configs()) {
+                sage_handler_.connect(sage_config.host,
+                                      std::to_string(sage_config.port),
+                                      sage_config.session_token);
+            }
+        }
+
+        //        sage_status =
+        //            sage_on ? sage_handler_.connect(config_.sage_host(),
+        //                                            std::to_string(config_.sage_port()),
+        //                                            config_.sage_session_token())
+        //                    : !sage_on;
+        //        set_status_indicator(ui->sage_status_indicator_label,
+        //        sage_status);
         sage_handler_.set_state_machine(shared_from_this());
     } catch(const boost::system::system_error& err) {
         show_message(err.what());
