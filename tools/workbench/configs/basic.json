@@ -13,11 +13,12 @@
       "dimensions": {
         "width": 10,
         "height": 3
-      }
+      },
+      "normal_vector": [0, 0, 1]
     },
     {
       "id": 1,
-      "host": "canopus.evl.uic.edu",
+      "host": "vega.evl.uic.edu",
       "port": 80,
       "session_token": "",
       "offset": {
@@ -28,7 +29,8 @@
       "dimensions": {
         "width": 10,
         "height": 3
-      }
+      },
+      "normal_vector": [1, 0, 0]
     }
   ],
   "vrpn": {
