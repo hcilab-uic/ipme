@@ -14,6 +14,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(SOURCES
     color.cpp
     config.cpp
+    display.cpp
     frame.cpp
     frame_collection.cpp
     frame_model.cpp
