@@ -32,11 +32,17 @@ QString get_default_rootdir()
 } // namespace
 
 Live_window::Live_window(const ipme::wb::Config& config, QWidget* parent)
-    : QDialog{parent}, ui{new Ui::Live_window}, config_{config},
-      output_root_dir_{get_default_rootdir()}, status_bar_{parent},
-      omicron_thread_{nullptr}, scene_{std::make_shared<ipme::data::Scene>()},
-      sage_handler_{scene_},
-      vrpn_listener_{std::make_unique<ipme::sensor::Vrpn_handler>(scene_)}
+    // clang-format off
+    : QDialog{parent}
+    , ui{new Ui::Live_window}
+    , config_{config}
+    , output_root_dir_{get_default_rootdir()}
+    , status_bar_{parent}
+    , omicron_thread_{nullptr}
+    , scene_{std::make_shared<ipme::data::Scene>()}
+    , vrpn_listener_{std::make_unique<ipme::sensor::Vrpn_handler>(scene_)}
+    , display_manager_{config, scene_}
+// clang-format on
 {
     ui->setupUi(this);
     set_start_button_init();
@@ -116,15 +122,15 @@ void Live_window::process_video()
         }
 
         cv::cvtColor(frame, display_frame, CV_BGR2RGB);
-        //        cv::circle(frame, cv::Point{100, 100}, 50, cv::Scalar{255, 0,
-        //        0});
+        //        cv::circle(frame, cv::Point{100, 100}, 50, cv::Scalar{255,
+        //        0, 0});
         QImage widget_image(static_cast<uchar*>(display_frame.data),
                             display_frame.cols, display_frame.rows,
                             display_frame.step, QImage::Format_RGB888);
         ui->video_feed_label->setPixmap(QPixmap::fromImage(widget_image));
 
-        // FIXME: There are two nested if blocks here. We should be able to do
-        // this with one. Figure out how
+        // FIXME: There are two nested if blocks here. We should be able to
+        // do this with one. Figure out how
         if(is_running()) {
             // If experiment is in running state, then record
 
@@ -347,7 +353,7 @@ void Live_window::add_new_frame()
 {
     auto frame_index = frame_number();
     auto timestamp = frame_index * capture_timer_->interval();
-    sage_handler_.flush();
+    //    sage_handler_.flush();
 
     scene_->add_new_frame(frame_index, timestamp);
     DEBUG() << "Added new frame " << frame_index << " at time " << timestamp;
@@ -426,21 +432,11 @@ void Live_window::initialize_experiment()
     try {
         auto sage_on = ui->on_sage_checkbox->isChecked();
         if(sage_on) {
-            for(const auto& sage_config : config_.sage_configs()) {
-                sage_handler_.connect(sage_config.host,
-                                      std::to_string(sage_config.port),
-                                      sage_config.session_token);
-            }
+            sage_status = display_manager_.create_sessions();
         }
 
-        //        sage_status =
-        //            sage_on ? sage_handler_.connect(config_.sage_host(),
-        //                                            std::to_string(config_.sage_port()),
-        //                                            config_.sage_session_token())
-        //                    : !sage_on;
-        //        set_status_indicator(ui->sage_status_indicator_label,
-        //        sage_status);
-        sage_handler_.set_state_machine(shared_from_this());
+        set_status_indicator(ui->sage_status_indicator_label, sage_status);
+        //        sage_handler_.set_state_machine(shared_from_this());
     } catch(const boost::system::system_error& err) {
         show_message(err.what());
         set_status("SAGE2 connection refused", "red");
@@ -474,7 +470,8 @@ void Live_window::initialize_experiment()
         }
 
         if(sage_status) {
-            sage_handler_.disconnect();
+            //            sage_handler_.disconnect();
+            display_manager_.stop();
             set_status_indicator(ui->sage_status_indicator_label, false);
             WARN() << "Shutting down SAGE2";
         } else {
@@ -493,9 +490,9 @@ void Live_window::start_experiment()
         throw std::runtime_error{"Could not initialize camera"};
     }
 
-    if(!sage_handler_.start()) {
-        throw std::runtime_error{"Could not start SAGE2"};
-    }
+    //    if(!sage_handler_.start()) {
+    //        throw std::runtime_error{"Could not start SAGE2"};
+    //    }
 
     if(!omicron_thread_) {
         DEBUG() << "Initializing omicron thread";
@@ -527,7 +524,7 @@ void Live_window::stop_experiment()
 
     shutdown_vrpn();
 
-    sage_handler_.stop();
+    //    sage_handler_.stop();
 
     stop_camera();
     scene_->reset();

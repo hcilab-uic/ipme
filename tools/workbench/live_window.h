@@ -17,6 +17,7 @@
 #include "config.h"
 #include "connector/omicronConnectorClient.h"
 #include "data/scene.h"
+#include "display_manager.h"
 #include "sage_handler.h"
 #include "sensor/vicon_listener.h"
 #include "state_machine.h"
@@ -127,8 +128,9 @@ private:
 
     std::unique_ptr<std::thread> omicron_thread_;
     std::shared_ptr<ipme::data::Scene> scene_;
-    ipme::wb::Sage_handler sage_handler_;
+    //    ipme::wb::Sage_handler sage_handler_;
     ipme::sensor::Vicon_listener vrpn_listener_;
+    ipme::wb::Display_manager display_manager_;
 
     std::shared_ptr<omicronConnector::OmicronConnectorClient> omicron_client_;
 };

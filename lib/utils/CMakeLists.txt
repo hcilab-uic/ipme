@@ -20,5 +20,5 @@ set(SRCS
 
 add_library(utils SHARED ${SRCS})
 target_link_libraries(utils Boost::system Boost::log
-    Boost::log_setup Boost::thread Boost::program_options
+    Boost::log_setup Boost::thread Boost::program_options Boost::filesystem
     stdc++fs)

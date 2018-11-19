@@ -9,10 +9,11 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 
+#include "config.h"
 #include "data/scene.h"
 
 namespace ipme::wb {
-class Display : std::enable_shared_from_this<Display> {
+class Display_session : public std::enable_shared_from_this<Display_session> {
 public:
     using tcp = boost::asio::ip::tcp;
 
@@ -24,13 +25,17 @@ public:
         active
     };
 
-    Display(boost::asio::io_context& ioc, const std::string& name,
-            std::shared_ptr<data::Scene> scene);
+    Display_session(boost::asio::io_context& ioc,
+                    std::shared_ptr<data::Scene> scene,
+                    const Config::Sage_config& config);
 
-    void start(const std::string& host, const std::string& port);
+    void start();
 
-    static std::vector<std::shared_ptr<Display>>
-    create_displays_from_scene(std::shared_ptr<data::Scene> scene);
+    void stop();
+
+    static std::shared_ptr<Display_session>
+    create(boost::asio::io_context& ioc, std::shared_ptr<data::Scene> scene,
+           const Config::Sage_config& config);
 
 private:
     void read();
@@ -40,6 +45,10 @@ private:
     void send_next_subscribe_message();
 
     void process_message(const std::string& message);
+
+    void do_next();
+
+    void fail(boost::system::error_code ec, const char* what);
 
     // Handlers
     void on_resolve(boost::system::error_code ec,
@@ -55,15 +64,16 @@ private:
 
     void on_close(boost::system::error_code ec);
 
+    std::shared_ptr<data::Scene> scene_;
     tcp::resolver resolver_;
     boost::beast::websocket::stream<tcp::socket> ws_;
     boost::beast::multi_buffer read_buffer_;
 
     Status status_ = Status::initial;
-    std::size_t read_msg_count_ = 0;
+    std::size_t read_count_ = 0;
     std::size_t subscribe_message_index_ = 0;
     std::string name_;
-    std::string host_;
+    Config::Sage_config config_;
 
     static constexpr size_t init_message_count_ = 161;
 };

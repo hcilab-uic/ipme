@@ -31,7 +31,7 @@ void Scene::set_config(const scene::Scene_config& config)
         valid_ids_.insert(object.id());
     }
 
-    INFO() << "New scene config\n" << config_string;
+    //    INFO() << "New scene config\n" << config_string;
 }
 
 void Scene::add_object(const omicronConnector::EventData& event)

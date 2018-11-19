@@ -46,10 +46,7 @@ std::string path_to_filename(const std::string& path)
                       << expr::format_date_time<boost::posix_time::ptime>(
                              "TimeStamp", "%Y%m%d %H:%M:%S")
                       << " " << std::left << std::setw(8) << std::setfill(' ')
-                      << logging::trivial::severity << " "
-                      << (set_get_attrib("file", path_to_filename(__FILE__)))
-                      << ":" << (set_get_attrib("line", __LINE__)) << " "
-                      << expr::smessage));
+                      << logging::trivial::severity << " " << expr::smessage));
     logging::add_common_attributes();
 }
 
