@@ -1,9 +1,13 @@
 #include "display_session.h"
 
+#include <sstream>
+
 #include <boost/asio/connect.hpp>
 #include <boost/system/error_code.hpp>
 
-#define SID "[session " << name_ << "] "
+#include "utils/json.h"
+
+#define SID "[session " << name_ << "] [status:" << to_string(status_) << "] "
 
 namespace ipme::wb {
 constexpr const char* add_client_msg_template =
@@ -59,13 +63,15 @@ static const std::vector<std::string> subscribe_messages = {
 
 Display_session::Display_session(boost::asio::io_context& ioc,
                                  std::shared_ptr<data::Scene> scene,
-                                 const Config::Sage_config& config)
+                                 const Config::Sage_config& config,
+                                 const handler_map_type& handler_map)
     // clang-format off
     : scene_{scene}
     , resolver_{ioc}
     , ws_{ioc}
     , name_{std::to_string(config.id)}
     , config_{config}
+    , handler_map_{handler_map}
 // clang-format on
 {
 }
@@ -129,7 +135,7 @@ void Display_session::on_write(boost::system::error_code ec,
     TRACE() << SID << "wrote " << bytes_transferred << " bytes";
 
     if(status_ == Status::initial) {
-        status_ = Status::receive_welcome_messages;
+        set_status(Status::receive_welcome_messages);
         INFO() << SID << "session status to receive initial messages";
         read();
     } else if(status_ == Status::send_subscribe_messages) {
@@ -148,25 +154,35 @@ void Display_session::on_read(boost::system::error_code ec,
         return fail(ec, "read");
     }
 
+    if(status_ == Status::active) {
+        process_message();
+        read();
+        return;
+    }
+
     INFO() << SID << "RX: " << boost::beast::buffers(read_buffer_.data());
     TRACE() << SID << "read " << bytes_transferred << " bytes on the last read";
 
-    read_buffer_.consume(read_buffer_.size());
-
     read_count_++;
     if(read_count_ < init_message_count_) {
-        TRACE() << SID << read_count_ << " initial messages received";
+        TRACE() << SID << read_count_
+                << " initial messages received, current status "
+                << to_string(status_);
     } else if(read_count_ == init_message_count_) {
-        status_ = Status::send_subscribe_messages;
+        INFO() << SID
+               << "initial messages complete, preparing to send subscribe "
+                  "messages";
+        set_status(Status::send_subscribe_messages);
     }
 
-    if(status_ == Status::receive_welcome_messages ||
-       status_ == Status::active) {
+    if(status_ == Status::receive_welcome_messages) {
         read();
     } else if(status_ == Status::send_subscribe_messages) {
         send_next_subscribe_message();
         TRACE() << SID << "called send_next_subscribe_message()";
     }
+
+    read_buffer_.consume(read_buffer_.size());
 }
 
 void Display_session::on_close(boost::system::error_code ec)
@@ -204,9 +220,10 @@ void Display_session::stop()
 std::shared_ptr<Display_session>
 Display_session::create(boost::asio::io_context& ioc,
                         std::shared_ptr<data::Scene> scene,
-                        const Config::Sage_config& config)
+                        const Config::Sage_config& config,
+                        const Display_session::handler_map_type& handler_map)
 {
-    return std::make_shared<Display_session>(ioc, scene, config);
+    return std::make_shared<Display_session>(ioc, scene, config, handler_map);
 }
 
 void Display_session::send_next_subscribe_message()
@@ -233,6 +250,55 @@ void Display_session::do_next()
 void Display_session::fail(boost::system::error_code ec, const char* what)
 {
     ERROR() << SID << what << ": " << ec.message() << "\n";
+}
+
+/* static */ std::string
+Display_session::to_string(Display_session::Status status)
+{
+    switch(status) {
+    case Status::initial:
+        return "initial";
+
+    case Status::receive_welcome_messages:
+        return "receive_welcome_messages";
+
+    case Status::send_subscribe_messages:
+        return "send_subscribe_messages";
+
+    case Status::active:
+        return "active";
+
+    default:
+        return "<invalid-status>";
+    }
+}
+
+void Display_session::set_status(Display_session::Status status)
+{
+    DEBUG() << "Setting status to " << to_string(status);
+    status_ = status;
+}
+
+void Display_session::process_message()
+{
+    std::stringstream ss;
+    ss << boost::beast::buffers(read_buffer_.data());
+    read_buffer_.consume(read_buffer_.size());
+
+    try {
+        utils::Json json;
+        json.read(ss);
+        const std::string handler_name = json.get("f");
+        auto handler = handler_map_.find(handler_name);
+        if(handler == std::end(handler_map_)) {
+            ERROR() << SID << "no handler for message type " << handler_name;
+            return;
+        }
+        handler->second->dispatch(json);
+        DEBUG() << SID << "handled message " << ss.str();
+    } catch(const std::exception&) {
+        WARN() << SID << "could not proces " << ss.str();
+    }
 }
 
 } // namespace ipme::wb

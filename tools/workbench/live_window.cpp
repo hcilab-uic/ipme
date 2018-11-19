@@ -354,6 +354,7 @@ void Live_window::add_new_frame()
     auto frame_index = frame_number();
     auto timestamp = frame_index * capture_timer_->interval();
     //    sage_handler_.flush();
+    display_manager_.flush();
 
     scene_->add_new_frame(frame_index, timestamp);
     DEBUG() << "Added new frame " << frame_index << " at time " << timestamp;

@@ -9,6 +9,8 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 
+#include "sage_message_handler.h"
+
 #include "config.h"
 #include "data/scene.h"
 
@@ -16,6 +18,8 @@ namespace ipme::wb {
 class Display_session : public std::enable_shared_from_this<Display_session> {
 public:
     using tcp = boost::asio::ip::tcp;
+    using handler_ptr = std::shared_ptr<Sage_message_handler>;
+    using handler_map_type = std::unordered_map<std::string, handler_ptr>;
 
     enum class Status
     {
@@ -27,7 +31,8 @@ public:
 
     Display_session(boost::asio::io_context& ioc,
                     std::shared_ptr<data::Scene> scene,
-                    const Config::Sage_config& config);
+                    const Config::Sage_config& config,
+                    const handler_map_type& handler_map);
 
     void start();
 
@@ -35,7 +40,8 @@ public:
 
     static std::shared_ptr<Display_session>
     create(boost::asio::io_context& ioc, std::shared_ptr<data::Scene> scene,
-           const Config::Sage_config& config);
+           const Config::Sage_config& config,
+           const handler_map_type& handler_map);
 
 private:
     void read();
@@ -49,6 +55,12 @@ private:
     void do_next();
 
     void fail(boost::system::error_code ec, const char* what);
+
+    void set_status(Status status);
+
+    void process_message();
+
+    static std::string to_string(Status status);
 
     // Handlers
     void on_resolve(boost::system::error_code ec,
@@ -74,6 +86,7 @@ private:
     std::size_t subscribe_message_index_ = 0;
     std::string name_;
     Config::Sage_config config_;
+    handler_map_type handler_map_;
 
     static constexpr size_t init_message_count_ = 161;
 };
