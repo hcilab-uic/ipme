@@ -5,6 +5,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <sstream>
+#include <thread>
 
 #include <QDebug>
 #include <QDir>
@@ -494,6 +495,8 @@ void Live_window::start_experiment()
     //    if(!sage_handler_.start()) {
     //        throw std::runtime_error{"Could not start SAGE2"};
     //    }
+
+    display_manager_.start();
 
     if(!omicron_thread_) {
         DEBUG() << "Initializing omicron thread";

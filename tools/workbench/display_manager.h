@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <thread>
 
 #include "config.h"
 #include "data/scene.h"
@@ -15,6 +16,8 @@ public:
     Display_manager(const Config& config, std::shared_ptr<data::Scene> scene);
 
     bool create_sessions();
+
+    void start();
 
     void stop();
 
@@ -30,6 +33,7 @@ private:
 
     Display_session::handler_map_type handler_map_;
     std::shared_ptr<sage::Sage_element_container> element_container_;
+    std::shared_ptr<std::thread> ioc_thread_;
 };
 } // namespace ipme::wb
 

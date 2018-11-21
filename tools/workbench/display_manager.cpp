@@ -28,14 +28,18 @@ bool Display_manager::create_sessions()
         session->start();
     }
 
-    const auto count = ioc_.run();
-
-    INFO() << "io_context count " << count;
-
     // TODO: We need to set some kind of return value on start/run inside
     // session started
 
     return true;
+}
+
+void Display_manager::start()
+{
+    INFO() << "starting the run sequence";
+    //    const auto count = ioc_.run();
+    //    INFO() << count << " contexts created";
+    ioc_thread_ = std::make_shared<std::thread>([this] { ioc_.run(); });
 }
 
 void Display_manager::stop()
