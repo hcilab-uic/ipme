@@ -13,7 +13,8 @@ public:
     {
     }
 
-    void dispatch(const utils::Json& message) override;
+    void dispatch(const std::string& display_id,
+                  const utils::Json& message) override;
 };
 } // namespace ipme::wb::sage
 #endif // IPME_WB_SAGE_CREATE_APP_WINDOW_HANDLER_H

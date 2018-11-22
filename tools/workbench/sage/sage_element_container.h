@@ -12,11 +12,12 @@ class Sage_element_container {
 public:
     using Container_type = std::unordered_map<std::string, Sage_element>;
 
-    void add_element(const ipme::utils::Json& message);
-    void add_element(const std::string& id, double left, double top,
-                     double width, double height);
-    void update_element(const std::string& id, double left, double top,
-                        double width, double height);
+    void add_element(const std::string& display_id,
+                     const ipme::utils::Json& message);
+    void add_element(const std::string& id, const std::string& display_id,
+                     double left, double top, double width, double height);
+    void update_element(const std::string& id, const std::string& display_id,
+                        double left, double top, double width, double height);
     void delete_element(const std::string& id);
 
     inline const Container_type& elements() const

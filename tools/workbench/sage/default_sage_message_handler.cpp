@@ -37,7 +37,8 @@ std::string Default_sage_message_handler::generate_registration_message()
     return ss.str();
 }
 
-void Default_sage_message_handler::dispatch(const utils::Json& message)
+void Default_sage_message_handler::dispatch(const std::string& display_id,
+                                            const utils::Json& message)
 {
     // FIXME: Need to rethink this. Do we need separate classes?
     if(name_ == "setItemPositionAndSize" || name_ == "setItemPosition") {
@@ -46,7 +47,7 @@ void Default_sage_message_handler::dispatch(const utils::Json& message)
         auto top = message.get<double>("d.elemTop");
         auto width = message.get<double>("d.elemWidth");
         auto height = message.get<double>("d.elemHeight");
-        container_->update_element(id, left, top, width, height);
+        container_->update_element(id, display_id, left, top, width, height);
     } else if(name_ == "deleteElement") {
         auto id = message.get("d.elemId");
         container_->delete_element(id);

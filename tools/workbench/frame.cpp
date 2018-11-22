@@ -44,7 +44,7 @@ void Frame::apply_all_registered()
 
 Frame Frame::create_from_pb(
     const ipme::scene::Frame& scene_frame,
-    const std::unordered_map<uint32_t, ipme::scene::Display>& display_map,
+    const std::unordered_map<std::string, scene::Display>& display_map,
     const std::unordered_map<uint32_t, std::string>& registered_objects)
 {
     Frame frame;
@@ -79,7 +79,7 @@ Frame Frame::create_from_pb(
     }
 
     for(const auto& screen_object : scene_frame.screen_objects()) {
-        const auto& display = display_map.at(screen_object.screen_id());
+        const auto display = display_map.at(screen_object.screen_id());
         frame.screen_objects.emplace_back(Screen_object{
             screen_object.position(), display, screen_object.size().width(),
             screen_object.size().height()});

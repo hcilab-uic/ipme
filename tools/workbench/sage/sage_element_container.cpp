@@ -3,7 +3,8 @@
 #include "utils/logger.h"
 
 namespace ipme::wb::sage {
-void Sage_element_container::add_element(const ipme::utils::Json& message)
+void Sage_element_container::add_element(const std::string& display_id,
+                                         const ipme::utils::Json& message)
 {
     auto id = message.get("d.id");
     auto left = message.get<double>("d.left");
@@ -11,21 +12,23 @@ void Sage_element_container::add_element(const ipme::utils::Json& message)
     auto width = message.get<double>("d.width");
     auto height = message.get<double>("d.height");
 
-    add_element(id, left, top, width, height);
+    add_element(id, display_id, left, top, width, height);
 }
 
-void Sage_element_container::add_element(const std::string& id, double left,
-                                         double top, double width,
+void Sage_element_container::add_element(const std::string& id,
+                                         const std::string& display_id,
+                                         double left, double top, double width,
                                          double height)
 {
-    auto itr =
-        elements_.emplace(id, Sage_element{id, left, top, width, height});
+    auto itr = elements_.emplace(
+        id, Sage_element{id, display_id, left, top, width, height});
     INFO() << "Added element " << itr.second;
 }
 
-void Sage_element_container::update_element(const std::string& id, double left,
-                                            double top, double width,
-                                            double height)
+void Sage_element_container::update_element(const std::string& id,
+                                            const std::string& display_id,
+                                            double left, double top,
+                                            double width, double height)
 {
     auto itr = elements_.find(id.data());
     if(itr != std::end(elements_)) {
@@ -33,7 +36,7 @@ void Sage_element_container::update_element(const std::string& id, double left,
         DEBUG() << "Updated element " << itr->second;
     } else {
         INFO() << "Update received from an unknown element " << id << " adding";
-        add_element(id, left, top, width, height);
+        add_element(id, display_id, left, top, width, height);
     }
 }
 

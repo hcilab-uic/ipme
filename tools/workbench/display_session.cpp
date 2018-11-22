@@ -69,7 +69,7 @@ Display_session::Display_session(boost::asio::io_context& ioc,
     : scene_{scene}
     , resolver_{ioc}
     , ws_{ioc}
-    , name_{std::to_string(config.id)}
+    , name_{config.id}
     , config_{config}
     , handler_map_{handler_map}
 // clang-format on
@@ -294,7 +294,7 @@ void Display_session::process_message()
             ERROR() << SID << "no handler for message type " << handler_name;
             return;
         }
-        handler->second->dispatch(json);
+        handler->second->dispatch(name_, json);
         DEBUG() << SID << "handled message " << ss.str();
     } catch(const std::exception&) {
         WARN() << SID << "could not proces " << ss.str();

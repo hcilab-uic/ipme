@@ -6,9 +6,9 @@
 #include "utils/logger.h"
 
 namespace ipme::wb::sage {
-Sage_element::Sage_element(std::string_view id, double left, double top,
-                           double width, double height)
-    : id_{id}
+Sage_element::Sage_element(const std::string& id, const std::string& display_id,
+                           double left, double top, double width, double height)
+    : id_{id}, display_id_{display_id}
 {
     update(left, top, width, height);
     INFO() << "CREATE [" << id << "]\n";

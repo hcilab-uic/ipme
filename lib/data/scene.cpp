@@ -98,8 +98,8 @@ void Scene::add_object(std::shared_ptr<scene::Object> object)
     orientation->set_z(simple_object->pose().orientation().z());
 }
 
-void Scene::add_object(uint32_t id, double top, double left, double width,
-                       double height)
+void Scene::add_object(const std::string& id, const std::string& display_id,
+                       double top, double left, double width, double height)
 {
     if(!current_frame_) {
         return;
@@ -108,6 +108,7 @@ void Scene::add_object(uint32_t id, double top, double left, double width,
     auto screen_object = current_frame_->add_screen_objects();
 
     screen_object->set_screen_object_id(id);
+    screen_object->set_screen_id(display_id);
 
     auto position = screen_object->mutable_position();
     position->set_x(left);

@@ -52,12 +52,17 @@ void Display_manager::stop()
 void Display_manager::flush()
 {
     for(const auto& element : element_container_->elements()) {
-        char* end;
-        auto& ui = element.second;
-        uint32_t id =
-            static_cast<uint32_t>(std::strtoul(ui.id().data(), &end, 10));
-        scene_->add_object(id, ui.top(), ui.left(), ui.width(), ui.height());
+        // clang-format off
+        scene_->add_object(element.second.id(),
+                           element.second.display_id(),
+                           element.second.top(),
+                           element.second.left(),
+                           element.second.width(),
+                           element.second.height());
+        // clang-format on
     }
+
+    INFO() << element_container_->elements().size() << " elements flushed";
 }
 
 std::pair<std::string, std::shared_ptr<Sage_message_handler>>

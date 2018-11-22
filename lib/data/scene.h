@@ -17,7 +17,7 @@ class Scene : public std::enable_shared_from_this<Scene> {
 public:
     using Frame_container = std::vector<std::shared_ptr<scene::Frame>>;
     using Vrpn_object = std::shared_ptr<scene::Vrpn_object>;
-    using Display_map = std::unordered_map<uint32_t, ipme::scene::Display>;
+    using Display_map = std::unordered_map<std::string, ipme::scene::Display>;
 
     virtual ~Scene();
 
@@ -25,8 +25,8 @@ public:
 
     void add_object(const omicronConnector::EventData& event);
     void add_object(std::shared_ptr<scene::Object> object);
-    void add_object(uint32_t id, double top, double left, double width,
-                    double height);
+    void add_object(const std::string& id, const std::string& display_id,
+                    double top, double left, double width, double height);
 
     void add_new_frame(uint32_t id, uint64_t timestamp);
 

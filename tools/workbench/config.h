@@ -12,12 +12,13 @@ namespace ipme::wb {
 class Config {
 public:
     struct Sage_config {
-        uint32_t id;
+        std::string id;
         std::string host;
         unsigned short port;
         std::string session_token;
         ipme::scene::Position offset;
         ipme::scene::Size_2d dimensions;
+        ipme::scene::Vector_3d normal_vector;
 
         static Sage_config create(const boost::property_tree::ptree& sage_node);
     };

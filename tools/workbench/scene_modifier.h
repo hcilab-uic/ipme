@@ -17,7 +17,7 @@ class Scene_modifier : public QObject {
     Q_OBJECT
 public:
     struct Scene_display {
-        uint32_t display_id;
+        std::string display_id;
         QVector3D offset;
         QVector2D dimensions;
     };

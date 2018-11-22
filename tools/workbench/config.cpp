@@ -4,11 +4,13 @@
 #include <sstream>
 
 #include "utils/json.h"
+#include "utils/logger.h"
 
 namespace ipme::wb {
 void Config::parse_config(const std::filesystem::path& path)
 {
     if(!std::filesystem::exists(path)) {
+        ERROR() << "config path " << path << " not found";
         return;
     }
 
@@ -17,6 +19,25 @@ void Config::parse_config(const std::filesystem::path& path)
     auto sage_hosts = json_.get_node("sage");
     for(const auto& sage_host : sage_hosts) {
         sage_config_.emplace_back(Sage_config::create(sage_host.second));
+        auto& sage_config = sage_config_.back();
+
+        auto display = scene_config_.add_displays();
+        display->set_display_id(sage_config.id);
+
+        display->mutable_offset()->set_x(sage_config.offset.x());
+        display->mutable_offset()->set_y(sage_config.offset.y());
+        display->mutable_offset()->set_z(sage_config.offset.z());
+
+        auto dim = display->mutable_dimensions();
+        dim->set_height(sage_config.dimensions.height());
+        dim->set_width(sage_config.dimensions.width());
+
+        auto nv = display->mutable_normal_vector();
+        nv->set_x(sage_config.normal_vector.x());
+        nv->set_y(sage_config.normal_vector.y());
+        nv->set_z(sage_config.normal_vector.z());
+
+        DEBUG() << "display id " << sage_config.id << " just added";
     }
 
     auto vrpn_objects = json_.get_node("vrpn_objects");
@@ -85,7 +106,7 @@ Config::Sage_config
 Config::Sage_config::create(const boost::property_tree::ptree& sage_node)
 {
     Sage_config sage_config;
-    sage_config.id = sage_node.get<uint32_t>("id");
+    sage_config.id = sage_node.get<std::string>("id");
     sage_config.host = sage_node.get<std::string>("host");
     sage_config.port = sage_node.get<unsigned short>("port");
     sage_config.session_token = sage_node.get<std::string>("session_token");
@@ -98,6 +119,18 @@ Config::Sage_config::create(const boost::property_tree::ptree& sage_node)
     auto& dimension_node = sage_node.get_child("dimensions");
     sage_config.dimensions.set_width(dimension_node.get<double>("width"));
     sage_config.dimensions.set_height(dimension_node.get<double>("height"));
+
+    auto nv_node = sage_node.get_child("normal_vector");
+    std::vector<double> normal_vector;
+    for(const auto& nv : nv_node) {
+        normal_vector.push_back(nv.second.get_value<double>());
+    }
+
+    assert(normal_vector.size() == 3);
+
+    sage_config.normal_vector.set_x(normal_vector[0]);
+    sage_config.normal_vector.set_y(normal_vector[1]);
+    sage_config.normal_vector.set_z(normal_vector[2]);
 
     return sage_config;
 }

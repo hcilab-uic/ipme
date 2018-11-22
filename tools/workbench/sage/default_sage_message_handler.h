@@ -29,7 +29,8 @@ public:
 
     std::string generate_registration_message() override;
 
-    void dispatch(const utils::Json& message) override;
+    void dispatch(const std::string& display_id,
+                  const utils::Json& message) override;
 
     void set_element_container(
         std::shared_ptr<ipme::wb::sage::Sage_element_container> container)

@@ -8,6 +8,12 @@ message Position {
     double z = 3;
 }
 
+message Vector_3d {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+};
+
 message Quaternion {
     double w = 1;
     double x = 2;
@@ -39,8 +45,8 @@ message Object {
 }
 
 message Screen_object {
-    uint32 screen_object_id = 1;
-    uint32 screen_id = 2;
+    string screen_object_id = 1;
+    string screen_id = 2;
     Position position = 3;
     Size_2d size = 4;
 }
@@ -98,9 +104,10 @@ message Registered_object {
 }
 
 message Display {
-    uint32 display_id = 1;
+    string display_id = 1;
     Position offset = 2;
     Size_2d dimensions = 3;
+    Vector_3d normal_vector = 4;
 }
 
 message Scene_config {
