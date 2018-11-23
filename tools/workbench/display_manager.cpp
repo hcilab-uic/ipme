@@ -1,9 +1,12 @@
 #include "display_manager.h"
 
+#include "connector/omicronConnectorClient.h"
+
 #include "sage/create_app_window_handler.h"
 #include "sage/default_sage_message_handler.h"
 #include "sage/update_item_order_handler.h"
 #include "sage_message_handler.h"
+#include "sensor/vrpn_handler.h"
 
 namespace ipme::wb {
 Display_manager::Display_manager(const Config& config,
@@ -12,11 +15,12 @@ Display_manager::Display_manager(const Config& config,
     : config_{config}
     , scene_{scene}
     , element_container_{std::make_shared<sage::Sage_element_container>()}
+    , mc_listener_{std::make_unique<sensor::Vrpn_handler>(scene)}
 // clang-format on
 {
     setup_handler_map();
     for(const auto& sage_config : config_.sage_configs()) {
-        sessions_.push_back(
+        display_sessions_.push_back(
             Display_session::create(ioc_, scene, sage_config, handler_map_));
     }
 }
@@ -24,17 +28,27 @@ Display_manager::Display_manager(const Config& config,
 bool Display_manager::create_sessions()
 {
     DEBUG() << "Creating sessions";
-    for(auto session : sessions_) {
-        session->start();
+
+    bool session_created{true};
+    for(auto session : display_sessions_) {
+        session_created &= session->initialize() & session_created;
     }
 
     // TODO: We need to set some kind of return value on start/run inside
     // session started
 
-    return true;
+    omicron_client_ = std::make_shared<omicron>(&mc_listener_);
+    std::stringstream ss;
+    INFO() << "Connecting to motion capture service " << config_.vrpn_host()
+           << ":" << config_.vrpn_port();
+    session_created &=
+        omicron_client_->connect(config_.vrpn_host().c_str(),
+                                 config_.vrpn_port(), config_.vrpn_data_port());
+
+    return session_created;
 }
 
-void Display_manager::start()
+void Display_manager::run()
 {
     INFO() << "starting the run sequence";
     //    const auto count = ioc_.run();
@@ -44,9 +58,14 @@ void Display_manager::start()
 
 void Display_manager::stop()
 {
-    for(auto session : sessions_) {
+    for(auto session : display_sessions_) {
         session->stop();
     }
+
+    ioc_thread_->join();
+    INFO() << "sessions stopped, disposing omicron connection";
+
+    omicron_client_->dispose();
 }
 
 void Display_manager::flush()
@@ -63,6 +82,25 @@ void Display_manager::flush()
     }
 
     INFO() << element_container_->elements().size() << " elements flushed";
+}
+
+void Display_manager::run_all_sessions()
+{
+    ioc_.run();
+
+    if(omicron_client_) {
+        // Currently we don't have a defined way of stopping this loop. They way
+        // we do it is, call stop for the display sessions on the original
+        // thread and wait for them to stop. When they are stopped, we can
+        // assume our work is done and exit loop. A better way to do this would
+        // be to make VRPN session compliant with display sessions
+        while(!ioc_.stopped()) {
+            omicron_client_->poll();
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+        }
+
+        INFO() << "Stop condition reached for omicron, exiting loop";
+    }
 }
 
 std::pair<std::string, std::shared_ptr<Sage_message_handler>>

@@ -76,7 +76,7 @@ Display_session::Display_session(boost::asio::io_context& ioc,
 {
 }
 
-void Display_session::start()
+bool Display_session::initialize()
 {
     resolver_.async_resolve(
         config_.host.c_str(), std::to_string(config_.port).c_str(),
@@ -84,6 +84,7 @@ void Display_session::start()
                   std::placeholders::_1, std::placeholders::_2));
     TRACE() << SID << "called async_resolve(" << config_.host << ":"
             << config_.port << ")";
+    return true;
 }
 
 void Display_session::on_resolve(boost::system::error_code ec,
