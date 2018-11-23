@@ -1,6 +1,7 @@
 #include "frame.h"
 
 #include <QQuaternion>
+#include <QVector3D>
 
 #include <boost/assign.hpp>
 
@@ -118,35 +119,68 @@ Frame Frame::create_from_pb(
 //    return frames;
 //}
 
+namespace detail {
+constexpr float to_f(double v)
+{
+    return static_cast<float>(v);
+}
+
+template <typename Vector>
+QVector3D to_vector(Vector&& v)
+{
+    return QVector3D{to_f(v.x()), to_f(v.y()), to_f(v.z())};
+}
+
+} // namespace detail
+
 Screen_object::Screen_object(const ipme::scene::Position& position,
                              const scene::Display& config, double width_,
                              double height_)
 {
     auto mutable_position = pose.mutable_position();
-    constexpr double scale_factor = 1000.0;
+    constexpr double scale_factor = 0.001;
 
     const auto offset = config.offset();
 
-    const double half_width = width_ / 2.0;
-    const double position_x = (position.x() + half_width) / scale_factor;
-    mutable_position->set_x(position_x + offset.x());
+    //    const double half_width = width_ / 2.0;
+    //    const double position_x = (position.x() + half_width) / scale_factor;
+    //    mutable_position->set_x(position_x + offset.x());
 
-    const double half_height = height_ / 2.0;
-    const double position_y = -(position.y() + half_height) / scale_factor;
-    mutable_position->set_y(position_y + offset.y());
+    //    const double half_height = height_ / 2.0;
+    //    const double position_y = -(position.y() + half_height) /
+    //    scale_factor; mutable_position->set_y(position_y + offset.y());
 
-    mutable_position->set_z(position.z() / scale_factor + offset.z());
+    //    mutable_position->set_z(position.z() / scale_factor + offset.z());
 
-    const auto orientation = pose.mutable_orientation();
-    const auto q = QQuaternion::fromAxisAndAngle(1, 0, 0, 90);
+    auto orientation = pose.mutable_orientation();
+
+    const auto nv = config.normal_vector();
+    const auto normal_direction = detail::to_vector(nv);
+
+    static const QVector3D up{0.f, 1.f, 0.f};
+    static const auto rotator = QQuaternion::fromAxisAndAngle(up, 90);
+
+    const auto direction = rotator.rotatedVector(normal_direction);
+    const auto q = QQuaternion::fromAxisAndAngle(direction, 90);
+
+    const auto position_vector = detail::to_vector(position);
+    const auto rotated = q.rotatedVector(position_vector);
+
+    mutable_position->set_x((rotated.x() * scale_factor) + offset.x());
+    mutable_position->set_y(-(rotated.y() * scale_factor) + offset.y());
+    mutable_position->set_z((rotated.z() * scale_factor) + offset.z());
+
+    DEBUG() << "quaternion for display_id " << config.display_id() << " ["
+            << q.scalar() << "," << q.x() << "," << q.y() << "," << q.z()
+            << "]";
 
     orientation->set_w(static_cast<double>(q.scalar()));
     orientation->set_x(static_cast<double>(q.x()));
     orientation->set_y(static_cast<double>(q.y()));
     orientation->set_z(static_cast<double>(q.z()));
 
-    width = width_ / scale_factor;
-    height = height_ / scale_factor;
+    width = width_ * scale_factor;
+    height = height_ * scale_factor;
 }
 
 } // namespace ipme::wb

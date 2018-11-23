@@ -58,7 +58,7 @@ void Sensor_manager::run()
     INFO() << "starting the run sequence";
     //    const auto count = ioc_.run();
     //    INFO() << count << " contexts created";
-    ioc_thread_ = std::make_shared<std::thread>([this] { ioc_.run(); });
+    ioc_thread_ = std::make_shared<std::thread>([this] { run_all_sessions(); });
 }
 
 void Sensor_manager::stop()
@@ -93,7 +93,7 @@ void Sensor_manager::flush()
 
 void Sensor_manager::run_all_sessions()
 {
-    ioc_.run();
+    //    ioc_.run();
 
     if(omicron_client_) {
         // Currently we don't have a defined way of stopping this loop. They way
@@ -103,6 +103,7 @@ void Sensor_manager::run_all_sessions()
         // be to make VRPN session compliant with display sessions
         while(!ioc_.stopped()) {
             omicron_client_->poll();
+            ioc_.poll();
             std::this_thread::sleep_for(std::chrono::microseconds(100));
         }
 

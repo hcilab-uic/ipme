@@ -13,6 +13,8 @@ const QColor Scene_modifier::device_color{QRgb{0xa699ff}};
 const QColor Scene_modifier::center_color{QRgb{0xff0000}};
 const QColor Scene_modifier::ui_color{QRgb{0xff6600}};
 
+static const QVector3D device_dimensions{1.f, 1.f, 0.05f};
+
 QVector3D make_position_vector(const ipme::scene::Position& pos)
 {
     return QVector3D{static_cast<float>(pos.x()) * scale_factor,
@@ -27,9 +29,20 @@ QQuaternion make_rotation(const ipme::scene::Quaternion& rot)
                        static_cast<float>(rot.z())};
 }
 
+constexpr float scale(double value)
+{
+    return static_cast<float>(value) * scale_factor;
+}
+
 Scene_modifier::Scene_modifier(Qt3DCore::QEntity* root_entity)
     : root_entity_{root_entity}
 {
+}
+
+template <typename Object>
+QVector3D make_extents(Object&& object)
+{
+    return QVector3D{scale(object.width), scale(object.height), 0.05f};
 }
 
 void Scene_modifier::add_frame(const Frame& frame)
@@ -40,14 +53,11 @@ void Scene_modifier::add_frame(const Frame& frame)
     }
 
     for(const auto& device : frame.devices) {
-        add_cuboid(device.pose(), QVector3D{1.f, 1.f, 0.05f}, device_color);
+        add_cuboid(device, device_dimensions, device_color);
     }
 
     for(const auto& screen_object : frame.screen_objects) {
-        QVector3D extents{
-            static_cast<float>(screen_object.width) * scale_factor,
-            static_cast<float>(screen_object.height) * scale_factor, 0.05f};
-        add_cuboid(screen_object.pose, extents, ui_color);
+        add_cuboid(screen_object.pose, make_extents(screen_object), ui_color);
     }
 }
 
@@ -175,16 +185,21 @@ void Scene_modifier::add_cuboid(const ipme::scene::Pose& pose,
 
 void Scene_modifier::add_gaze(const ipme::scene::Pose& pose)
 {
-    constexpr float length = 2.f;
+    static constexpr float length = 3.f;
+    static constexpr float radius = 0.03f;
+    static const QColor color{QRgb{0xffffff}};
+
     auto cylinder = new Qt3DExtras::QCylinderMesh;
-    cylinder->setRadius(0.03f);
+    cylinder->setRadius(radius);
     cylinder->setLength(length);
 
     auto cylinder_transform = new Qt3DCore::QTransform;
     cylinder_transform->setScale(1.f);
 
     auto rotation = make_rotation(pose.orientation());
-    auto offset = rotation.rotatedVector(QVector3D{0, length / 2, 0});
+
+    static const QVector3D vector_to_rotate{0, length / 2, 0};
+    auto offset = rotation.rotatedVector(vector_to_rotate);
 
     auto translation = make_position_vector(pose.position());
     auto translation_with_offset =
@@ -194,7 +209,7 @@ void Scene_modifier::add_gaze(const ipme::scene::Pose& pose)
     cylinder_transform->setRotation(rotation);
 
     auto cylinder_material = new Qt3DExtras::QPhongMaterial;
-    cylinder_material->setDiffuse(QColor{QRgb{0xffffff}});
+    cylinder_material->setDiffuse(color);
 
     entities_.emplace_back(new Qt3DCore::QEntity{root_entity_});
     auto& cylinder_entity = entities_.back();
