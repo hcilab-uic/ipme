@@ -130,7 +130,7 @@ private:
     std::unique_ptr<std::thread> omicron_thread_;
     std::shared_ptr<ipme::data::Scene> scene_;
     //    ipme::wb::Sage_handler sage_handler_;
-    ipme::sensor::Vicon_listener vrpn_listener_;
+    //    ipme::sensor::Vicon_listener vrpn_listener_;
     ipme::wb::Display_manager display_manager_;
 
     std::shared_ptr<omicronConnector::OmicronConnectorClient> omicron_client_;

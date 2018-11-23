@@ -41,7 +41,7 @@ Live_window::Live_window(const ipme::wb::Config& config, QWidget* parent)
     , status_bar_{parent}
     , omicron_thread_{nullptr}
     , scene_{std::make_shared<ipme::data::Scene>()}
-    , vrpn_listener_{std::make_unique<ipme::sensor::Vrpn_handler>(scene_)}
+//    , vrpn_listener_{std::make_unique<ipme::sensor::Vrpn_handler>(scene_)}
     , display_manager_{config, scene_}
 // clang-format on
 {
@@ -50,9 +50,9 @@ Live_window::Live_window(const ipme::wb::Config& config, QWidget* parent)
     ui->video_device_index_edit->setText(
         QString::number(config_.video_device_index()));
 
-    ui->vrpn_host_edit->setText(config_.vrpn_host().c_str());
-    ui->vrpn_port_edit->setText(QString::number(config_.vrpn_port()));
-    ui->vrpn_data_port_edit->setText(QString::number(config_.vrpn_data_port()));
+    //    ui->vrpn_host_edit->setText(config_.vrpn_host().c_str());
+    //    ui->vrpn_port_edit->setText(QString::number(config_.vrpn_port()));
+    //    ui->vrpn_data_port_edit->setText(QString::number(config_.vrpn_data_port()));
 
     //    ui->sage_host_edit->setText(config_.sage_host().c_str());
     //    ui->sage_port_edit->setText(QString::number(config_.sage_port()));
@@ -179,23 +179,24 @@ void Live_window::process_vrpn()
 
 bool Live_window::initialize_vrpn()
 {
-    using omicron = omicronConnector::OmicronConnectorClient;
-    omicron_client_ = std::make_shared<omicron>(&vrpn_listener_);
+    //    using omicron = omicronConnector::OmicronConnectorClient;
+    //    omicron_client_ = std::make_shared<omicron>(&vrpn_listener_);
 
-    const auto host = ui->vrpn_host_edit->text();
-    const auto port = ui->vrpn_port_edit->text().toShort();
-    const auto data_port = ui->vrpn_data_port_edit->text().toShort();
-    std::stringstream ss;
-    auto ret = omicron_client_->connect(host.toStdString().c_str(), port,
-                                        data_port, 0, ss);
+    //    const auto host = ui->vrpn_host_edit->text();
+    //    const auto port = ui->vrpn_port_edit->text().toShort();
+    //    const auto data_port = ui->vrpn_data_port_edit->text().toShort();
+    //    std::stringstream ss;
+    //    auto ret = omicron_client_->connect(host.toStdString().c_str(), port,
+    //                                        data_port, 0, ss);
 
-    std::string omicron_message{ss.str()};
-    INFO() << omicron_message;
-    show_message(omicron_message.c_str());
+    //    std::string omicron_message{ss.str()};
+    //    INFO() << omicron_message;
+    //    show_message(omicron_message.c_str());
 
-    set_status_indicator(ui->vrpn_status_indicator_label, ret);
+    //    set_status_indicator(ui->vrpn_status_indicator_label, ret);
 
-    return ret;
+    //    return ret;
+    return true;
 }
 
 bool Live_window::initialize_camera()
@@ -287,12 +288,12 @@ void Live_window::shutdown()
 
 void Live_window::shutdown_vrpn()
 {
-    if(omicron_client_) {
-        omicron_client_->dispose();
-        //        omicron_client_.release();
-    }
+    //    if(omicron_client_) {
+    //        omicron_client_->dispose();
+    //        //        omicron_client_.release();
+    //    }
 
-    set_status_indicator(ui->vrpn_status_indicator_label, false);
+    //    set_status_indicator(ui->vrpn_status_indicator_label, false);
 }
 
 void Live_window::set_start_button_state(std::string_view text,
@@ -405,9 +406,9 @@ void Live_window::initialize_experiment()
     //                              screen_offset_z);
 
     // VRPN
-    config_.set_vrpn_host(ui->vrpn_host_edit->text().toStdString());
-    config_.set_vrpn_port(ui->vrpn_port_edit->text().toUShort());
-    config_.set_vrpn_data_port(ui->vrpn_data_port_edit->text().toUShort());
+    //    config_.set_vrpn_host(ui->vrpn_host_edit->text().toStdString());
+    //    config_.set_vrpn_port(ui->vrpn_port_edit->text().toUShort());
+    //    config_.set_vrpn_data_port(ui->vrpn_data_port_edit->text().toUShort());
 
     // SAGE2
     //    config_.set_sage_host(ui->sage_host_edit->text().toStdString());
@@ -462,14 +463,14 @@ void Live_window::initialize_experiment()
             ERROR() << msg;
         }
 
-        if(vrpn_status) {
-            shutdown_vrpn();
-            WARN() << "Shutting down VRPN";
-        } else {
-            std::string msg{"VRPN initialization error"};
-            show_message(msg.c_str());
-            ERROR() << msg;
-        }
+        //        if(vrpn_status) {
+        //            shutdown_vrpn();
+        //            WARN() << "Shutting down VRPN";
+        //        } else {
+        //            std::string msg{"VRPN initialization error"};
+        //            show_message(msg.c_str());
+        //            ERROR() << msg;
+        //        }
 
         if(sage_status) {
             //            sage_handler_.disconnect();
@@ -496,13 +497,14 @@ void Live_window::start_experiment()
     //        throw std::runtime_error{"Could not start SAGE2"};
     //    }
 
-    display_manager_.start();
+    display_manager_.run();
 
-    if(!omicron_thread_) {
-        DEBUG() << "Initializing omicron thread";
-        omicron_thread_ =
-            std::make_unique<std::thread>(&Live_window::process_vrpn, this);
-    }
+    //    if(!omicron_thread_) {
+    //        DEBUG() << "Initializing omicron thread";
+    //        omicron_thread_ =
+    //            std::make_unique<std::thread>(&Live_window::process_vrpn,
+    //            this);
+    //    }
 
     set_start_button_pause();
     enable_stop_button();
@@ -520,13 +522,13 @@ void Live_window::stop_experiment()
 
     set_state(ipme::wb::State_machine::State::stopped);
 
-    DEBUG() << "Joining omicron thread till it exits";
+    //    DEBUG() << "Joining omicron thread till it exits";
 
-    if(omicron_thread_) {
-        omicron_thread_->join();
-    }
+    //    if(omicron_thread_) {
+    //        omicron_thread_->join();
+    //    }
 
-    shutdown_vrpn();
+    //    shutdown_vrpn();
 
     //    sage_handler_.stop();
 

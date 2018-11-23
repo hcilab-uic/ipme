@@ -34,7 +34,7 @@ public:
                     const Config::Sage_config& config,
                     const handler_map_type& handler_map);
 
-    void start();
+    bool initialize();
 
     void stop();
 
