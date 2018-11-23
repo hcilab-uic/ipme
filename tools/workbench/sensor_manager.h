@@ -16,9 +16,11 @@
 #include "sensor/vrpn_handler.h"
 
 namespace ipme::wb {
-class Display_manager {
+class Sensor_manager {
 public:
-    Display_manager(const Config& config, std::shared_ptr<data::Scene> scene);
+    Sensor_manager(const Config& config, std::shared_ptr<data::Scene> scene);
+
+    ~Sensor_manager();
 
     bool create_sessions();
 
