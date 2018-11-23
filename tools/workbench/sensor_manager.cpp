@@ -1,4 +1,4 @@
-#include "display_manager.h"
+#include "sensor_manager.h"
 
 #include "connector/omicronConnectorClient.h"
 
@@ -9,8 +9,8 @@
 #include "sensor/vrpn_handler.h"
 
 namespace ipme::wb {
-Display_manager::Display_manager(const Config& config,
-                                 std::shared_ptr<data::Scene> scene)
+Sensor_manager::Sensor_manager(const Config& config,
+                               std::shared_ptr<data::Scene> scene)
     // clang-format off
     : config_{config}
     , scene_{scene}
@@ -25,7 +25,12 @@ Display_manager::Display_manager(const Config& config,
     }
 }
 
-bool Display_manager::create_sessions()
+Sensor_manager::~Sensor_manager()
+{
+    stop();
+}
+
+bool Sensor_manager::create_sessions()
 {
     DEBUG() << "Creating sessions";
 
@@ -48,7 +53,7 @@ bool Display_manager::create_sessions()
     return session_created;
 }
 
-void Display_manager::run()
+void Sensor_manager::run()
 {
     INFO() << "starting the run sequence";
     //    const auto count = ioc_.run();
@@ -56,19 +61,21 @@ void Display_manager::run()
     ioc_thread_ = std::make_shared<std::thread>([this] { ioc_.run(); });
 }
 
-void Display_manager::stop()
+void Sensor_manager::stop()
 {
     for(auto session : display_sessions_) {
         session->stop();
     }
 
-    ioc_thread_->join();
-    INFO() << "sessions stopped, disposing omicron connection";
+    if(ioc_thread_) {
+        ioc_thread_->join();
+        INFO() << "sessions stopped, disposing omicron connection";
 
-    omicron_client_->dispose();
+        omicron_client_->dispose();
+    }
 }
 
-void Display_manager::flush()
+void Sensor_manager::flush()
 {
     for(const auto& element : element_container_->elements()) {
         // clang-format off
@@ -84,7 +91,7 @@ void Display_manager::flush()
     INFO() << element_container_->elements().size() << " elements flushed";
 }
 
-void Display_manager::run_all_sessions()
+void Sensor_manager::run_all_sessions()
 {
     ioc_.run();
 
@@ -117,7 +124,7 @@ create(const std::string& alias)
     return std::make_pair(alias, std::make_shared<Handler>(alias));
 }
 
-void Display_manager::setup_handler_map()
+void Sensor_manager::setup_handler_map()
 {
     namespace sage = ipme::wb::sage;
     handler_map_.insert(create_default("0000", "partitionsGrabAllContent"));

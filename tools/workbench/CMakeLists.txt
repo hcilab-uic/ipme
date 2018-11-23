@@ -14,7 +14,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(SOURCES
     color.cpp
     config.cpp
-    display_manager.cpp
     display_session.cpp
     frame.cpp
     frame_collection.cpp
@@ -31,6 +30,7 @@ set(SOURCES
     scene_object.cpp
     scene_widget.cpp
     scene_modifier.cpp
+    sensor_manager.cpp
 
     color.h
     frame_model.h

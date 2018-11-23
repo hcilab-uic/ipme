@@ -37,7 +37,7 @@ void Config::parse_config(const std::filesystem::path& path)
         nv->set_y(sage_config.normal_vector.y());
         nv->set_z(sage_config.normal_vector.z());
 
-        DEBUG() << "display id " << sage_config.id << " just added";
+        DEBUG() << "display id " << sage_config.id << " added";
     }
 
     auto vrpn_objects = json_.get_node("vrpn_objects");
@@ -50,8 +50,8 @@ void Config::parse_config(const std::filesystem::path& path)
 
     auto vrpn_node = json_.get_node("vrpn");
     set_vrpn_host(vrpn_node.get<std::string>("host"));
-    set_vrpn_port(vrpn_node.get<short>("port"));
-    set_vrpn_data_port(vrpn_node.get<short>("data_port"));
+    set_vrpn_port(vrpn_node.get<unsigned short>("port"));
+    set_vrpn_data_port(vrpn_node.get<unsigned short>("data_port"));
 
     set_video_device_index(json_.get<int>("video_device_index"));
 }

@@ -18,9 +18,9 @@
 #include "config.h"
 #include "connector/omicronConnectorClient.h"
 #include "data/scene.h"
-#include "display_manager.h"
 #include "sage_handler.h"
 #include "sensor/vicon_listener.h"
+#include "sensor_manager.h"
 #include "state_machine.h"
 
 namespace Ui {
@@ -131,7 +131,7 @@ private:
     std::shared_ptr<ipme::data::Scene> scene_;
     //    ipme::wb::Sage_handler sage_handler_;
     //    ipme::sensor::Vicon_listener vrpn_listener_;
-    ipme::wb::Display_manager display_manager_;
+    ipme::wb::Sensor_manager display_manager_;
 
     std::shared_ptr<omicronConnector::OmicronConnectorClient> omicron_client_;
 };
