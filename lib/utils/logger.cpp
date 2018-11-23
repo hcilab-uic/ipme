@@ -45,8 +45,8 @@ std::string path_to_filename(const std::string& path)
         kw::format = (expr::stream
                       << expr::format_date_time<boost::posix_time::ptime>(
                              "TimeStamp", "%Y%m%d %H:%M:%S")
-                      << " " << std::left << std::setw(8) << std::setfill(' ')
-                      << logging::trivial::severity << " " << expr::smessage));
+                      << " [" << std::left << std::setw(8) << std::setfill(' ')
+                      << logging::trivial::severity << "] " << expr::smessage));
     logging::add_common_attributes();
 }
 

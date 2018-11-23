@@ -188,11 +188,13 @@ void Display_session::on_read(boost::system::error_code ec,
 
 void Display_session::on_close(boost::system::error_code ec)
 {
+    TRACE() << SID << "Handling close on display " << name_;
+
     if(ec) {
         return fail(ec, "close");
     }
 
-    INFO() << SID << "Connection closed by display " << name_;
+    INFO() << SID << "Connection to display " << name_ << " closed";
 }
 
 void Display_session::read()
@@ -216,6 +218,7 @@ void Display_session::stop()
     ws_.async_close(boost::beast::websocket::close_code::normal,
                     std::bind(&Display_session::on_close, shared_from_this(),
                               std::placeholders::_1));
+    INFO() << SID << "stop called";
 }
 
 std::shared_ptr<Display_session>
@@ -250,7 +253,7 @@ void Display_session::do_next()
 
 void Display_session::fail(boost::system::error_code ec, const char* what)
 {
-    ERROR() << SID << what << ": " << ec.message() << "\n";
+    ERROR() << SID << what << ": " << ec.message();
 }
 
 /* static */ std::string

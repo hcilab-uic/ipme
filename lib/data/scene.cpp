@@ -69,7 +69,9 @@ void Scene::add_object(const omicronConnector::EventData& event)
     orientation->set_y(static_cast<double>(event.ory));
     orientation->set_z(static_cast<double>(event.orz));
 
-    DEBUG() << "Added object with source id: " << event.sourceId;
+    DEBUG() << "Added object with source id: " << event.sourceId
+            << ", position " << position->DebugString() << ", quaternion "
+            << orientation->DebugString();
 }
 
 void Scene::add_object(std::shared_ptr<scene::Object> object)

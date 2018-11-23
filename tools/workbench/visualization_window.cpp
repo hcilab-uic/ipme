@@ -70,7 +70,7 @@ Visualization_window::~Visualization_window()
 void Visualization_window::on_file_open_triggered()
 {
     QString dir_path = QFileDialog::getExistingDirectory(
-        this, "tracking.pb", "/home/harish/ipme_experiments/study_20180810");
+        this, "tracking.pb", "/home/harish/ipme_experiments");
     DEBUG() << dir_path.toStdString() << "\n";
 
     video_window_->set_dirpath(dir_path);

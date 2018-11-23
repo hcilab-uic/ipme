@@ -18,7 +18,7 @@
 
 #define DO_LOG(level)                                                          \
     BOOST_LOG_SEV(ipme::utils::Logger::log, level)                             \
-        << FILENAME << ":" << __LINE__ << ":" << __func__ << " "
+        << "[" << FILENAME << ":" << __LINE__ << ":" << __func__ << "] "
 
 #define TRACE() DO_LOG(boost::log::trivial::trace)
 #define DEBUG() DO_LOG(boost::log::trivial::debug)

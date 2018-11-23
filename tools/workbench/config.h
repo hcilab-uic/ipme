@@ -88,20 +88,20 @@ public:
         return scene_config_;
     }
 
-    inline double offset_x(uint32_t id) const
-    {
-        return display_map_.at(id).offset().x();
-    }
+    //    inline double offset_x(uint32_t id) const
+    //    {
+    //        return display_map_.at(id).offset().x();
+    //    }
 
-    inline double offset_y(uint32_t id) const
-    {
-        return display_map_.at(id).offset().y();
-    }
+    //    inline double offset_y(uint32_t id) const
+    //    {
+    //        return display_map_.at(id).offset().y();
+    //    }
 
-    inline double offset_z(uint32_t id) const
-    {
-        return display_map_.at(id).offset().z();
-    }
+    //    inline double offset_z(uint32_t id) const
+    //    {
+    //        return display_map_.at(id).offset().z();
+    //    }
 
     //    void set_screen_offset(double x, double y, double z);
 
