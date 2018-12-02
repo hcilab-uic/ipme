@@ -36,12 +36,12 @@ void Scene_modifier::add_frame(const Frame& frame)
 {
     //    add_sphere(0, 0, 0, center_color);
     for(const auto& person : frame.persons) {
-        add_sphere(person);
-        add_gaze(person);
+        add_sphere(person.pose());
+        add_gaze(person.pose());
     }
 
     for(const auto& device : frame.devices) {
-        add_cuboid(device, QVector3D{1.f, 1.f, 0.05f}, device_color);
+        add_cuboid(device.pose(), QVector3D{1.f, 1.f, 0.05f}, device_color);
     }
 
     for(const auto& screen_object : frame.screen_objects) {
