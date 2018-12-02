@@ -298,8 +298,9 @@ void Visualization_window::on_save_outcome_button_clicked()
     std::ofstream ofs{labeled_file_path_.toStdString(), std::ios::app};
 
     const auto record_vrpn_object = [&ofs](auto vrpn_object) {
-        const auto pos = vrpn_object.position();
-        const auto rot = vrpn_object.orientation();
+        const auto& pose = vrpn_object.pose();
+        const auto pos = pose.position();
+        const auto rot = pose.orientation();
         ofs << pos.x() << "," << pos.y() << "," << pos.z() << "," << rot.w()
             << "," << rot.x() << "," << rot.y() << "," << rot.z() << ",";
     };

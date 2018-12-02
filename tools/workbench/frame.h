@@ -31,10 +31,12 @@ public:
 
     using map_type = boost::bimap<Policy, std::string>;
     using container = std::vector<Frame>;
+    using motion_capture_object = ipme::scene::Vrpn_object;
+
     static const map_type policy_map;
 
-    std::vector<ipme::scene::Pose> persons;
-    std::vector<ipme::scene::Pose> devices;
+    std::vector<motion_capture_object> persons;
+    std::vector<motion_capture_object> devices;
     std::vector<Screen_object> screen_objects;
 
     inline bool has_all_registered_ids() const

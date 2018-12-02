@@ -63,13 +63,13 @@ Frame Frame::create_from_pb(
         const auto type = itr->second;
         if(type.find("person") != std::string::npos) {
             if(frame.vrpn_ids_.find(source_id) == std::end(frame.vrpn_ids_)) {
-                frame.persons.push_back(vrpn_object.pose());
+                frame.persons.push_back(vrpn_object);
                 ++people_count;
                 frame.vrpn_ids_.insert(source_id);
             }
         } else if(type.find("computer") != std::string::npos) {
             if(frame.vrpn_ids_.find(source_id) == std::end(frame.vrpn_ids_)) {
-                frame.devices.push_back(vrpn_object.pose());
+                frame.devices.push_back(vrpn_object);
                 ++device_count;
                 frame.vrpn_ids_.insert(source_id);
             }
