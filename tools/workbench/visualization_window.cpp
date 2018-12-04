@@ -301,8 +301,9 @@ void Visualization_window::on_save_outcome_button_clicked()
         const auto& pose = vrpn_object.pose();
         const auto pos = pose.position();
         const auto rot = pose.orientation();
-        ofs << pos.x() << "," << pos.y() << "," << pos.z() << "," << rot.w()
-            << "," << rot.x() << "," << rot.y() << "," << rot.z() << ",";
+        ofs << vrpn_object.vrpn_source_id() << "," << pos.x() << "," << pos.y()
+            << "," << pos.z() << "," << rot.w() << "," << rot.x() << ","
+            << rot.y() << "," << rot.z() << ",";
     };
 
     const auto selected_label =
@@ -316,12 +317,23 @@ void Visualization_window::on_save_outcome_button_clicked()
             continue;
         }
         ofs << frame.frame_id() << ",";
+
+        // std::map should not be used because it is slow. But I don't know of
+        // another quick way to sort the keys. Until then, we shall use this
+        std::map<size_t, ipme::scene::Vrpn_object> map_to_sort;
         for(const auto& person : frame.persons) {
-            record_vrpn_object(person);
+            //            record_vrpn_object(person);
+            map_to_sort.emplace(person.vrpn_source_id(), person);
         }
 
         for(const auto& device : frame.devices) {
-            record_vrpn_object(device);
+            //            record_vrpn_object(device);
+            map_to_sort.emplace(device.vrpn_source_id(), device);
+        }
+
+        // Now take the sorted objects in the frame and write to ostream
+        for(const auto& item : map_to_sort) {
+            record_vrpn_object(item.second);
         }
 
         ofs << label << "\n";
