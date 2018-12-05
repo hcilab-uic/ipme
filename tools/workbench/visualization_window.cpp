@@ -316,10 +316,11 @@ void Visualization_window::on_save_outcome_button_clicked()
         if(!frame.has_all_registered_ids()) {
             continue;
         }
-        ofs << frame.frame_id() << ",";
+        ofs << frame.frame_id() << "," << frame.timestamp() << ",";
 
-        // std::map should not be used because it is slow. But I don't know of
-        // another quick way to sort the keys. Until then, we shall use this
+        // std::map should not be used because it is slow. But I don't know
+        // of another quick way to sort the keys. Until then, we shall use
+        // this
         std::map<size_t, ipme::scene::Vrpn_object> map_to_sort;
         for(const auto& person : frame.persons) {
             //            record_vrpn_object(person);

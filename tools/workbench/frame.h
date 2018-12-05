@@ -49,6 +49,11 @@ public:
         return frame_id_;
     }
 
+    inline uint64_t timestamp() const
+    {
+        return timestamp_;
+    }
+
     void apply_filter(Policy policy_value);
     void apply_filter(std::string_view policy_name);
 
@@ -67,6 +72,7 @@ public:
 
 private:
     uint32_t frame_id_{std::numeric_limits<uint32_t>::infinity()};
+    uint64_t timestamp_{std::numeric_limits<uint64_t>::infinity()};
     bool has_all_registered_ids_{false};
     std::unordered_set<uint32_t> vrpn_ids_;
 };
