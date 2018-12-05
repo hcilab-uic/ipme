@@ -53,7 +53,7 @@ void Scene_modifier::add_frame(const Frame& frame)
     }
 
     for(const auto& device : frame.devices) {
-        add_cuboid(device, device_dimensions, device_color);
+        add_cuboid(device.pose(), device_dimensions, device_color);
     }
 
     for(const auto& screen_object : frame.screen_objects) {

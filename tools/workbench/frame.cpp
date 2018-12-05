@@ -50,6 +50,7 @@ Frame Frame::create_from_pb(
 {
     Frame frame;
     frame.frame_id_ = scene_frame.frame_id();
+    frame.timestamp_ = scene_frame.timestamp();
 
     size_t device_count{0};
     size_t people_count{0};
