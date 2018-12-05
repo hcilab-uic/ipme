@@ -288,9 +288,12 @@ def main():
     multi_display_df = pd.read_csv(options.multi_display_file)
     single_display_df = pd.read_csv(options.single_display_file)
 
+    min_score = 0
+    min_score_diff = 0
+
     def make_scatter_plot(x_label, y_label, title=None):
-        make_plot(multi_display_df, outdir, x_label, y_label, options, 0,
-                  0, title)
+        make_plot(multi_display_df, outdir, x_label, y_label, options,
+                  min_score, min_score_diff, title)
 
     make_scatter_plot('canopus', 'vega')
     make_scatter_plot('canopus', 'pd', 'Personal Device vs Canopus')
@@ -298,12 +301,15 @@ def main():
 
     draw_count_plots(multi_display_df,
                      outdir / 'multi_display_associations.png', options,
+                     min_score, min_score_diff,
                      'Multi-Screen Associations (Separate)')
     draw_binary_plots(multi_display_df,
-                      outdir / 'multi_display_binary_associations.png', options,
+                      outdir / 'multi_display_binary_associations.png',
+                      min_score, min_score_diff, options,
                       'Multi-Screen Associations (Binary)')
     draw_binary_plots(single_display_df,
                       outdir / 'single_display_binary_associations.png',
+                      min_score, min_score_diff,
                       options, 'Single-Screen Associations (Binary)')
 
 
