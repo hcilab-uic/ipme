@@ -34,7 +34,6 @@ Scene_modifier::Scene_modifier(Qt3DCore::QEntity* root_entity)
 
 void Scene_modifier::add_frame(const Frame& frame)
 {
-    //    add_sphere(0, 0, 0, center_color);
     for(const auto& person : frame.persons) {
         add_sphere(person.pose());
         add_gaze(person.pose());
