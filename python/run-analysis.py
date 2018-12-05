@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 import copy
+import logging
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scipy.stats as stats
 import seaborn as sns
 import sys
 
@@ -14,6 +16,11 @@ from datetime import datetime
 from pathlib import Path
 from pyquaternion import Quaternion
 from scipy.spatial.distance import cosine
+
+
+logger = logging.getLogger(__name__)
+FORMAT = '%(asctime)-15s %(levelname)s %(funcName)s:%(lineno)s %(message)s'
+logging.basicConfig(format=FORMAT)
 
 sns.set()
 sns.set_style('whitegrid')
@@ -27,6 +34,8 @@ colors = ['r', 'g', 'b']
 ColumnIdx = namedtuple('ColumnIdx', ['person', 'device'])
 Association = namedtuple('Association', ['score', 'angle'])
 AssociationCount = namedtuple('Count', ['person_id', 'pd', 'canopus', 'vega'])
+CombinedData = namedtuple('CombinedData', ['separate', 'all', 'timestamps',
+                                           'time_slices', 'stats'])
 
 
 def parse_options():
@@ -36,6 +45,8 @@ def parse_options():
     parser.add_argument('--min-score', type=float, default=0)
     parser.add_argument('--min-score-diff', type=float, default=0)
     parser.add_argument('--outdir', default=str(Path().absolute()))
+    parser.add_argument('--title')
+    parser.add_argument('--log-level', default='info')
 
     return parser.parse_args()
 
@@ -80,6 +91,8 @@ class ScoreComputation(object):
         self.__src_df = df
         self.__min_score = kwargs['min_score']
         self.__min_score_diff = kwargs['min_score_diff']
+        self.__time_spent = [0, 0, 0]
+        self.__time_slices = []
         self.__compute()
 
     def __add(self, *args):
@@ -107,26 +120,54 @@ class ScoreComputation(object):
     def __compute(self):
         person = extract(self.__src_df, self.__column_idx.person)
         device = extract(self.__src_df, self.__column_idx.device)
+        timestamps = self.__src_df['timestamp']
 
         counts = [0, 0, 0]
 
+        previous_assoc_idx = np.inf
+        previous_ts = 0
         for i in range(0, len(person)):
             head_vector = make_vector(person.values[i])
             device_vector = make_vector(device.values[i])
 
-            pd = compute_score(head_vector, device_vector)
+            personal_device = compute_score(head_vector, device_vector)
             canopus = compute_score(head_vector, canopus_normal)
             vega = compute_score(head_vector, vega_normal)
 
-            scores = self.__add(pd, canopus, vega)
+            scores = self.__add(personal_device, canopus, vega)
             max_assoc_idx = np.argmax(scores)
+
+            if previous_assoc_idx == np.inf:
+                previous_assoc_idx = max_assoc_idx
+
+            if max_assoc_idx != previous_assoc_idx:
+                time_delta = timestamps[i] - previous_ts
+                self.__time_spent[previous_assoc_idx] += time_delta
+
+                slices = [0, 0, 0]
+                slices[previous_assoc_idx] = time_delta
+                self.__time_slices.append([self.__person_id] + slices)
+
+                logger.debug('switched from {} to {}, td={}ms'.format(
+                    previous_assoc_idx, max_assoc_idx, time_delta))
+                previous_assoc_idx = max_assoc_idx
+                previous_ts = timestamps[i]
 
             counts[max_assoc_idx] += 1
 
-        self.__assoc_counts = AssociationCount(person_id=self.__person_id,
-                                               pd=counts[0],
-                                               canopus=counts[1],
-                                               vega=counts[2])
+        self.__assoc_counts = AssociationCount(
+            person_id=self.__person_id, pd=counts[0], canopus=counts[1],
+            vega=counts[2])
+
+    @property
+    def time_slices(self):
+        return pd.DataFrame(data=self.__time_slices,
+                            columns=['Person ID', 'Personal Device',
+                                     'Canopus', 'Vega'])
+
+    @property
+    def time_spent(self):
+        return [self.__person_id] + self.__time_spent
 
     @property
     def person_id(self):
@@ -152,7 +193,18 @@ def make_combined_data(df, min_score, min_score_diff):
     p3 = ScoreComputation(df, 'Person 3', ColumnIdx(person=5, device=6),
                           min_score=min_score, min_score_diff=min_score_diff)
     all_data = p1.df.append(p2.df).append(p3.df)
-    return [p1, p2, p3], all_data
+
+    time_stamp = [p1.time_spent, p2.time_spent, p3.time_spent]
+    df_time_stamp = pd.DataFrame(data=time_stamp,
+                                 columns=['Person ID', 'Personal Device',
+                                          'Canopus', 'Vega'])
+    time_slices = p1.time_slices.append(p2.time_slices).append(p3.time_slices)
+    stat = stats.f_oneway(time_slices['Personal Device'],
+                          time_slices['Canopus'],
+                          time_slices['Vega'])
+
+    return CombinedData([p1, p2, p3], all_data, df_time_stamp, time_slices,
+                        stat)
 
 
 def tick_labels():
@@ -181,18 +233,16 @@ class Plotter(object):
         plt.savefig(outfile_path)
 
 
-def make_multi_scatter(options, x_label, y_label, **kwargs):
+def make_multi_scatter(x_label, y_label, **kwargs):
     title = '{} vs {}'.format(y_label.capitalize(), x_label.capitalize()) \
         if 'title' not in kwargs else kwargs['title']
     x_data_label = '{}_score'.format(x_label)
     y_data_label = '{}_score'.format(y_label)
 
-    separate, _ = make_combined_data(kwargs['df'], options.min_score,
-                                     options.min_score_diff)
     plotter = Plotter(x_data_label, y_data_label, title=title)
 
     outfile_name = kwargs['outdir'] / '{}_{}.png'.format(y_label, x_label)
-    plotter.plot(separate, outfile_name)
+    plotter.plot(kwargs['df_list'], outfile_name)
 
 
 class DiscreteCounter(object):
@@ -207,8 +257,7 @@ class DiscreteCounter(object):
             all_percents = [
                 DiscreteCounter.percent(count.pd, total),
                 DiscreteCounter.percent(count.canopus, total),
-                DiscreteCounter.percent(count.vega, total)
-            ]
+                DiscreteCounter.percent(count.vega, total)]
             max_count_index = np.argmax(all_counts)
             max_device_name = device_names[max_count_index]
             max_device_count = all_counts[max_count_index]
@@ -244,12 +293,10 @@ class DiscreteCounter(object):
         return count.pd + count.canopus + count.vega
 
 
-def draw_count_plots(options, df, title, **kwargs):
-    separate, all_data = make_combined_data(df, options.min_score,
-                                            options.min_score_diff)
-    discrete_counter = DiscreteCounter(separate[0].association_counts,
-                                       separate[1].association_counts,
-                                       separate[2].association_counts)
+def draw_count_plots(df_list, title, **kwargs):
+    discrete_counter = DiscreteCounter(df_list[0].association_counts,
+                                       df_list[1].association_counts,
+                                       df_list[2].association_counts)
     discrete_counter.make_table()
     ax = discrete_counter.data_frame.plot(
         x='Person ID',
@@ -261,11 +308,10 @@ def draw_count_plots(options, df, title, **kwargs):
     plt.savefig(kwargs['filepath'])
 
 
-def draw_binary_plots(options, df, title, **kwargs):
-    s, d = make_combined_data(df, options.min_score, options.min_score_diff)
-    dc = DiscreteCounter(s[0].association_counts,
-                         s[1].association_counts,
-                         s[2].association_counts)
+def draw_binary_plots(df_list, title, **kwargs):
+    dc = DiscreteCounter(df_list[0].association_counts,
+                         df_list[1].association_counts,
+                         df_list[2].association_counts)
     dc.make_table()
     df = dc.data_frame
     pdc_col = df[['Canopus Count', 'Vega Count']].sum(axis=1)
@@ -280,28 +326,42 @@ def draw_binary_plots(options, df, title, **kwargs):
 
 def main():
     options = parse_options()
-    outdir = Path(options.outdir) / datetime.now().strftime('%Y%m%d-%H%M%S')
+    logger.setLevel(logging.getLevelName(options.log_level.upper()))
+
+    dir_name = datetime.now().strftime('%Y%m%d-%H%M%S')
+    if options.title:
+        dir_name += '-{}'.format(options.title)
+
+    outdir = Path(options.outdir) / dir_name
     outdir.mkdir(parents=True, exist_ok=True)
 
     multi_df = pd.read_csv(options.multi_file)
+    multi = make_combined_data(multi_df, options.min_score,
+                               options.min_score_diff)
 
-    make_multi_scatter(options, 'canopus', 'vega', outdir=outdir, df=multi_df)
-    make_multi_scatter(options, 'canopus', 'pd', df=multi_df,
-                       title='Personal Device vs Canopus', outdir=outdir)
-    make_multi_scatter(options, 'vega', 'pd', df=multi_df,
-                       title='Personal Device vs Vega', outdir=outdir)
+    make_multi_scatter('canopus', 'vega', outdir=outdir, df_list=multi.separate)
+    make_multi_scatter('canopus', 'pd', df_list=multi.separate, outdir=outdir,
+                       title='Personal Device vs Canopus')
+    make_multi_scatter('vega', 'pd', df_list=multi.separate, outdir=outdir,
+                       title='Personal Device vs Vega')
 
-    draw_count_plots(options, multi_df,
+    draw_count_plots(multi.separate,
                      filepath=outdir / 'multi-associations.png',
                      title='Multi-Screen Associations (Separate)')
-    draw_binary_plots(options, multi_df,
+    draw_binary_plots(multi.separate,
                       filepath=outdir / 'multi-binary_associations.png',
                       title='Multi-Screen Associations (Binary)')
 
     single_df = pd.read_csv(options.single_file)
-    draw_binary_plots(options, single_df,
+    single = make_combined_data(single_df, options.min_score,
+                                options.min_score_diff)
+    draw_binary_plots(single.separate,
                       filepath=outdir / 'single-binary_associations.png',
                       title='Single-Screen Associations (Binary)')
+
+    multi.time_slices.to_csv(outdir / 'multi_time_slices.csv')
+    print('F-Statistic {}, p-value {}'.format(multi.stats.statistic,
+                                              multi.stats.pvalue))
 
 
 if __name__ == '__main__':
