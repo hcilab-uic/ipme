@@ -16,7 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from pyquaternion import Quaternion
 from scipy.spatial.distance import cosine
-from scipy.stats import mannwhitneyu
+from scipy.stats import mannwhitneyu, shapiro, ttest_ind, ranksums
 
 
 logger = logging.getLogger(__name__)
@@ -51,6 +51,8 @@ def parse_options():
     parser.add_argument('--hist-range-min', default=0.0, type=float)
     parser.add_argument('--hist-range-max', default=30000, type=float)
     parser.add_argument('--bin-count', default=25)
+    parser.add_argument('--fig-width', type=int, default=10)
+    parser.add_argument('--fig-height', type=int, default=8)
 
     return parser.parse_args()
 
@@ -199,17 +201,23 @@ def make_combined_data(df, min_score, min_score_diff, use_vega=True):
     all_data = p1.df.append(p2.df).append(p3.df)
 
     time_stamp = [p1.time_spent, p2.time_spent, p3.time_spent]
-    df_time_stamp = pd.DataFrame(data=time_stamp,
-                                 columns=['Person ID', 'Personal Device',
-                                          'Canopus', 'Vega'])
+    cols = ['Person ID', 'Personal Device', 'Canopus', 'Vega']
+    df_time_stamp = pd.DataFrame(data=time_stamp, columns=cols)
     time_slices = p1.time_slices.append(p2.time_slices).append(p3.time_slices)
-    if use_vega:
-        stat = stats.f_oneway(time_slices['Personal Device'],
-                              time_slices['Canopus'],
-                              time_slices['Vega'])
-    else:
-        stat = stats.f_oneway(time_slices['Personal Device'],
-                              time_slices['Canopus'])
+
+    # Perform normality testing
+    def perform_normality_test(name):
+        times = time_slices[name]
+        w, pvalue = shapiro(times)
+        logger.info('Normality test for {name}, W={W}, pvalue={pvalue}'.format(
+            name=name, W=w, pvalue=pvalue))
+        return times
+
+    personal_devices = perform_normality_test('Personal Device')
+    canopus_devices = perform_normality_test('Canopus')
+    vega_devices = perform_normality_test('Vega')
+
+    stat = stats.f_oneway(personal_devices, canopus_devices, vega_devices)
 
     return CombinedData([p1, p2, p3], all_data, df_time_stamp, time_slices,
                         stat)
@@ -362,38 +370,43 @@ def main():
 
     single_df = pd.read_csv(options.single_file)
     single = make_combined_data(single_df, options.min_score,
-                                options.min_score_diff)
+                                options.min_score_diff, use_vega=False)
     draw_binary_plots(single.separate,
                       filepath=outdir / 'single-binary_associations.png',
                       title='Single-Screen Associations (Binary)')
 
-    hist_multi = multi.time_slices.hist(bins=int(options.bin_count),
-                                        range=(options.hist_range_min,
-                                            options.hist_range_max),
-                                        figsize=(10, 8))
-    hist_multi[0].set(x_label='Log Time Delta', y_label='Frequency')
+    figsize = (options.fig_width, options.fig_height)
+    hist_multi = multi.time_slices.hist(
+        bins=int(options.bin_count),
+        range=(options.hist_range_min, options.hist_range_max), figsize=figsize)
     plt.savefig(outdir / 'multi_hist.png')
     multi.time_slices.to_csv(outdir / 'multi_time_slices.csv')
-    logger.info('F-Statistic {}, p-value {}'.format(multi.stats.statistic,
-                                                    multi.stats.pvalue))
+    logger.info('Multi-screen ANOVA F-Statistic {}, p-value {}'.format(
+        multi.stats.statistic, multi.stats.pvalue))
 
-    hist_single = single.time_slices.hist(bins=int(options.bin_count),
-                                          range=(options.hist_range_min,
-                                                 options.hist_range_max),
-                                          figsize=(10, 8), use_vega=False)
-    for ax in hist_single:
-        ax.set(x_label='Log Time Delta', y_label='Frequency')
+    hist_single = single.time_slices.hist(
+        bins=int(options.bin_count),
+        range=(options.hist_range_min, options.hist_range_max), figsize=figsize)
+
     plt.savefig(outdir / 'single_hist.png')
 
-    x = multi.time_slices['Personal Device']
-    y = single.time_slices['Personal Device']
-    u = mannwhitneyu(x, y)
-    logger.info('statistic={}, pvalue={}'.format(u.statistic, u.pvalue))
+    def report_tests(name):
+        x = multi.time_slices[name]
+        y = single.time_slices[name]
+        t_stat, t_pvalue = ttest_ind(x, y)
+        logger.info('{name}: t-test={stat}, pvalue={pvalue}'.format(
+            name=name, stat=t_stat, pvalue=t_pvalue))
+        u_stat, u_pvalue = mannwhitneyu(x, y)
+        logger.info('{name}: Mann-Whitney statistic={stat}, '
+                    'pvalue={pvalue}'.format(name=name, stat=u_stat,
+                                             pvalue=u_pvalue))
+        rs_stat, rs_pvalue = ranksums(x, y)
+        logger.info('{name}: Wilcoxon rank-sum statistic={stat}, '
+                    'pvalue={pvalue}'.format(name=name, stat=rs_stat,
+                                             pvalue=rs_pvalue))
 
-    x1 = multi.time_slices['Canopus']
-    y1 = single.time_slices['Canopus']
-    u1 = mannwhitneyu(x1, y1)
-    logger.info('statistic={}, pvalue={}'.format(u1.statistic, u1.pvalue))
+    report_tests('Personal Device')
+    report_tests('Canopus')
 
 
 if __name__ == '__main__':
