@@ -16,6 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from pyquaternion import Quaternion
 from scipy.spatial.distance import cosine
+from scipy.stats import mannwhitneyu
 
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,9 @@ def parse_options():
     parser.add_argument('--outdir', default=str(Path().absolute()))
     parser.add_argument('--title')
     parser.add_argument('--log-level', default='info')
+    parser.add_argument('--hist-range-min', default=0.0, type=float)
+    parser.add_argument('--hist-range-max', default=30000, type=float)
+    parser.add_argument('--bin-count', default=25)
 
     return parser.parse_args()
 
@@ -145,7 +149,7 @@ class ScoreComputation(object):
                 self.__time_spent[previous_assoc_idx] += time_delta
 
                 slices = [0, 0, 0]
-                slices[previous_assoc_idx] = time_delta
+                slices[previous_assoc_idx] = np.log(time_delta)
                 self.__time_slices.append([self.__person_id] + slices)
 
                 logger.debug('switched from {} to {}, td={}ms'.format(
@@ -185,7 +189,7 @@ class ScoreComputation(object):
         return self.df.append(other.df)
 
 
-def make_combined_data(df, min_score, min_score_diff):
+def make_combined_data(df, min_score, min_score_diff, use_vega=True):
     p1 = ScoreComputation(df, 'Person 1', ColumnIdx(person=1, device=2),
                           min_score=min_score, min_score_diff=min_score_diff)
     p2 = ScoreComputation(df, 'Person 2', ColumnIdx(person=3, device=4),
@@ -199,9 +203,13 @@ def make_combined_data(df, min_score, min_score_diff):
                                  columns=['Person ID', 'Personal Device',
                                           'Canopus', 'Vega'])
     time_slices = p1.time_slices.append(p2.time_slices).append(p3.time_slices)
-    stat = stats.f_oneway(time_slices['Personal Device'],
-                          time_slices['Canopus'],
-                          time_slices['Vega'])
+    if use_vega:
+        stat = stats.f_oneway(time_slices['Personal Device'],
+                              time_slices['Canopus'],
+                              time_slices['Vega'])
+    else:
+        stat = stats.f_oneway(time_slices['Personal Device'],
+                              time_slices['Canopus'])
 
     return CombinedData([p1, p2, p3], all_data, df_time_stamp, time_slices,
                         stat)
@@ -359,9 +367,33 @@ def main():
                       filepath=outdir / 'single-binary_associations.png',
                       title='Single-Screen Associations (Binary)')
 
+    hist_multi = multi.time_slices.hist(bins=int(options.bin_count),
+                                        range=(options.hist_range_min,
+                                            options.hist_range_max),
+                                        figsize=(10, 8))
+    hist_multi[0].set(x_label='Log Time Delta', y_label='Frequency')
+    plt.savefig(outdir / 'multi_hist.png')
     multi.time_slices.to_csv(outdir / 'multi_time_slices.csv')
-    print('F-Statistic {}, p-value {}'.format(multi.stats.statistic,
-                                              multi.stats.pvalue))
+    logger.info('F-Statistic {}, p-value {}'.format(multi.stats.statistic,
+                                                    multi.stats.pvalue))
+
+    hist_single = single.time_slices.hist(bins=int(options.bin_count),
+                                          range=(options.hist_range_min,
+                                                 options.hist_range_max),
+                                          figsize=(10, 8), use_vega=False)
+    for ax in hist_single:
+        ax.set(x_label='Log Time Delta', y_label='Frequency')
+    plt.savefig(outdir / 'single_hist.png')
+
+    x = multi.time_slices['Personal Device']
+    y = single.time_slices['Personal Device']
+    u = mannwhitneyu(x, y)
+    logger.info('statistic={}, pvalue={}'.format(u.statistic, u.pvalue))
+
+    x1 = multi.time_slices['Canopus']
+    y1 = single.time_slices['Canopus']
+    u1 = mannwhitneyu(x1, y1)
+    logger.info('statistic={}, pvalue={}'.format(u1.statistic, u1.pvalue))
 
 
 if __name__ == '__main__':
