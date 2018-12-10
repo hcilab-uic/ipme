@@ -65,7 +65,27 @@ Frame Frame::create_from_pb(
         const auto type = itr->second;
         if(type.find("person") != std::string::npos) {
             if(frame.vrpn_ids_.find(source_id) == std::end(frame.vrpn_ids_)) {
-                frame.persons.push_back(vrpn_object);
+                // FIXME: (Harish)
+                // This should not be hard-coded. Perhaps done on a per object
+                // basis, via config file or the UI
+                float correction_pitch_degrees = 25.f;
+                float correction_roll_degrees = 0.f;
+                float correction_yaw_degrees = 0.f;
+                ipme::scene::Vrpn_object corrected_object{vrpn_object};
+                const auto& rot = vrpn_object.pose().orientation();
+                QQuaternion corrected_rotation =
+                    QQuaternion(rot.w(), rot.x(), rot.y(), rot.z()) *
+                    QQuaternion::fromEulerAngles(correction_pitch_degrees,
+                                                 correction_yaw_degrees,
+                                                 correction_roll_degrees);
+                auto corrected_rot =
+                    corrected_object.mutable_pose()->mutable_orientation();
+                corrected_rot->set_w(corrected_rotation.scalar());
+                corrected_rot->set_x(corrected_rotation.x());
+                corrected_rot->set_y(corrected_rotation.y());
+                corrected_rot->set_z(corrected_rotation.z());
+
+                frame.persons.push_back(corrected_object);
                 ++people_count;
                 frame.vrpn_ids_.insert(source_id);
             }
