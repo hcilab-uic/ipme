@@ -121,7 +121,7 @@ class ScoreComputation(object):
 
         self.__compute()
 
-    def __add(self, *args):
+    def __add(self, timestamp, *args):
         cosine_scores = np.array([arg.score for arg in args])
         sorted_scores = copy.deepcopy(cosine_scores)
         sorted_scores = -np.sort(-sorted_scores)
@@ -133,6 +133,10 @@ class ScoreComputation(object):
             return
 
         idx = np.argmax(cosine_scores)
+
+        if not self.__use_vega and idx == 2:
+            return
+
         device = device_names[idx]
         binary_assoc = device if idx == 0 else 'Public Display'
         watching_public_display = min(1, int(idx))
@@ -140,6 +144,21 @@ class ScoreComputation(object):
               [s for arg in args for s in [arg.score, arg.angle]] + \
               [device, cosine_scores[idx], binary_assoc,
                watching_public_display]
+
+        if self.__prev_assoc_idx == np.inf:
+            self.__prev_assoc_idx = idx
+
+        if idx != self.__prev_assoc_idx:
+            time_delta = timestamp - self.__prev_ts
+            self.__time_spent[self.__prev_assoc_idx] += time_delta
+
+            binary_slices = [0, 0]
+            slice_index = min(1, int(self.__prev_assoc_idx))
+            binary_slices[slice_index] = compute_transform(
+                time_delta, self.__o.transform_type)
+            self.__time_slices.append([timestamp, self.__person_id] +
+                                      binary_slices)
+
         self.__table.append(row)
 
         return cosine_scores
@@ -161,7 +180,7 @@ class ScoreComputation(object):
             canopus = compute_score(head_vector, canopus_normal)
             vega = compute_score(head_vector, vega_normal)
 
-            scores = self.__add(personal_device, canopus, vega)
+            scores = self.__add(timestamps[i], personal_device, canopus, vega)
             max_assoc_idx = np.argmax(scores)
 
             if previous_assoc_idx == np.inf:
@@ -190,7 +209,7 @@ class ScoreComputation(object):
     def time_slices(self):
         return pd.DataFrame(data=self.__time_slices,
                             columns=['Person ID', 'Personal Device',
-                                     'Canopus', 'Vega'])
+                                     'Public Device'])
 
     @property
     def time_spent(self):
