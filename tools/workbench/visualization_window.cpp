@@ -297,7 +297,9 @@ void Visualization_window::on_save_outcome_button_clicked()
                                          file_name.c_str(), "CSV file (*.csv)");
     }
 
-    std::ofstream ofs{labeled_file_path_.toStdString(), std::ios::app};
+    std::ios::openmode mode =
+        ui->overwrite_checkbox->isChecked() ? std::ios::out : std::ios::app;
+    std::ofstream ofs{labeled_file_path_.toStdString(), mode};
     ofs << "seq_id,timestamp";
 
     for(int i = 0; i < config_.scene_config().registered_objects_size(); ++i) {
@@ -327,14 +329,23 @@ void Visualization_window::on_save_outcome_button_clicked()
     const auto selected_label =
         ui->outcome_label_combobox->currentText().toStdString();
     const int label = outcome_labels_[selected_label];
-    const size_t begin = ui->start_frame_edit->text().toULong();
 
-    size_t end = std::min(ui->end_frame_edit->text().toULong(), frames_.size());
+    const bool save_all_frames = ui->save_all_frames_checkbox->isChecked();
+    const size_t requested_begin = ui->start_frame_edit->text().toULong();
+    const size_t requested_end = ui->end_frame_edit->text().toULong();
+
+    const size_t begin = save_all_frames ? 0 : requested_begin;
+    const size_t end = save_all_frames
+                           ? frames_.size()
+                           : std::min(requested_end, frames_.size());
+
     size_t count_frames_saved{0};
+    const bool validate_frame = ui->frame_validity_checkbox->isChecked();
     for(size_t i = begin; i < end; ++i) {
         //        const auto frame = filter(frames_[i]);
         const auto& frame = frames_[i];
-        if(!frame.has_all_registered_ids()) {
+        if(validate_frame && !frame.has_all_registered_ids()) {
+            WARN() << "Frame " << i << " invalid, skipping";
             continue;
         }
         ofs << frame.frame_id() << "," << frame.timestamp() << ",";
