@@ -18,10 +18,12 @@ from pyquaternion import Quaternion
 from scipy.spatial.distance import cosine
 from scipy.stats import mannwhitneyu, shapiro, ttest_ind, ranksums
 
+from utils.log import setup_logger, set_log_level
 
-logger = logging.getLogger(__name__)
-FORMAT = '%(asctime)-15s %(levelname)s %(funcName)s:%(lineno)s %(message)s'
-logging.basicConfig(format=FORMAT)
+logger = setup_logger('run_analysis')
+# logger = logging.getLogger(__name__)
+# FORMAT = '%(asctime)-15s %(levelname)s %(funcName)s:%(lineno)s %(message)s'
+# logging.basicConfig(format=FORMAT)
 
 sns.set()
 sns.set_style('whitegrid')
@@ -53,6 +55,8 @@ def parse_options():
     parser.add_argument('--bin-count', default=25)
     parser.add_argument('--fig-width', type=int, default=10)
     parser.add_argument('--fig-height', type=int, default=8)
+    parser.add_argument('--transform-type',
+                        choices=['none', 'natural', '2', '10'], default='none')
 
     return parser.parse_args()
 
@@ -77,8 +81,25 @@ def make_vector(q):
 device_names = ['Personal Device', 'Canopus', 'Vega']
 
 
+def apply_log_transform(value, transform_type):
+    if transform_type == 'natural':
+        return np.log(value)
+
+    if transform_type == '2':
+        return np.log2(value)
+
+    if transform_type == '10':
+        return np.log10(value)
+
+    if transform_type == 'none':
+        return value
+
+    raise Exception('unrecognized transform_type={}'.format(transform_type))
+
+
 class ScoreComputation(object):
-    columns = ['person_id',
+    columns = ['timestamp',
+               'person_id',
                'pd_score',
                'pd_angle',
                'canopus_score',
@@ -95,33 +116,35 @@ class ScoreComputation(object):
         self.__person_id = person_id
         self.__column_idx = column_idx
         self.__src_df = df
-        self.__min_score = kwargs['min_score']
-        self.__min_score_diff = kwargs['min_score_diff']
+        self.__o = kwargs['options']
+        self.__min_score = self.__o.min_score
+        self.__min_score_diff = self.__o.min_score_diff
         self.__time_spent = [0, 0, 0]
         self.__time_slices = []
+        self.__use_vega = kwargs['use_vega']
         self.__compute()
 
-    def __add(self, *args):
+    def __add(self, timestamp, *args):
         cosine_scores = np.array([arg.score for arg in args])
         sorted_scores = copy.deepcopy(cosine_scores)
         sorted_scores = -np.sort(-sorted_scores)
 
         if sorted_scores[0] < self.__min_score:
-            return
+            return [], None
 
         if abs(sorted_scores[0] - sorted_scores[1]) < self.__min_score_diff:
-            return
+            return [], None
 
         idx = np.argmax(cosine_scores)
         device = device_names[idx]
         binary_assoc = device if idx == 0 else 'Public Display'
         watching_public_display = min(1, int(idx))
-        row = [self.__person_id] + \
+        row = [timestamp, self.__person_id] + \
               [s for arg in args for s in [arg.score, arg.angle]] + \
               [device, cosine_scores[idx], binary_assoc,
                watching_public_display]
         self.__table.append(row)
-        return cosine_scores
+        return cosine_scores, idx
 
     def __compute(self):
         person = extract(self.__src_df, self.__column_idx.person)
@@ -132,35 +155,57 @@ class ScoreComputation(object):
 
         previous_assoc_idx = np.inf
         previous_ts = 0
+
+        switch_public_to_private = 0
+        switch_private_to_public = 0
         for i in range(0, len(person)):
             head_vector = make_vector(person.values[i])
             device_vector = make_vector(device.values[i])
 
             personal_device = compute_score(head_vector, device_vector)
             canopus = compute_score(head_vector, canopus_normal)
-            vega = compute_score(head_vector, vega_normal)
+            vega = compute_score(head_vector, vega_normal) if self.__use_vega \
+                else Association(0, 90)
 
-            scores = self.__add(personal_device, canopus, vega)
-            max_assoc_idx = np.argmax(scores)
+            time_stamp = timestamps[i]
+            scores, max_assoc_idx = self.__add(
+                time_stamp, personal_device, canopus, vega)
+
+            if len(scores) == 0:
+                continue
 
             if previous_assoc_idx == np.inf:
                 previous_assoc_idx = max_assoc_idx
 
             if max_assoc_idx != previous_assoc_idx:
-                time_delta = timestamps[i] - previous_ts
+                time_delta = time_stamp - previous_ts
                 self.__time_spent[previous_assoc_idx] += time_delta
 
                 slices = [0, 0, 0]
-                slices[previous_assoc_idx] = np.log(time_delta)
+                slices[previous_assoc_idx] = apply_log_transform(
+                    time_delta, self.__o.transform_type)
                 self.__time_slices.append([self.__person_id] + slices)
 
-                logger.debug('switched from {} to {}, td={}ms'.format(
-                    previous_assoc_idx, max_assoc_idx, time_delta))
+                logger.debug('{person_id} switched from {frm} to {to}, '
+                             'td={ms}ms'.format(person_id=self.__person_id,
+                                                frm=previous_assoc_idx,
+                                                to=max_assoc_idx,
+                                                ms=time_delta))
+
+                if previous_assoc_idx == 0:
+                    switch_private_to_public += 1
+                elif max_assoc_idx == 0:
+                    switch_public_to_private += 1
                 previous_assoc_idx = max_assoc_idx
-                previous_ts = timestamps[i]
+                previous_ts = time_stamp
 
             counts[max_assoc_idx] += 1
 
+        logger.debug('{person_id} private->public {pr_pu}, '
+                     'public->private {pu_pr}'.format(
+                         person_id=self.__person_id,
+                         pr_pu=switch_private_to_public,
+                         pu_pr=switch_public_to_private))
         self.__assoc_counts = AssociationCount(
             person_id=self.__person_id, pd=counts[0], canopus=counts[1],
             vega=counts[2])
@@ -191,13 +236,33 @@ class ScoreComputation(object):
         return self.df.append(other.df)
 
 
-def make_combined_data(df, min_score, min_score_diff, use_vega=True):
+def get_non_zero(df, name):
+    # return df[df[name] != 0][name]
+    return df[name]
+
+
+def perform_normality_test(df, name):
+    times = get_non_zero(df, name)
+    if len(times) < 3:
+        logger.error('Shapiro-Wilk normality test for {name}, size of '
+                     'time slice container < 3: [{values}]'.format(
+                         name=name, values=','.join(times)))
+        return
+    w, pvalue = shapiro(times)
+    normal = False if pvalue < 0.01 else True
+    logger.info('Shapiro-Wilk normality test for {name}, W={W},'
+                'pvalue={pvalue}, normal={normal}'.format(
+                    name=name, W=w, pvalue=pvalue, normal=normal))
+    return times
+
+
+def make_combined_data(df, options, use_vega=True):
     p1 = ScoreComputation(df, 'Person 1', ColumnIdx(person=1, device=2),
-                          min_score=min_score, min_score_diff=min_score_diff)
+                          options=options, use_vega=use_vega)
     p2 = ScoreComputation(df, 'Person 2', ColumnIdx(person=3, device=4),
-                          min_score=min_score, min_score_diff=min_score_diff)
+                          options=options, use_vega=use_vega)
     p3 = ScoreComputation(df, 'Person 3', ColumnIdx(person=5, device=6),
-                          min_score=min_score, min_score_diff=min_score_diff)
+                          options=options, use_vega=use_vega)
     all_data = p1.df.append(p2.df).append(p3.df)
 
     time_stamp = [p1.time_spent, p2.time_spent, p3.time_spent]
@@ -206,18 +271,14 @@ def make_combined_data(df, min_score, min_score_diff, use_vega=True):
     time_slices = p1.time_slices.append(p2.time_slices).append(p3.time_slices)
 
     # Perform normality testing
-    def perform_normality_test(name):
-        times = time_slices[name]
-        w, pvalue = shapiro(times)
-        logger.info('Normality test for {name}, W={W}, pvalue={pvalue}'.format(
-            name=name, W=w, pvalue=pvalue))
-        return times
 
-    personal_devices = perform_normality_test('Personal Device')
-    canopus_devices = perform_normality_test('Canopus')
-    vega_devices = perform_normality_test('Vega')
-
-    stat = stats.f_oneway(personal_devices, canopus_devices, vega_devices)
+    personal_devices = perform_normality_test(time_slices, 'Personal Device')
+    canopus_devices = perform_normality_test(time_slices, 'Canopus')
+    if use_vega:
+        vega_devices = perform_normality_test(time_slices, 'Vega')
+        stat = stats.f_oneway(personal_devices, canopus_devices, vega_devices)
+    else:
+        stat = None
 
     return CombinedData([p1, p2, p3], all_data, df_time_stamp, time_slices,
                         stat)
@@ -342,7 +403,8 @@ def draw_binary_plots(df_list, title, **kwargs):
 
 def main():
     options = parse_options()
-    logger.setLevel(logging.getLevelName(options.log_level.upper()))
+    set_log_level(logger, options.log_level)
+    # logger.setLevel(logging.getLevelName(options.log_level.upper()))
 
     dir_name = datetime.now().strftime('%Y%m%d-%H%M%S')
     if options.title:
@@ -352,8 +414,9 @@ def main():
     outdir.mkdir(parents=True, exist_ok=True)
 
     multi_df = pd.read_csv(options.multi_file)
-    multi = make_combined_data(multi_df, options.min_score,
-                               options.min_score_diff)
+    multi = make_combined_data(multi_df, options)
+
+    multi.all.to_csv(outdir / 'multi.csv', index=False)
 
     make_multi_scatter('canopus', 'vega', outdir=outdir, df_list=multi.separate)
     make_multi_scatter('canopus', 'pd', df_list=multi.separate, outdir=outdir,
@@ -368,31 +431,31 @@ def main():
                       filepath=outdir / 'multi-binary_associations.png',
                       title='Multi-Screen Associations (Binary)')
 
-    single_df = pd.read_csv(options.single_file)
-    single = make_combined_data(single_df, options.min_score,
-                                options.min_score_diff, use_vega=False)
-    draw_binary_plots(single.separate,
-                      filepath=outdir / 'single-binary_associations.png',
-                      title='Single-Screen Associations (Binary)')
-
     figsize = (options.fig_width, options.fig_height)
-    hist_multi = multi.time_slices.hist(
-        bins=int(options.bin_count),
-        range=(options.hist_range_min, options.hist_range_max), figsize=figsize)
+
+    multi.time_slices.hist(
+        bins=int(options.bin_count), figsize=figsize)
     plt.savefig(outdir / 'multi_hist.png')
     multi.time_slices.to_csv(outdir / 'multi_time_slices.csv')
     logger.info('Multi-screen ANOVA F-Statistic {}, p-value {}'.format(
         multi.stats.statistic, multi.stats.pvalue))
 
-    hist_single = single.time_slices.hist(
-        bins=int(options.bin_count),
-        range=(options.hist_range_min, options.hist_range_max), figsize=figsize)
+    single_df = pd.read_csv(options.single_file)
+    single = make_combined_data(single_df, options, use_vega=False)
+    single.all.to_csv(outdir / 'single.csv', index=False)
+
+    draw_binary_plots(single.separate,
+                      filepath=outdir / 'single-binary_associations.png',
+                      title='Single-Screen Associations (Binary)')
+
+    single.time_slices.hist(
+        bins=int(options.bin_count), figsize=figsize)
 
     plt.savefig(outdir / 'single_hist.png')
 
     def report_tests(name):
-        x = multi.time_slices[name]
-        y = single.time_slices[name]
+        x = get_non_zero(multi.time_slices, name)
+        y = get_non_zero(single.time_slices, name)
         t_stat, t_pvalue = ttest_ind(x, y)
         logger.info('{name}: t-test={stat}, pvalue={pvalue}'.format(
             name=name, stat=t_stat, pvalue=t_pvalue))
