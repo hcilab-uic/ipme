@@ -93,6 +93,9 @@ Frame Frame::create_from_pb(
 
     bool found{true};
     for(const auto& ro : registered_objects) {
+        if(ro.first == 30) {
+            continue;
+        }
         if(frame.vrpn_ids_.find(ro.first) == std::end(frame.vrpn_ids_)) {
             found = false;
             break;
