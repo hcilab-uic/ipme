@@ -109,10 +109,16 @@ class ScoreComputation(object):
         self.__person_id = person_id
         self.__column_idx = column_idx
         self.__src_df = df
-        self.__min_score = kwargs['min_score']
-        self.__min_score_diff = kwargs['min_score_diff']
+        self.__o = kwargs['options']
+        self.__min_score = self.__o.min_score
+        self.__min_score_diff = self.__o.min_score_diff
+        self.__use_vega = True if 'vega' not in kwargs else kwargs['vega']
         self.__time_spent = [0, 0, 0]
         self.__time_slices = []
+
+        self.__prev_assoc_idx = np.inf
+        self.__prev_ts = 0
+
         self.__compute()
 
     def __add(self, *args):
@@ -135,6 +141,7 @@ class ScoreComputation(object):
               [device, cosine_scores[idx], binary_assoc,
                watching_public_display]
         self.__table.append(row)
+
         return cosine_scores
 
     def __compute(self):
@@ -205,13 +212,13 @@ class ScoreComputation(object):
         return self.df.append(other.df)
 
 
-def make_combined_data(df, min_score, min_score_diff, use_vega=True):
+def make_combined_data(df, options, use_vega=True):
     p1 = ScoreComputation(df, 'Person 1', ColumnIdx(person=1, device=2),
-                          min_score=min_score, min_score_diff=min_score_diff)
+                          options=options, vega=use_vega)
     p2 = ScoreComputation(df, 'Person 2', ColumnIdx(person=3, device=4),
-                          min_score=min_score, min_score_diff=min_score_diff)
+                          options=options, vega=use_vega)
     p3 = ScoreComputation(df, 'Person 3', ColumnIdx(person=5, device=6),
-                          min_score=min_score, min_score_diff=min_score_diff)
+                          options=options, vega=use_vega)
     all_data = p1.df.append(p2.df).append(p3.df)
 
     time_stamp = [p1.time_spent, p2.time_spent, p3.time_spent]
@@ -366,8 +373,7 @@ def main():
     outdir.mkdir(parents=True, exist_ok=True)
 
     multi_df = pd.read_csv(options.multi_file)
-    multi = make_combined_data(multi_df, options.min_score,
-                               options.min_score_diff)
+    multi = make_combined_data(multi_df, options)
 
     make_multi_scatter('canopus', 'vega', outdir=outdir, df_list=multi.separate)
     make_multi_scatter('canopus', 'pd', df_list=multi.separate, outdir=outdir,
@@ -383,8 +389,7 @@ def main():
                       title='Multi-Screen Associations (Binary)')
 
     single_df = pd.read_csv(options.single_file)
-    single = make_combined_data(single_df, options.min_score,
-                                options.min_score_diff, use_vega=False)
+    single = make_combined_data(single_df, options, use_vega=False)
     draw_binary_plots(single.separate,
                       filepath=outdir / 'single-binary_associations.png',
                       title='Single-Screen Associations (Binary)')
