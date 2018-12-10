@@ -57,16 +57,16 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
 
 Visualization_window::~Visualization_window()
 {
-    const auto cleanup = [](auto object) {
-        if(object) {
-            delete object;
-            object = nullptr;
+    if(root_entity_) {
+        for(auto c : root_entity_->components()) {
+            root_entity_->removeComponent(c);
+            c = nullptr;
         }
-    };
+        root_entity_ = nullptr;
+    }
 
-    cleanup(root_entity_);
-    //    cleanup(view_);
-    cleanup(ui);
+    delete ui;
+    ui = nullptr;
 }
 
 void Visualization_window::on_file_open_triggered()

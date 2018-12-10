@@ -43,11 +43,15 @@ private:
 
     void add_cuboid(const ipme::scene::Pose& pose, QVector3D extents,
                     const QColor& color);
-    void add_gaze(const ipme::scene::Pose& pose);
+    void add_looking_direction(const ipme::scene::Pose& pose);
 
     Qt3DCore::QEntity* root_entity_;
-    std::vector<Qt3DCore::QEntity*> spheres_;
-    std::vector<Qt3DCore::QEntity*> entities_;
+
+    using entity_container_type = std::vector<Qt3DCore::QEntity*>;
+    using entity_container_ptr = std::shared_ptr<entity_container_type>;
+
+    entity_container_ptr active_entities_;
+    entity_container_ptr inactive_entities_;
 
     std::vector<Scene_display> displays_;
 };
