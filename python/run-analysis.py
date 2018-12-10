@@ -19,9 +19,9 @@ from scipy.spatial.distance import cosine
 from scipy.stats import mannwhitneyu, shapiro, ttest_ind, ranksums
 
 
-logger = logging.getLogger(__name__)
-FORMAT = '%(asctime)-15s %(levelname)s %(funcName)s:%(lineno)s %(message)s'
-logging.basicConfig(format=FORMAT)
+from utils.log import setup_logger, set_log_level
+
+logger = setup_logger(__name__)
 
 sns.set()
 sns.set_style('whitegrid')
@@ -53,6 +53,8 @@ def parse_options():
     parser.add_argument('--bin-count', default=25)
     parser.add_argument('--fig-width', type=int, default=10)
     parser.add_argument('--fig-height', type=int, default=8)
+    parser.add_argument('--transform-type', default='none',
+                        choices=['none', '2', 'natural', '10'])
 
     return parser.parse_args()
 
@@ -75,6 +77,18 @@ def make_vector(q):
 
 
 device_names = ['Personal Device', 'Canopus', 'Vega']
+
+
+def compute_transform(value, transform_type):
+    if transform_type == 'none':
+        return value
+    if transform_type == '2':
+        return np.log2(value)
+    if transform_type == '10':
+        return np.log10(value)
+    if transform_type == 'natural':
+        return np.log(value)
+    raise Exception('unknown transform type {}'.format(transform_type))
 
 
 class ScoreComputation(object):
@@ -342,7 +356,7 @@ def draw_binary_plots(df_list, title, **kwargs):
 
 def main():
     options = parse_options()
-    logger.setLevel(logging.getLevelName(options.log_level.upper()))
+    set_log_level(logger, options.log_level)
 
     dir_name = datetime.now().strftime('%Y%m%d-%H%M%S')
     if options.title:
