@@ -10,6 +10,7 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QQuaternion>
 #include <QVBoxLayout>
 #include <Qt3DCore>
@@ -25,11 +26,12 @@
 #include "utils/utils.h"
 #include "video_window.h"
 
-Visualization_window::Visualization_window(QWidget* parent)
+Visualization_window::Visualization_window(const ipme::wb::Config& config,
+                                           QWidget* parent)
     : QMainWindow{parent}, ui{new Ui::Visualization_window},
       root_entity_{new Qt3DCore::QEntity},
       view_{std::make_shared<Qt3DExtras::Qt3DWindow>()},
-      video_window_{std::make_shared<Video_window>(this)}
+      video_window_{std::make_shared<Video_window>(this)}, config_{config}
 {
     ui->setupUi(this);
 
@@ -296,6 +298,22 @@ void Visualization_window::on_save_outcome_button_clicked()
     }
 
     std::ofstream ofs{labeled_file_path_.toStdString(), std::ios::app};
+    ofs << "seq_id,timestamp";
+
+    for(int i = 0; i < config_.scene_config().registered_objects_size(); ++i) {
+        const int index = i + 1;
+        // clang-format off
+        ofs << ",src_id" << index
+            << ",x" << index
+            << ",y" << index
+            << ",z" << index
+            << ",rw" << index
+            << ",rx" << index
+            << ",ry" << index
+            << ",rz" << index;
+        // clang-format on
+    }
+    ofs << ",label\n";
 
     const auto record_vrpn_object = [&ofs](auto vrpn_object) {
         const auto& pose = vrpn_object.pose();
@@ -310,9 +328,12 @@ void Visualization_window::on_save_outcome_button_clicked()
         ui->outcome_label_combobox->currentText().toStdString();
     const int label = outcome_labels_[selected_label];
     const size_t begin = ui->start_frame_edit->text().toULong();
-    const size_t end = ui->end_frame_edit->text().toULong();
+
+    size_t end = std::min(ui->end_frame_edit->text().toULong(), frames_.size());
+    size_t count_frames_saved{0};
     for(size_t i = begin; i < end; ++i) {
-        const auto frame = filter(frames_[i]);
+        //        const auto frame = filter(frames_[i]);
+        const auto& frame = frames_[i];
         if(!frame.has_all_registered_ids()) {
             continue;
         }
@@ -338,9 +359,14 @@ void Visualization_window::on_save_outcome_button_clicked()
         }
 
         ofs << label << "\n";
+        ++count_frames_saved;
     }
 
     ui->start_frame_edit->setText(QString::number(end));
+
+    std::stringstream ss;
+    ss << "Export complete, " << count_frames_saved << " frames saved";
+    QMessageBox::information(this, tr("Data Export"), tr(ss.str().c_str()));
 }
 
 void Visualization_window::on_frame_policy_combobox_currentIndexChanged(

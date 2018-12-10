@@ -9,6 +9,7 @@
 #include <QVector3D>
 #include <Qt3DExtras/Qt3DWindow>
 
+#include "config.h"
 #include "frame.h"
 #include "frame_collection.h"
 #include "protobuf/scene.pb.h"
@@ -27,7 +28,8 @@ class Visualization_window
     Q_OBJECT
 
 public:
-    explicit Visualization_window(QWidget* parent = 0);
+    explicit Visualization_window(const ipme::wb::Config& config,
+                                  QWidget* parent = 0);
     ~Visualization_window();
 
     void show_frame(int frame_index) override;
@@ -81,6 +83,7 @@ private:
     QString labeled_file_path_;
     ipme::wb::Frame_collection frames_;
     std::unordered_map<std::string, int> outcome_labels_;
+    ipme::wb::Config config_;
 };
 
 #endif // VISUALIZATION_WINDOW_H

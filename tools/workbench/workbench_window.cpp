@@ -19,7 +19,7 @@ Workbench_window::Workbench_window(const ipme::wb::Config& config,
       ui(new Ui::Workbench_window),
       live_window_{std::make_shared<Live_window>(config, this)},
       main_window_{std::make_shared<MainWindow>(this)},
-      visualization_window_{std::make_shared<Visualization_window>(this)}
+      visualization_window_{std::make_shared<Visualization_window>(config, this)}
 // clang-format on
 {
     ui->setupUi(this);
