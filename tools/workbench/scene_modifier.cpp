@@ -13,6 +13,7 @@ const QColor Scene_modifier::device_color{QRgb{0xa699ff}};
 const QColor Scene_modifier::center_color{QRgb{0xff0000}};
 const QColor Scene_modifier::ui_color{QRgb{0xff6600}};
 
+static const QVector3D device_dimensions{2.f, 1.5f, 0.05f};
 QVector3D make_position_vector(const ipme::scene::Position& pos)
 {
     return QVector3D{static_cast<float>(pos.x()) * scale_factor,
@@ -28,15 +29,19 @@ QQuaternion make_rotation(const ipme::scene::Quaternion& rot)
 }
 
 Scene_modifier::Scene_modifier(Qt3DCore::QEntity* root_entity)
-    : root_entity_{root_entity}
+    : root_entity_{root_entity},
+      active_entities_{std::make_shared<entity_container_type>()},
+      inactive_entities_{std::make_shared<entity_container_type>()}
 {
 }
 
 void Scene_modifier::add_frame(const Frame& frame)
 {
+    active_entities_.swap(inactive_entities_);
+
     for(const auto& person : frame.persons) {
         add_sphere(person.pose());
-        add_gaze(person.pose());
+        add_looking_direction(person.pose());
     }
 
     for(const auto& device : frame.devices) {
@@ -83,7 +88,7 @@ void Scene_modifier::add_screen()
 
 void Scene_modifier::clear()
 {
-    for(auto& entity : spheres_) {
+    for(auto& entity : *inactive_entities_) {
         for(auto& component : entity->components()) {
             entity->removeComponent(component);
             delete component;
@@ -94,19 +99,7 @@ void Scene_modifier::clear()
         entity = nullptr;
     }
 
-    spheres_.clear();
-
-    for(auto& entity : entities_) {
-        for(auto& component : entity->components()) {
-            entity->removeComponent(component);
-            delete component;
-            component = nullptr;
-        }
-
-        delete entity;
-        entity = nullptr;
-    }
-    entities_.clear();
+    inactive_entities_->clear();
 }
 
 void Scene_modifier::set_displays(const scene::Scene_config& config)
@@ -146,7 +139,7 @@ void Scene_modifier::add_sphere(const ipme::scene::Pose& pose,
     sphere->addComponent(sphere_material);
 
     sphere->setEnabled(true);
-    spheres_.push_back(sphere);
+    active_entities_->push_back(sphere);
 }
 
 void Scene_modifier::add_cuboid(const ipme::scene::Pose& pose,
@@ -165,17 +158,18 @@ void Scene_modifier::add_cuboid(const ipme::scene::Pose& pose,
     auto cuboid_material = new Qt3DExtras::QPhongMaterial;
     cuboid_material->setDiffuse(color);
 
-    entities_.emplace_back(new Qt3DCore::QEntity{root_entity_});
-    auto& cuboid_entity = entities_.back();
+    active_entities_->emplace_back(new Qt3DCore::QEntity{root_entity_});
+    auto& cuboid_entity = active_entities_->back();
 
     cuboid_entity->addComponent(cuboid);
     cuboid_entity->addComponent(cuboid_material);
     cuboid_entity->addComponent(cuboid_transform);
 }
 
-void Scene_modifier::add_gaze(const ipme::scene::Pose& pose)
+void Scene_modifier::add_looking_direction(const ipme::scene::Pose& pose)
 {
-    constexpr float length = 2.f;
+    static constexpr float length = 5.f;
+    static constexpr float radius = 0.02f;
     auto cylinder = new Qt3DExtras::QCylinderMesh;
     cylinder->setRadius(0.03f);
     cylinder->setLength(length);
@@ -196,8 +190,8 @@ void Scene_modifier::add_gaze(const ipme::scene::Pose& pose)
     auto cylinder_material = new Qt3DExtras::QPhongMaterial;
     cylinder_material->setDiffuse(QColor{QRgb{0xffffff}});
 
-    entities_.emplace_back(new Qt3DCore::QEntity{root_entity_});
-    auto& cylinder_entity = entities_.back();
+    active_entities_->emplace_back(new Qt3DCore::QEntity{root_entity_});
+    auto& cylinder_entity = active_entities_->back();
 
     cylinder_entity->addComponent(cylinder);
     cylinder_entity->addComponent(cylinder_material);
