@@ -16,8 +16,8 @@ from datetime import datetime
 from pathlib import Path
 from pyquaternion import Quaternion
 from scipy.spatial.distance import cosine
-from scipy.stats import mannwhitneyu, shapiro, ttest_ind, ranksums
-
+from scipy.stats import mannwhitneyu, shapiro, ttest_ind, ranksums, ttest_rel
+from statsmodels.graphics.gofplots import qqplot
 
 from utils.log import setup_logger, set_log_level
 
@@ -35,8 +35,10 @@ colors = ['r', 'g', 'b']
 ColumnIdx = namedtuple('ColumnIdx', ['person', 'device'])
 Association = namedtuple('Association', ['score', 'angle'])
 AssociationCount = namedtuple('Count', ['person_id', 'pd', 'canopus', 'vega'])
-CombinedData = namedtuple('CombinedData', ['separate', 'all', 'timestamps',
-                                           'time_slices', 'stats'])
+# CombinedData = namedtuple('CombinedData', ['separate', 'all', 'timestamps',
+#                                            'time_slices', 'stats'])
+CombinedData = namedtuple('CombinedData', ['separate', 'all',
+                                           'time_slices_table'])
 
 
 def parse_options():
@@ -55,12 +57,14 @@ def parse_options():
     parser.add_argument('--fig-height', type=int, default=8)
     parser.add_argument('--transform-type', default='none',
                         choices=['none', '2', 'natural', '10'])
+    parser.add_argument('--alpha', default=0.01)
 
     return parser.parse_args()
 
 
 def compute_score(v1, v2):
-    score = max(0, cosine(v1, v2) - 1)
+    # score = max(0, cosine(v1, v2) - 1)
+    score = max(0, -(v1.dot(v2)))
     return Association(score, math.degrees(np.arccos(score)))
 
 
@@ -73,10 +77,12 @@ def make_vector(q):
     # Our motion capture system rotates the upvector by the quaternion.
     # So in order to get our desired vector, we take the quaternion
     # recorded by the motion capture system and rotate the up-vector
+    # logger.debug(q)
     return Quaternion(q).rotate(up_vector)
 
 
-device_names = ['Personal Device', 'Canopus', 'Vega']
+# device_names = ['Personal Device', 'Canopus', 'Vega']
+device_names = ['Personal Device', 'Public Device']
 
 
 def compute_transform(value, transform_type):
@@ -119,6 +125,7 @@ class ScoreComputation(object):
         self.__prev_assoc_idx = np.inf
         self.__prev_ts = 0
 
+        self.__assoc_counts = [0, 0, 0]
         self.__compute()
 
     def __add(self, timestamp, *args):
@@ -135,9 +142,21 @@ class ScoreComputation(object):
         idx = np.argmax(cosine_scores)
 
         if not self.__use_vega and idx == 2:
+            logger.debug('VEGA not in use and found VEGA index, ignoring, '
+                         'cosine scores: [{}]'.format(
+                           ' '.join([format(s, '.4f') for s in cosine_scores])))
             return
 
-        device = device_names[idx]
+        # This is not very smart, fix this
+        if idx == 0:
+            device = 'Personal Device'
+        elif idx == 1:
+            device = 'Canopus'
+        elif idx == 2:
+            device = 'Vega'
+        else:
+            raise Exception('Invalid index={idx}'.format(idx=idx))
+
         binary_assoc = device if idx == 0 else 'Public Display'
         watching_public_display = min(1, int(idx))
         row = [self.__person_id] + \
@@ -150,6 +169,9 @@ class ScoreComputation(object):
 
         if idx != self.__prev_assoc_idx:
             time_delta = timestamp - self.__prev_ts
+            logger.debug('switched from {} to {}, td={}ms'.format(
+                        self.__prev_assoc_idx, idx, time_delta))
+
             self.__time_spent[self.__prev_assoc_idx] += time_delta
 
             binary_slices = [0, 0]
@@ -158,6 +180,11 @@ class ScoreComputation(object):
                 time_delta, self.__o.transform_type)
             self.__time_slices.append([timestamp, self.__person_id] +
                                       binary_slices)
+
+            self.__prev_assoc_idx = idx
+            self.__prev_ts = timestamp
+
+        self.__assoc_counts[idx] += 1
 
         self.__table.append(row)
 
@@ -168,48 +195,25 @@ class ScoreComputation(object):
         device = extract(self.__src_df, self.__column_idx.device)
         timestamps = self.__src_df['timestamp']
 
-        counts = [0, 0, 0]
-
-        previous_assoc_idx = np.inf
-        previous_ts = 0
         for i in range(0, len(person)):
             head_vector = make_vector(person.values[i])
             device_vector = make_vector(device.values[i])
 
-            personal_device = compute_score(head_vector, device_vector)
+            personal = compute_score(head_vector, device_vector)
             canopus = compute_score(head_vector, canopus_normal)
             vega = compute_score(head_vector, vega_normal)
 
-            scores = self.__add(timestamps[i], personal_device, canopus, vega)
-            max_assoc_idx = np.argmax(scores)
-
-            if previous_assoc_idx == np.inf:
-                previous_assoc_idx = max_assoc_idx
-
-            if max_assoc_idx != previous_assoc_idx:
-                time_delta = timestamps[i] - previous_ts
-                self.__time_spent[previous_assoc_idx] += time_delta
-
-                slices = [0, 0, 0]
-                slices[previous_assoc_idx] = np.log(time_delta)
-                self.__time_slices.append([self.__person_id] + slices)
-
-                logger.debug('switched from {} to {}, td={}ms'.format(
-                    previous_assoc_idx, max_assoc_idx, time_delta))
-                previous_assoc_idx = max_assoc_idx
-                previous_ts = timestamps[i]
-
-            counts[max_assoc_idx] += 1
+            self.__add(timestamps[i], personal, canopus, vega)
 
         self.__assoc_counts = AssociationCount(
-            person_id=self.__person_id, pd=counts[0], canopus=counts[1],
-            vega=counts[2])
+            person_id=self.__person_id, pd=self.__assoc_counts[0],
+            canopus=self.__assoc_counts[1], vega=self.__assoc_counts[2])
 
     @property
-    def time_slices(self):
+    def time_slices_table(self):
         return pd.DataFrame(data=self.__time_slices,
-                            columns=['Person ID', 'Personal Device',
-                                     'Public Device'])
+                            columns=['Timestamp', 'Person ID',
+                                     'Personal Device', 'Public Device'])
 
     @property
     def time_spent(self):
@@ -231,6 +235,19 @@ class ScoreComputation(object):
         return self.df.append(other.df)
 
 
+def test_nomality(df, name, alpha, msg_tag):
+    times = df[df[name] != 0][name]
+    logger.debug('Performing Shapiro-Wilk test on {name}({tag}), '
+                 'length={len}'.format(name=name, len=len(times),
+                                       tag=msg_tag))
+    w, pvalue = shapiro(times)
+    normal = False if pvalue < alpha else True
+    logger.info('Normality test for {name}({tag}), W={W}, pvalue={pvalue:.4f}, '
+                'normal={normal}'.format(name=name, W=w, pvalue=pvalue,
+                                         normal=normal, tag=msg_tag))
+    return times, normal
+
+
 def make_combined_data(df, options, use_vega=True):
     p1 = ScoreComputation(df, 'Person 1', ColumnIdx(person=1, device=2),
                           options=options, vega=use_vega)
@@ -240,27 +257,25 @@ def make_combined_data(df, options, use_vega=True):
                           options=options, vega=use_vega)
     all_data = p1.df.append(p2.df).append(p3.df)
 
-    time_stamp = [p1.time_spent, p2.time_spent, p3.time_spent]
-    cols = ['Person ID', 'Personal Device', 'Canopus', 'Vega']
-    df_time_stamp = pd.DataFrame(data=time_stamp, columns=cols)
-    time_slices = p1.time_slices.append(p2.time_slices).append(p3.time_slices)
+    # time_stamp = [p1.time_spent, p2.time_spent, p3.time_spent]
+    # # cols = ['Person ID', 'Personal Device', 'Canopus', 'Vega']
+    # cols = ['Person ID', 'Personal Device', 'Public Device']
+    # df_time_stamp = pd.DataFrame(data=time_stamp, columns=cols)
+    time_slices = p1.time_slices_table.append(p2.time_slices_table).append(p3.time_slices_table)
 
     # Perform normality testing
-    def perform_normality_test(name):
-        times = time_slices[name]
-        w, pvalue = shapiro(times)
-        logger.info('Normality test for {name}, W={W}, pvalue={pvalue}'.format(
-            name=name, W=w, pvalue=pvalue))
-        return times
 
-    personal_devices = perform_normality_test('Personal Device')
-    canopus_devices = perform_normality_test('Canopus')
-    vega_devices = perform_normality_test('Vega')
+    # logger.debug(time_slices)
+    # personal_times, personal_normal = test_nomality(
+    #     time_slices, 'Personal Device', options.alpha)
+    # public_times, public_normal = test_nomality(
+    #     time_slices, 'Public Device', options.alpha)
+    # canopus_devices = perform_normality_test('Canopus')
+    # vega_devices = perform_normality_test('Vega')
 
-    stat = stats.f_oneway(personal_devices, canopus_devices, vega_devices)
+    # stat = stats.f_oneway(personal_devices, canopus_devices, vega_devices)
 
-    return CombinedData([p1, p2, p3], all_data, df_time_stamp, time_slices,
-                        stat)
+    return CombinedData([p1, p2, p3], all_data, time_slices)
 
 
 def tick_labels():
@@ -300,99 +315,119 @@ def make_multi_scatter(x_label, y_label, **kwargs):
     outfile_name = kwargs['outdir'] / '{}_{}.png'.format(y_label, x_label)
     plotter.plot(kwargs['df_list'], outfile_name)
 
+#
+# class DiscreteCounter(object):
+#     def __init__(self, *args):
+#         self.__counts = [arg for arg in args]
+#         self.__table = []
+#
+#     def make_table(self):
+#         for i, count in enumerate(self.__counts):
+#             total = DiscreteCounter.sum_counts(count)
+#             all_counts = [count.pd, count.canopus, count.vega]
+#             all_percents = [
+#                 DiscreteCounter.percent(count.pd, total),
+#                 DiscreteCounter.percent(count.canopus, total),
+#                 DiscreteCounter.percent(count.vega, total)]
+#             max_count_index = np.argmax(all_counts)
+#             max_device_name = device_names[max_count_index]
+#             max_device_count = all_counts[max_count_index]
+#             max_device_percentage = all_percents[max_count_index]
+#             self.__table.append([
+#                 count.person_id,
+#                 count.pd, all_percents[device_names.index('Personal Device')],
+#
+#                 # count.canopus, all_percents[device_names.index('Canopus')],
+#                 # count.vega, all_percents[device_names.index('Vega')],
+#                 max_device_name,
+#                 max_device_count,
+#                 max_device_percentage
+#             ])
+#
+#     @property
+#     def data_frame(self):
+#         columns = ['Person ID', 'Personal Device Count',
+#                    'Personal Device %',
+#                    'Canopus Count', 'Canopus %', 'Vega Count', 'Vega %',
+#                    'Max Device Name', 'Max Device Assoc Count',
+#                    'Max Device Assoc %']
+#         return pd.DataFrame(data=self.__table, columns=columns)
+#
+#     @staticmethod
+#     def percent(n, d):
+#         if d == 0:
+#             print('denominator 0, returning 0')
+#             return 0
+#         return float(n) * 100.0 / d
+#
+#     @staticmethod
+#     def sum_counts(count):
+#         return count.pd + count.canopus + count.vega
+#
+#
+# def draw_count_plots(df_list, title, **kwargs):
+#     discrete_counter = DiscreteCounter(df_list[0].association_counts,
+#                                        df_list[1].association_counts,
+#                                        df_list[2].association_counts)
+#     discrete_counter.make_table()
+#     ax = discrete_counter.data_frame.plot(
+#         x='Person ID',
+#         y=['Personal Device Count', 'Canopus Count', 'Vega Count'],
+#         kind='bar', title=title, figsize=(8, 6)
+#     )
+#     ax.set_ylabel('Counts')
+#     plt.tight_layout()
+#     plt.savefig(kwargs['filepath'])
+#
+#
+# def draw_binary_plots(df_list, title, **kwargs):
+#     dc = DiscreteCounter(df_list[0].association_counts,
+#                          df_list[1].association_counts,
+#                          df_list[2].association_counts)
+#     dc.make_table()
+#     df = dc.data_frame
+#     pdc_col = df[['Canopus Count', 'Vega Count']].sum(axis=1)
+#     df['Public Display Count'] = pdc_col
+#     ax = df.plot(x='Person ID',
+#                  y=['Personal Device Count', 'Public Display Count'],
+#                  kind='bar', title=title, figsize=(8, 6))
+#     ax.set_ylabel('Counts')
+#     plt.tight_layout()
+#     plt.savefig(kwargs['filepath'])
 
-class DiscreteCounter(object):
-    def __init__(self, *args):
-        self.__counts = [arg for arg in args]
-        self.__table = []
 
-    def make_table(self):
-        for i, count in enumerate(self.__counts):
-            total = DiscreteCounter.sum_counts(count)
-            all_counts = [count.pd, count.canopus, count.vega]
-            all_percents = [
-                DiscreteCounter.percent(count.pd, total),
-                DiscreteCounter.percent(count.canopus, total),
-                DiscreteCounter.percent(count.vega, total)]
-            max_count_index = np.argmax(all_counts)
-            max_device_name = device_names[max_count_index]
-            max_device_count = all_counts[max_count_index]
-            max_device_percentage = all_percents[max_count_index]
-            self.__table.append([
-                count.person_id,
-                count.pd, all_percents[device_names.index('Personal Device')],
-                count.canopus, all_percents[device_names.index('Canopus')],
-                count.vega, all_percents[device_names.index('Vega')],
-                max_device_name,
-                max_device_count,
-                max_device_percentage
-            ])
-
-    @property
-    def data_frame(self):
-        columns = ['Person ID', 'Personal Device Count',
-                   'Personal Device %',
-                   'Canopus Count', 'Canopus %', 'Vega Count', 'Vega %',
-                   'Max Device Name', 'Max Device Assoc Count',
-                   'Max Device Assoc %']
-        return pd.DataFrame(data=self.__table, columns=columns)
-
-    @staticmethod
-    def percent(n, d):
-        if d == 0:
-            print('denominator 0, returning 0')
-            return 0
-        return float(n) * 100.0 / d
-
-    @staticmethod
-    def sum_counts(count):
-        return count.pd + count.canopus + count.vega
+def non_zero(data, name):
+    return data[data[name] != 0][name]
 
 
-def draw_count_plots(df_list, title, **kwargs):
-    discrete_counter = DiscreteCounter(df_list[0].association_counts,
-                                       df_list[1].association_counts,
-                                       df_list[2].association_counts)
-    discrete_counter.make_table()
-    ax = discrete_counter.data_frame.plot(
-        x='Person ID',
-        y=['Personal Device Count', 'Canopus Count', 'Vega Count'],
-        kind='bar', title=title, figsize=(8, 6)
-    )
-    ax.set_ylabel('Counts')
-    plt.tight_layout()
-    plt.savefig(kwargs['filepath'])
+def make_plots(data, prefix, outdir, figsize):
+    df = data.time_slices_table[['Personal Device', 'Public Device']]
+    df.to_csv(outdir / '{}_time_slices.csv'.format(prefix))
+
+    personal_nz = non_zero(df, 'Personal Device')
+    public_nz = non_zero(df, 'Public Device')
+
+    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=figsize)
+    sns.distplot(personal_nz, ax=ax[0, 0])
+    sns.distplot(public_nz, ax=ax[0, 1])
+    qqplot(personal_nz, line='s', markersize=3, ax=ax[1, 0])
+    qqplot(public_nz, line='s', markersize=3, ax=ax[1, 1])
+    plt.title('{} Screen'.format(prefix.capitalize()), x=0.5, y=0)
+    plt.savefig(outdir / '{}_hist_kde_qqplot.png'.format(prefix))
 
 
-def draw_binary_plots(df_list, title, **kwargs):
-    dc = DiscreteCounter(df_list[0].association_counts,
-                         df_list[1].association_counts,
-                         df_list[2].association_counts)
-    dc.make_table()
-    df = dc.data_frame
-    pdc_col = df[['Canopus Count', 'Vega Count']].sum(axis=1)
-    df['Public Display Count'] = pdc_col
-    ax = df.plot(x='Person ID',
-                 y=['Personal Device Count', 'Public Display Count'],
-                 kind='bar', title=title, figsize=(8, 6))
-    ax.set_ylabel('Counts')
-    plt.tight_layout()
-    plt.savefig(kwargs['filepath'])
-
-
-def main():
-    options = parse_options()
-    set_log_level(logger, options.log_level)
-
+def do_analysis(single, multi, options):
     dir_name = datetime.now().strftime('%Y%m%d-%H%M%S')
     if options.title:
         dir_name += '-{}'.format(options.title)
 
+    figsize = (options.fig_width, options.fig_height)
+
     outdir = Path(options.outdir) / dir_name
     outdir.mkdir(parents=True, exist_ok=True)
 
-    multi_df = pd.read_csv(options.multi_file)
-    multi = make_combined_data(multi_df, options)
+    make_plots(single, 'single', outdir, figsize)
+    make_plots(multi, 'multi', outdir, figsize)
 
     make_multi_scatter('canopus', 'vega', outdir=outdir, df_list=multi.separate)
     make_multi_scatter('canopus', 'pd', df_list=multi.separate, outdir=outdir,
@@ -400,51 +435,40 @@ def main():
     make_multi_scatter('vega', 'pd', df_list=multi.separate, outdir=outdir,
                        title='Personal Device vs Vega')
 
-    draw_count_plots(multi.separate,
-                     filepath=outdir / 'multi-associations.png',
-                     title='Multi-Screen Associations (Separate)')
-    draw_binary_plots(multi.separate,
-                      filepath=outdir / 'multi-binary_associations.png',
-                      title='Multi-Screen Associations (Binary)')
-
-    single_df = pd.read_csv(options.single_file)
-    single = make_combined_data(single_df, options, use_vega=False)
-    draw_binary_plots(single.separate,
-                      filepath=outdir / 'single-binary_associations.png',
-                      title='Single-Screen Associations (Binary)')
-
-    figsize = (options.fig_width, options.fig_height)
-    hist_multi = multi.time_slices.hist(
-        bins=int(options.bin_count),
-        range=(options.hist_range_min, options.hist_range_max), figsize=figsize)
-    plt.savefig(outdir / 'multi_hist.png')
-    multi.time_slices.to_csv(outdir / 'multi_time_slices.csv')
-    logger.info('Multi-screen ANOVA F-Statistic {}, p-value {}'.format(
-        multi.stats.statistic, multi.stats.pvalue))
-
-    hist_single = single.time_slices.hist(
-        bins=int(options.bin_count),
-        range=(options.hist_range_min, options.hist_range_max), figsize=figsize)
-
-    plt.savefig(outdir / 'single_hist.png')
-
     def report_tests(name):
-        x = multi.time_slices[name]
-        y = single.time_slices[name]
-        t_stat, t_pvalue = ttest_ind(x, y)
-        logger.info('{name}: t-test={stat}, pvalue={pvalue}'.format(
-            name=name, stat=t_stat, pvalue=t_pvalue))
-        u_stat, u_pvalue = mannwhitneyu(x, y)
-        logger.info('{name}: Mann-Whitney statistic={stat}, '
-                    'pvalue={pvalue}'.format(name=name, stat=u_stat,
-                                             pvalue=u_pvalue))
-        rs_stat, rs_pvalue = ranksums(x, y)
-        logger.info('{name}: Wilcoxon rank-sum statistic={stat}, '
-                    'pvalue={pvalue}'.format(name=name, stat=rs_stat,
-                                             pvalue=rs_pvalue))
+        x, x_normal = test_nomality(multi.time_slices_table,
+                                    name, options.alpha, 'Multi-screen')
+        y, y_normal = test_nomality(single.time_slices_table, name,
+                                    options.alpha, 'Single-screen')
+
+        if x_normal and y_normal:
+            t_stat, t_pvalue = ttest_ind(x, y)
+            logger.info('{name}: t-test={stat:.4f}, pvalue={pvalue:.4f}'.format(
+                name=name, stat=t_stat, pvalue=t_pvalue))
+        else:
+            u_stat, u_pvalue = mannwhitneyu(x, y)
+            logger.info('{name}: Mann-Whitney statistic={stat:.4f}, '
+                        'pvalue={pvalue:.4f}'.format(name=name, stat=u_stat,
+                                                     pvalue=u_pvalue))
+            rs_stat, rs_pvalue = ranksums(x, y)
+            logger.info('{name}: Wilcoxon rank-sum statistic={stat:.4f}, '
+                        'pvalue={pvalue:.4f}'.format(name=name, stat=rs_stat,
+                                                     pvalue=rs_pvalue))
 
     report_tests('Personal Device')
-    report_tests('Canopus')
+    report_tests('Public Device')
+
+
+def main():
+    options = parse_options()
+    set_log_level(logger, options.log_level)
+
+    multi_df = pd.read_csv(options.multi_file)
+    multi = make_combined_data(multi_df, options)
+    single_df = pd.read_csv(options.single_file)
+    single = make_combined_data(single_df, options, use_vega=False)
+
+    do_analysis(single, multi, options)
 
 
 if __name__ == '__main__':
