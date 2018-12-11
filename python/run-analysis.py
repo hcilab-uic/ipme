@@ -43,8 +43,8 @@ CombinedData = namedtuple('CombinedData', ['separate', 'all',
 
 def parse_options():
     parser = ArgumentParser(sys.argv)
-    parser.add_argument('--single-file')
-    parser.add_argument('--multi-file', required=True)
+    parser.add_argument('--single-file', required=True, action='append')
+    parser.add_argument('--multi-file', required=True, action='append')
     parser.add_argument('--min-score', type=float, default=0)
     parser.add_argument('--min-score-diff', type=float, default=0)
     parser.add_argument('--outdir', default=str(Path().absolute()))
@@ -463,12 +463,29 @@ def main():
     options = parse_options()
     set_log_level(logger, options.log_level)
 
-    multi_df = pd.read_csv(options.multi_file)
-    multi = make_combined_data(multi_df, options)
-    single_df = pd.read_csv(options.single_file)
-    single = make_combined_data(single_df, options, use_vega=False)
+    # multi_df = pd.read_csv(options.multi_file)
+    # multi = make_combined_data(multi_df, options)
+    # single_df = pd.read_csv(options.single_file)
+    # single = make_combined_data(single_df, options, use_vega=False)
+    #
+    # do_analysis(single, multi, options)
+    single_file_count = len(options.single_file)
+    multi_file_count = len(options.multi_file)
 
-    do_analysis(single, multi, options)
+    if single_file_count != multi_file_count:
+        logger.error('multi/single file counts need to be the same')
+        sys.exit(1)
+
+    single_all = pd.DataFrame()
+    multi_all = pd.DataFrame()
+    for i in range(single_file_count):
+        s_df = pd.read_csv(options.single_file[i])
+        single_all.append(s_df)
+        m_df = pd.read_csv(options.multi_file[i])
+        multi_all.append(m_df)
+        logger.info('single {}, multi {}'.format(len(s_df.values), len(m_df.values)))
+    logger.info('single {}, multi {}'.format(
+        len(single_all.values), len(multi_all.values)))
 
 
 if __name__ == '__main__':
