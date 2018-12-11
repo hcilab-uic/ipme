@@ -16,7 +16,8 @@ from datetime import datetime
 from pathlib import Path
 from pyquaternion import Quaternion
 from scipy.spatial.distance import cosine
-from scipy.stats import mannwhitneyu, shapiro, ttest_ind, ranksums, ttest_rel
+from scipy.stats import mannwhitneyu, shapiro, ttest_ind, ranksums, \
+    ttest_rel, wilcoxon
 from statsmodels.graphics.gofplots import qqplot
 
 from utils.log import setup_logger, set_log_level
@@ -58,8 +59,15 @@ def parse_options():
     parser.add_argument('--transform-type', default='none',
                         choices=['none', '2', 'natural', '10'])
     parser.add_argument('--alpha', default=0.01)
+    parser.add_argument('--people-count', default=3)
+    parser.add_argument('--concat-public', action='store_true', default=False)
 
     return parser.parse_args()
+
+
+def get_rotated_vector(v):
+    rotator = Quaternion(axis=up_vector, degrees=90)
+    return rotator.rotate(v)
 
 
 def compute_score(v1, v2):
@@ -73,12 +81,15 @@ def extract(df, index):
     return pd.DataFrame(data=df[keys].values, columns=['rw', 'rx', 'ry', 'rz'])
 
 
-def make_vector(q):
+def make_vector(e, apply=None):
     # Our motion capture system rotates the upvector by the quaternion.
     # So in order to get our desired vector, we take the quaternion
     # recorded by the motion capture system and rotate the up-vector
     # logger.debug(q)
-    return Quaternion(q).rotate(up_vector)
+    q = Quaternion(e)
+    if apply:
+        q *= apply
+    return q.rotate(up_vector)
 
 
 # device_names = ['Personal Device', 'Canopus', 'Vega']
@@ -134,9 +145,11 @@ class ScoreComputation(object):
         sorted_scores = -np.sort(-sorted_scores)
 
         if sorted_scores[0] < self.__min_score:
+            logger.debug('does not meet min score')
             return
 
         if abs(sorted_scores[0] - sorted_scores[1]) < self.__min_score_diff:
+            logger.debug('does not meet min score diff')
             return
 
         idx = np.argmax(cosine_scores)
@@ -145,7 +158,7 @@ class ScoreComputation(object):
             logger.debug('VEGA not in use and found VEGA index, ignoring, '
                          'cosine scores: [{}]'.format(
                            ' '.join([format(s, '.4f') for s in cosine_scores])))
-            return
+            idx = 0
 
         # This is not very smart, fix this
         if idx == 0:
@@ -169,17 +182,28 @@ class ScoreComputation(object):
 
         if idx != self.__prev_assoc_idx:
             time_delta = timestamp - self.__prev_ts
-            logger.debug('switched from {} to {}, td={}ms'.format(
-                        self.__prev_assoc_idx, idx, time_delta))
+            # logger.debug('switched from {} to {}, td={}ms'.format(
+            #             self.__prev_assoc_idx, idx, time_delta))
 
             self.__time_spent[self.__prev_assoc_idx] += time_delta
 
-            binary_slices = [0, 0]
             slice_index = min(1, int(self.__prev_assoc_idx))
-            binary_slices[slice_index] = compute_transform(
-                time_delta, self.__o.transform_type)
-            self.__time_slices.append([timestamp, self.__person_id] +
-                                      binary_slices)
+            logger.debug('switched from {} to {}, td={}ms'.format(
+                        slice_index, idx, time_delta))
+
+            transform = compute_transform(time_delta, self.__o.transform_type)
+            if len(self.__time_slices) > 0 and self.__o.concat_public:
+                # If previous was public, concatenate
+                last_slice = self.__time_slices[-1]
+                # [timestamp, person_id, personal, public]
+                if self.__prev_assoc_idx == 1 and last_slice[2] == 0:
+                    last_slice[2] += transform
+            else:
+                binary_slices = [0, 0]
+                binary_slices[slice_index] = compute_transform(
+                    time_delta, self.__o.transform_type)
+                self.__time_slices.append([timestamp, self.__person_id] +
+                                          binary_slices)
 
             self.__prev_assoc_idx = idx
             self.__prev_ts = timestamp
@@ -196,7 +220,8 @@ class ScoreComputation(object):
         timestamps = self.__src_df['timestamp']
 
         for i in range(0, len(person)):
-            head_vector = make_vector(person.values[i])
+            head_rotation = Quaternion(axis=[1, 0, 0], degrees=20)
+            head_vector = make_vector(person.values[i], head_rotation)
             device_vector = make_vector(device.values[i])
 
             personal = compute_score(head_vector, device_vector)
@@ -205,9 +230,22 @@ class ScoreComputation(object):
 
             self.__add(timestamps[i], personal, canopus, vega)
 
+        # write the last time slice
+        timestamp = timestamps.values[-1]
+        binary_slices = [0, 0]
+        time_delta = timestamp - self.__prev_ts
+        slice_index = min(1, int(self.__prev_assoc_idx))
+        binary_slices[slice_index] = compute_transform(time_delta,
+                                                       self.__o.transform_type)
+        self.__time_slices.append([timestamp, self.__person_id] +
+                                  binary_slices)
+        print(self.__time_slices)
         self.__assoc_counts = AssociationCount(
             person_id=self.__person_id, pd=self.__assoc_counts[0],
             canopus=self.__assoc_counts[1], vega=self.__assoc_counts[2])
+        logger.debug('Association counts personal={personal}, '
+                     'public={public}'.format(personal=self.__assoc_counts[0],
+                                              public=self.__assoc_counts[1]))
 
     @property
     def time_slices_table(self):
@@ -242,9 +280,9 @@ def test_nomality(df, name, alpha, msg_tag):
                                        tag=msg_tag))
     w, pvalue = shapiro(times)
     normal = False if pvalue < alpha else True
-    logger.info('Normality test for {name}({tag}), W={W}, pvalue={pvalue:.4f}, '
-                'normal={normal}'.format(name=name, W=w, pvalue=pvalue,
-                                         normal=normal, tag=msg_tag))
+    logger.info('Normality test for {name}({tag}), W={W:.4f}, '
+                'pvalue={pvalue:.4f}, normal={normal}'.format(
+                    name=name, W=w, pvalue=pvalue, normal=normal, tag=msg_tag))
     return times, normal
 
 
@@ -257,23 +295,8 @@ def make_combined_data(df, options, use_vega=True):
                           options=options, vega=use_vega)
     all_data = p1.df.append(p2.df).append(p3.df)
 
-    # time_stamp = [p1.time_spent, p2.time_spent, p3.time_spent]
-    # # cols = ['Person ID', 'Personal Device', 'Canopus', 'Vega']
-    # cols = ['Person ID', 'Personal Device', 'Public Device']
-    # df_time_stamp = pd.DataFrame(data=time_stamp, columns=cols)
-    time_slices = p1.time_slices_table.append(p2.time_slices_table).append(p3.time_slices_table)
-
-    # Perform normality testing
-
-    # logger.debug(time_slices)
-    # personal_times, personal_normal = test_nomality(
-    #     time_slices, 'Personal Device', options.alpha)
-    # public_times, public_normal = test_nomality(
-    #     time_slices, 'Public Device', options.alpha)
-    # canopus_devices = perform_normality_test('Canopus')
-    # vega_devices = perform_normality_test('Vega')
-
-    # stat = stats.f_oneway(personal_devices, canopus_devices, vega_devices)
+    time_slices = p1.time_slices_table.append(p2.time_slices_table).append(
+        p3.time_slices_table)
 
     return CombinedData([p1, p2, p3], all_data, time_slices)
 
@@ -315,119 +338,80 @@ def make_multi_scatter(x_label, y_label, **kwargs):
     outfile_name = kwargs['outdir'] / '{}_{}.png'.format(y_label, x_label)
     plotter.plot(kwargs['df_list'], outfile_name)
 
-#
-# class DiscreteCounter(object):
-#     def __init__(self, *args):
-#         self.__counts = [arg for arg in args]
-#         self.__table = []
-#
-#     def make_table(self):
-#         for i, count in enumerate(self.__counts):
-#             total = DiscreteCounter.sum_counts(count)
-#             all_counts = [count.pd, count.canopus, count.vega]
-#             all_percents = [
-#                 DiscreteCounter.percent(count.pd, total),
-#                 DiscreteCounter.percent(count.canopus, total),
-#                 DiscreteCounter.percent(count.vega, total)]
-#             max_count_index = np.argmax(all_counts)
-#             max_device_name = device_names[max_count_index]
-#             max_device_count = all_counts[max_count_index]
-#             max_device_percentage = all_percents[max_count_index]
-#             self.__table.append([
-#                 count.person_id,
-#                 count.pd, all_percents[device_names.index('Personal Device')],
-#
-#                 # count.canopus, all_percents[device_names.index('Canopus')],
-#                 # count.vega, all_percents[device_names.index('Vega')],
-#                 max_device_name,
-#                 max_device_count,
-#                 max_device_percentage
-#             ])
-#
-#     @property
-#     def data_frame(self):
-#         columns = ['Person ID', 'Personal Device Count',
-#                    'Personal Device %',
-#                    'Canopus Count', 'Canopus %', 'Vega Count', 'Vega %',
-#                    'Max Device Name', 'Max Device Assoc Count',
-#                    'Max Device Assoc %']
-#         return pd.DataFrame(data=self.__table, columns=columns)
-#
-#     @staticmethod
-#     def percent(n, d):
-#         if d == 0:
-#             print('denominator 0, returning 0')
-#             return 0
-#         return float(n) * 100.0 / d
-#
-#     @staticmethod
-#     def sum_counts(count):
-#         return count.pd + count.canopus + count.vega
-#
-#
-# def draw_count_plots(df_list, title, **kwargs):
-#     discrete_counter = DiscreteCounter(df_list[0].association_counts,
-#                                        df_list[1].association_counts,
-#                                        df_list[2].association_counts)
-#     discrete_counter.make_table()
-#     ax = discrete_counter.data_frame.plot(
-#         x='Person ID',
-#         y=['Personal Device Count', 'Canopus Count', 'Vega Count'],
-#         kind='bar', title=title, figsize=(8, 6)
-#     )
-#     ax.set_ylabel('Counts')
-#     plt.tight_layout()
-#     plt.savefig(kwargs['filepath'])
-#
-#
-# def draw_binary_plots(df_list, title, **kwargs):
-#     dc = DiscreteCounter(df_list[0].association_counts,
-#                          df_list[1].association_counts,
-#                          df_list[2].association_counts)
-#     dc.make_table()
-#     df = dc.data_frame
-#     pdc_col = df[['Canopus Count', 'Vega Count']].sum(axis=1)
-#     df['Public Display Count'] = pdc_col
-#     ax = df.plot(x='Person ID',
-#                  y=['Personal Device Count', 'Public Display Count'],
-#                  kind='bar', title=title, figsize=(8, 6))
-#     ax.set_ylabel('Counts')
-#     plt.tight_layout()
-#     plt.savefig(kwargs['filepath'])
-
 
 def non_zero(data, name):
     return data[data[name] != 0][name]
 
 
 def make_plots(data, prefix, outdir, figsize):
-    df = data.time_slices_table[['Personal Device', 'Public Device']]
+    df = data[['Personal Device', 'Public Device']]
     df.to_csv(outdir / '{}_time_slices.csv'.format(prefix))
 
     personal_nz = non_zero(df, 'Personal Device')
     public_nz = non_zero(df, 'Public Device')
 
-    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=figsize)
-    sns.distplot(personal_nz, ax=ax[0, 0])
-    sns.distplot(public_nz, ax=ax[0, 1])
-    qqplot(personal_nz, line='s', markersize=3, ax=ax[1, 0])
-    qqplot(public_nz, line='s', markersize=3, ax=ax[1, 1])
-    plt.title('{} Screen'.format(prefix.capitalize()), x=0.5, y=0)
-    plt.savefig(outdir / '{}_hist_kde_qqplot.png'.format(prefix))
+    try:
+        fig, ax = plt.subplots(nrows=2, ncols=2, figsize=figsize)
+        sns.distplot(personal_nz, ax=ax[0, 0])
+        sns.distplot(public_nz, ax=ax[0, 1])
+        qqplot(personal_nz, line='s', markersize=3, ax=ax[1, 0])
+        qqplot(public_nz, line='s', markersize=3, ax=ax[1, 1])
+        plt.title('{} Screen'.format(prefix.capitalize()), x=0.5, y=0)
+        plt.savefig(outdir / '{}_hist_kde_qqplot.png'.format(prefix))
+    except ValueError as err:
+        logger.error(err)
 
 
-def do_analysis(single, multi, options):
-    dir_name = datetime.now().strftime('%Y%m%d-%H%M%S')
-    if options.title:
-        dir_name += '-{}'.format(options.title)
+def report_tests(single_ts, multi_ts, name, options, msg_tag):
+    x, x_normal = test_nomality(multi_ts, name, options.alpha, 'Multi-screen')
+    y, y_normal = test_nomality(single_ts, name, options.alpha, 'Single-screen')
 
+    table = []
+    def print_report(result, test_name):
+        outcome = 'REJECT' if result[1] < options.alpha else 'Do Not REJECT'
+        logger.info('{name}: {test} stat={stat:.4f}, '
+                    'pvalue={pvalue:.4f}, {outcome}'.format(
+            name=msg_tag, stat=result[0], pvalue=result[1], test=test_name,
+            outcome=outcome))
+        table.append([msg_tag, test_name, result[0], result[1], outcome])
+
+    if x_normal and y_normal:
+        print_report(ttest_ind(x, y), 'T-Test')
+    else:
+        print_report(mannwhitneyu(x, y), 'Mann-Whitney U')
+        print_report(ranksums(x, y), 'Wilcoxon Rank-Sum')
+        print_report(wilcoxon(x, y), 'Wilcoxon Signed-Rank')
+
+    headers = ['Type', 'Test', 'Stat', 'p-value', 'Null Hypothesis']
+    return pd.DataFrame(data=table, columns=headers)
+
+
+def make_reports(single_ts, multi_ts, outdir, options, tag=''):
     figsize = (options.fig_width, options.fig_height)
 
-    outdir = Path(options.outdir) / dir_name
-    outdir.mkdir(parents=True, exist_ok=True)
+    make_plots(single_ts, 'single', outdir, figsize)
+    make_plots(multi_ts, 'multi', outdir, figsize)
 
-    make_plots(single, 'single', outdir, figsize)
-    make_plots(multi, 'multi', outdir, figsize)
+    df = pd.DataFrame()
+    for device in ['personal', 'public']:
+        device_name = '{} Device'.format(device.capitalize())
+        msg_tag = '{device_name} ({tag})'.format(device_name=device_name,
+                                                 tag=tag)
+        try:
+            df_report = report_tests(single_ts, multi_ts, device_name, options,
+                                     msg_tag)
+            df = df.append(df_report)
+        except ValueError as err:
+            logger.error('Report generation failed for {} [{}]'.format(
+                device, err))
+    df.to_csv(outdir / '{}.csv'.format(tag))
+
+
+def do_analysis(single, multi, outdir, options):
+    single_ts = single.time_slices_table
+    multi_ts = multi.time_slices_table
+
+    make_reports(single_ts, multi_ts, outdir, options)
 
     make_multi_scatter('canopus', 'vega', outdir=outdir, df_list=multi.separate)
     make_multi_scatter('canopus', 'pd', df_list=multi.separate, outdir=outdir,
@@ -435,40 +419,18 @@ def do_analysis(single, multi, options):
     make_multi_scatter('vega', 'pd', df_list=multi.separate, outdir=outdir,
                        title='Personal Device vs Vega')
 
-    def report_tests(name):
-        x, x_normal = test_nomality(multi.time_slices_table,
-                                    name, options.alpha, 'Multi-screen')
-        y, y_normal = test_nomality(single.time_slices_table, name,
-                                    options.alpha, 'Single-screen')
-
-        if x_normal and y_normal:
-            t_stat, t_pvalue = ttest_ind(x, y)
-            logger.info('{name}: t-test={stat:.4f}, pvalue={pvalue:.4f}'.format(
-                name=name, stat=t_stat, pvalue=t_pvalue))
-        else:
-            u_stat, u_pvalue = mannwhitneyu(x, y)
-            logger.info('{name}: Mann-Whitney statistic={stat:.4f}, '
-                        'pvalue={pvalue:.4f}'.format(name=name, stat=u_stat,
-                                                     pvalue=u_pvalue))
-            rs_stat, rs_pvalue = ranksums(x, y)
-            logger.info('{name}: Wilcoxon rank-sum statistic={stat:.4f}, '
-                        'pvalue={pvalue:.4f}'.format(name=name, stat=rs_stat,
-                                                     pvalue=rs_pvalue))
-
-    report_tests('Personal Device')
-    report_tests('Public Device')
-
 
 def main():
     options = parse_options()
     set_log_level(logger, options.log_level)
 
-    # multi_df = pd.read_csv(options.multi_file)
-    # multi = make_combined_data(multi_df, options)
-    # single_df = pd.read_csv(options.single_file)
-    # single = make_combined_data(single_df, options, use_vega=False)
-    #
-    # do_analysis(single, multi, options)
+    dir_name = datetime.now().strftime('%Y%m%d-%H%M%S')
+    if options.title:
+        dir_name += '-{}'.format(options.title)
+
+    outdir = Path(options.outdir) / dir_name
+    outdir.mkdir(parents=True, exist_ok=True)
+
     single_file_count = len(options.single_file)
     multi_file_count = len(options.multi_file)
 
@@ -476,16 +438,37 @@ def main():
         logger.error('multi/single file counts need to be the same')
         sys.exit(1)
 
-    single_all = pd.DataFrame()
-    multi_all = pd.DataFrame()
+    def make_data(path, vega=True):
+        return make_combined_data(pd.read_csv(path), options, use_vega=vega)
+
+    single_all = [pd.DataFrame()] * options.people_count
+    multi_all = [pd.DataFrame()] * options.people_count
     for i in range(single_file_count):
-        s_df = pd.read_csv(options.single_file[i])
-        single_all.append(s_df)
-        m_df = pd.read_csv(options.multi_file[i])
-        multi_all.append(m_df)
-        logger.info('single {}, multi {}'.format(len(s_df.values), len(m_df.values)))
-    logger.info('single {}, multi {}'.format(
-        len(single_all.values), len(multi_all.values)))
+        single_data = make_data(options.single_file[i], vega=False)
+        multi_data = make_data(options.multi_file[i])
+
+        for person_idx in range(options.people_count):
+            stem = 'f{}_p{}'.format(i + 1, person_idx + 1)
+            single = single_data.separate[person_idx].time_slices_table
+            single_all[person_idx] = single_all[person_idx].append(
+                single, ignore_index=True)
+            single.to_csv(outdir / 's-{}.csv'.format(stem))
+
+            multi = multi_data.separate[person_idx].time_slices_table
+            multi.to_csv(outdir / 'm-{}.csv'.format(stem))
+
+            multi_all[person_idx] = multi_all[person_idx].append(
+                multi, ignore_index=True)
+            logger.debug('Finished reading person {}, file {}'.format(
+                person_idx + 1, i + 1))
+        logger.info('Finished reading file {}'.format(i + 1))
+
+    for person_idx in range(options.people_count):
+        tag = 'Person {}'.format(person_idx + 1)
+        final_outdir_p1 = outdir / 'overall_p{}'.format(person_idx)
+        final_outdir_p1.mkdir(parents=True, exist_ok=True)
+        make_reports(single_all[person_idx], multi_all[person_idx],
+                     final_outdir_p1, options, tag)
 
 
 if __name__ == '__main__':
