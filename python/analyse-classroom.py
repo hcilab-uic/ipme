@@ -23,8 +23,7 @@ logger = setup_logger(__name__)
 
 def parse_options():
     parser = ArgumentParser(sys.argv[0])
-    parser.add_argument('--single-file')
-    parser.add_argument('--multi-file')
+    parser.add_argument('--input-file', action='append')
     parser.add_argument('--outdir', default=str(Path()))
     parser.add_argument('--log-level', default='info')
     parser.add_argument('--title')
