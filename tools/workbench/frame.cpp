@@ -8,6 +8,23 @@
 #include "utils/logger.h"
 
 namespace ipme::wb {
+ipme::scene::Vrpn_object
+get_corrected_object(const ipme::scene::Vrpn_object& object, float pitch,
+                     float yaw, float roll)
+{
+    ipme::scene::Vrpn_object corrected_object{object};
+    const auto& rot = object.pose().orientation();
+    auto corrected_rot = QQuaternion(rot.w(), rot.x(), rot.y(), rot.z()) *
+                         QQuaternion::fromEulerAngles(pitch, yaw, roll);
+    auto orientation = corrected_object.mutable_pose()->mutable_orientation();
+    orientation->set_w(corrected_rot.scalar());
+    orientation->set_x(corrected_rot.x());
+    orientation->set_y(corrected_rot.y());
+    orientation->set_z(corrected_rot.z());
+
+    return corrected_object;
+}
+
 // clang-format off
 const Frame::map_type Frame::policy_map =
     boost::assign::list_of<Frame::map_type::relation>
@@ -71,19 +88,25 @@ Frame Frame::create_from_pb(
                 float correction_pitch_degrees = 25.f;
                 float correction_roll_degrees = 0.f;
                 float correction_yaw_degrees = 0.f;
-                ipme::scene::Vrpn_object corrected_object{vrpn_object};
-                const auto& rot = vrpn_object.pose().orientation();
-                QQuaternion corrected_rotation =
-                    QQuaternion(rot.w(), rot.x(), rot.y(), rot.z()) *
-                    QQuaternion::fromEulerAngles(correction_pitch_degrees,
-                                                 correction_yaw_degrees,
-                                                 correction_roll_degrees);
-                auto corrected_rot =
-                    corrected_object.mutable_pose()->mutable_orientation();
-                corrected_rot->set_w(corrected_rotation.scalar());
-                corrected_rot->set_x(corrected_rotation.x());
-                corrected_rot->set_y(corrected_rotation.y());
-                corrected_rot->set_z(corrected_rotation.z());
+                //                ipme::scene::Vrpn_object
+                //                corrected_object{vrpn_object}; const auto& rot
+                //                = vrpn_object.pose().orientation();
+                //                QQuaternion corrected_rotation =
+                //                    QQuaternion(rot.w(), rot.x(), rot.y(),
+                //                    rot.z()) *
+                //                    QQuaternion::fromEulerAngles(correction_pitch_degrees,
+                //                                                 correction_yaw_degrees,
+                //                                                 correction_roll_degrees);
+                //                auto corrected_rot =
+                //                    corrected_object.mutable_pose()->mutable_orientation();
+                //                corrected_rot->set_w(corrected_rotation.scalar());
+                //                corrected_rot->set_x(corrected_rotation.x());
+                //                corrected_rot->set_y(corrected_rotation.y());
+                //                corrected_rot->set_z(corrected_rotation.z());
+
+                const auto corrected_object = get_corrected_object(
+                    vrpn_object, correction_pitch_degrees,
+                    correction_yaw_degrees, correction_roll_degrees);
 
                 frame.persons.push_back(corrected_object);
                 ++people_count;
@@ -91,7 +114,17 @@ Frame Frame::create_from_pb(
             }
         } else if(type.find("computer") != std::string::npos) {
             if(frame.vrpn_ids_.find(source_id) == std::end(frame.vrpn_ids_)) {
-                frame.devices.push_back(vrpn_object);
+                /* if(source_id == 27) {
+                    const auto corrected =
+                        get_corrected_object(vrpn_object, 75, -30, 0);
+                    frame.devices.push_back(corrected);
+                } else */ if(source_id == 29) {
+                    const auto corrected =
+                        get_corrected_object(vrpn_object, 10, -10, 0);
+                    frame.devices.push_back(corrected);
+                } else {
+                    frame.devices.push_back(vrpn_object);
+                }
                 ++device_count;
                 frame.vrpn_ids_.insert(source_id);
             }

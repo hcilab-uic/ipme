@@ -53,6 +53,17 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
     }
 
     init();
+
+    const auto print = [](QQuaternion q) {
+        INFO() << "quaternion [" << q.scalar() << "," << q.x() << "," << q.y()
+               << "," << q.z() << "]";
+    };
+
+    auto q1 = QQuaternion::fromAxisAndAngle(QVector3D{1, 0, 0}, 5);
+    auto q2 = QQuaternion::fromEulerAngles(5, 0, 0);
+
+    print(q1);
+    print(q2);
 }
 
 Visualization_window::~Visualization_window()
