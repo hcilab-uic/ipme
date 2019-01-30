@@ -6,6 +6,6 @@ function(build_data_collection_tool dctool)
 endfunction(build_data_collection_tool)
 
 if(${BUILD_VICON_CODE})
-    build_vicon_demo(vicon_record_csv)
+    build_data_collection_tool(vicon_record_csv)
 endif()
 
