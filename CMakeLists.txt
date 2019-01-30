@@ -66,7 +66,6 @@ if(${BUILD_SENSOR_WALABOT})
 endif()
 
 add_subdirectory(lib)
-add_subdirectory(demos)
 add_subdirectory(tools)
 
 if(${BUILD_TESTS})
