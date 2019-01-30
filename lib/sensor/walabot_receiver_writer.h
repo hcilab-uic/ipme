@@ -1,3 +1,23 @@
+/* A tool for collecting, visualizing and annotating 3D Interaction data
+ *
+ * Copyright (C) 2017-2019 University of Illinois at Chicago
+ *
+ * Author: Harish G. Naik <hnaik2@uic.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #ifndef CDI_LIB_SENSOR_WALABOTRECEIVERWRITER_H
 #define CDI_LIB_SENSOR_WALABOTRECEIVERWRITER_H
 
@@ -10,13 +30,12 @@ namespace ipme {
 namespace sensor {
 template <typename Point_t>
 class Walabot_receiver_writer : public Receiver3d<Point_t> {
-  public:
+public:
     using Data_t = visualization::Polydata<Point_t>;
     /**
      * @brief Walabot_receiver_writer constructor
      */
-    Walabot_receiver_writer()
-        : data_{std::make_unique<Data_t>()}
+    Walabot_receiver_writer() : data_{std::make_unique<Data_t>()}
     {
     }
 
@@ -35,7 +54,7 @@ class Walabot_receiver_writer : public Receiver3d<Point_t> {
      */
     void write(const boost::filesystem::path& output_filename);
 
-  private:
+private:
     std::unique_ptr<Data_t> data_;
 };
 
