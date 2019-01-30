@@ -33,5 +33,6 @@ include(protobuf.cmake)
 include(vtk.cmake)
 include(opencv.cmake)
 include(omicron.cmake)
+include(zlib.cmake)
 
 message("Important: Third-party install directory: ${EXT_INSTALL_DIR}")
