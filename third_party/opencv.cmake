@@ -1,19 +1,19 @@
 set(SRC_DIR ../OpenCV/)
 set(protobuf_build_dir
     "${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/Protobuf-build/")
-set(vtk_dir "${CMAKE_CURRENT_BINARY_DIR}/vtk/src/VTK-build")
+#set(vtk_dir "${CMAKE_CURRENT_BINARY_DIR}/vtk/src/VTK-build")
 
 ExternalProject_Add(OpenCV
-  DEPENDS VTK Protobuf
+#  DEPENDS VTK Protobuf
 
   PREFIX                opencv
   GIT_REPOSITORY        https://github.com/opencv/opencv.git
-  GIT_TAG               3.4.2
+  GIT_TAG               4.0.1
 
   CMAKE_CACHE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DProtobuf_DIR:PATH=${protobuf_build_dir}
-      -DVTK_DIR:PATH=${vtk_dir}
+      #-DVTK_DIR:PATH=${vtk_dir}
       -DCMAKE_INSTALL_PREFIX:PATH=${EXT_INSTALL_DIR}
       -DCMAKE_INSTALL_RPATH:PATH=${EXT_INSTALL_DIR}/lib
       -DCMAKE_PREFIX_PATH:PATH=${EXT_INSTALL_DIR}

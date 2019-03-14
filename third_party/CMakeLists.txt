@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.13)
+project(ipme_third_party)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -28,9 +29,15 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(EXT_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/install)
 set(CMAKE_INSTALL_RPATH ${EXT_INSTALL_DIR}/lib)
 
+if(MSVC)
+  set(ZLIB_INCLUDE_DIR "${ZLIB_ROOT}/include")
+  set(ZLIB_LIBRARY "${ZLIB_ROOT}/lib/zlib.lib")
+  message(STATUS "Building for Microsoft platform, set ZLIB_LIBRARY=${ZLIB_LIBRARY}, ZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}")
+endif(MSVC)
+
 include(boost.cmake)
 include(protobuf.cmake)
-include(vtk.cmake)
+#include(vtk.cmake)
 include(opencv.cmake)
 include(omicron.cmake)
 

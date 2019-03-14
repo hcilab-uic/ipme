@@ -25,8 +25,13 @@ set(CMAKE_INSTALL_RPATH "${third_party_dir}/lib")
 set(QT5_ROOT CACHE PATH "Path to Qt5 installation")
 
 set(BOOST_ROOT ${third_party_dir})
-set(VTK_DIR ${third_party_dir}/lib/cmake/vtk-8.1)
-set(OpenCV_DIR ${third_party_dir}/share/OpenCV)
+#set(VTK_DIR ${third_party_dir}/lib/cmake/vtk-8.1)
+
+if(MSVC)
+    set(OpenCV_DIR ${third_party_dir}/lib)
+else()
+    set(OpenCV_DIR ${third_party_dir}/share/OpenCV)
+endif(MSVC)
 
 set(OMICRON_SOURCE_PATH ${THIRD_PARTY_ROOT}/omicron/src/Omicron)
 set(Qt5Core_DIR "${QT5_ROOT}/lib/cmake/Qt5Core")
@@ -34,13 +39,13 @@ set(Qt5Widgets_DIR "${QT5_ROOT}/lib/cmake/Qt5Widgets")
 set(Qt53DCore_DIR "${QT5_ROOT}/lib/cmake/Qt53DCore")
 set(Qt53DExtras_DIR "${QT5_ROOT}/lib/cmake/Qt53DExtras")
 
+message(STATUS "THIRD_PARTY_ROOT=${THIRD_PARTY_ROOT}")
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message("BOOST_ROOT=${BOOST_ROOT}")
-message("VTK_DIR=${VTK_DIR}")
+#message("VTK_DIR=${VTK_DIR}")
 message("OpenCV_DIR=${OpenCV_DIR}")
 message("OMICRON_SOURCE_PATH=${OMICRON_SOURCE_PATH}")
-
-message("XXXXXX Qt53DCore_DIR=${Qt53DCore_DIR}")
+message(STATUS "Qt53DCore_DIR=${Qt53DCore_DIR}")
 
 set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
 set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")
@@ -56,10 +61,10 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS system filesystem log_setup log
     program_options thread)
 find_package(OpenCV REQUIRED CONFIG)
-find_package(VTK REQUIRED CONFIG)
+#find_package(VTK REQUIRED CONFIG)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
-include_directories(${VTK_INCLUDE_DIRS})
+#include_directories(${VTK_INCLUDE_DIRS})
 
 if(${BUILD_SENSOR_WALABOT})
     include_directories(${CMAKE_SOURCE_DIR}/sensor)

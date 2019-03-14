@@ -1,2 +1,4 @@
 *.user
 .directory
+.vs
+CMakeSettings.json
