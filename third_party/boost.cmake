@@ -2,7 +2,7 @@ set(SRC_DIR ../Boost/)
 
 set(boost_rpath "${EXT_INSTALL_DIR}/lib")
 
-set(b2name "./b2")
+set(b2_command "./b2")
 set(bootstrap_command "./bootstrap.sh")
 
 if(MSVC)

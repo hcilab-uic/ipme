@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>88</y>
+      <y>140</y>
       <width>985</width>
-      <height>573</height>
+      <height>521</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="scene_vertical_layout"/>
@@ -42,7 +42,7 @@
       <rect>
        <x>4</x>
        <y>24</y>
-       <width>981</width>
+       <width>1001</width>
        <height>59</height>
       </rect>
      </property>
@@ -163,6 +163,22 @@ font-weight: bold;</string>
       </item>
      </layout>
     </widget>
+    <widget class="QProgressBar" name="viz_progress_bar">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>951</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background: #333;</string>
+     </property>
+     <property name="value">
+      <number>24</number>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menu_bar">
@@ -171,7 +187,7 @@ font-weight: bold;</string>
      <x>0</x>
      <y>0</y>
      <width>987</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_file">
