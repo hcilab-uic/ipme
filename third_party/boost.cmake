@@ -12,14 +12,13 @@ if(MSVC)
 endif(MSVC)
 
 set(boost_build
-        ${b2_command} -j8 install -d+2 --prefix=${EXT_INSTALL_DIR}
-            --layout=tagged
-			--with-python
-	    link=shared
-	    runtime-link=shared
-	    dll-path=${boost_rpath}
-	    threading=multi
-		address-model=64
+    ${b2_command} -j8 install -d+2 --prefix=${EXT_INSTALL_DIR}
+        --layout=tagged
+        link=shared
+        runtime-link=shared
+        dll-path=${boost_rpath}
+        threading=multi
+        address-model=64
 )
 
 set(boost_url
@@ -36,11 +35,11 @@ ExternalProject_Add(Boost
       -DCMAKE_INSTALL_RPATH:PATH=${EXT_INSTALL_DIR}/lib
       -DCMAKE_PREFIX_PATH:PATH=${EXT_INSTALL_DIR}
 
-
   CONFIGURE_COMMAND cd ${SRC_DIR} && pwd && ${bootstrap_command}
 
   BUILD_COMMAND
       cd ${SRC_DIR} && pwd && ${boost_build}
 
   INSTALL_COMMAND       ""
+  INSTALL_DIR           "${EXT_INSTALL_DIR}"
 )

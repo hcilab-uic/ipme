@@ -72,6 +72,8 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
         ui->frame_policy_combobox->addItem(policy.second.c_str());
     }
 
+    ui->viz_progress_bar->setMinimum(0);
+
     init();
 }
 

@@ -25,12 +25,16 @@ set(CMAKE_INSTALL_RPATH "${third_party_dir}/lib")
 set(QT5_ROOT CACHE PATH "Path to Qt5 installation")
 
 set(BOOST_ROOT ${third_party_dir})
+# this is redundant
+#set(BOOST_INCLUDEDIR "${third_party_dir}/include")
+#set(BOOST_LIBRARYDIR "${third_party_dir}/lib")
+
 #set(VTK_DIR ${third_party_dir}/lib/cmake/vtk-8.1)
 
 if(MSVC)
     set(OpenCV_DIR ${third_party_dir}/lib)
 else()
-    set(OpenCV_DIR ${third_party_dir}/share/OpenCV)
+    set(OpenCV_DIR ${third_party_dir}/lib/cmake/opencv4)
 endif(MSVC)
 
 set(OMICRON_SOURCE_PATH ${THIRD_PARTY_ROOT}/omicron/src/Omicron)
@@ -55,11 +59,23 @@ set(BUILD_TESTS false CACHE BOOL "Build unittests")
 set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
 
 set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_RELEASE_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_NAMESPACE "libboost")
+set(Boost_ARCHITECTURE "-x64")
+set(Boost_ADDITIONAL_VERSIONS "1.69" "1.69.0")
 
-find_package(Boost REQUIRED COMPONENTS system filesystem log_setup log
-    program_options thread)
+set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
+
+find_package(Boost REQUIRED COMPONENTS
+    system
+    filesystem
+    log_setup
+    log
+    program_options
+    thread)
+
 find_package(OpenCV REQUIRED CONFIG)
 #find_package(VTK REQUIRED CONFIG)
 
