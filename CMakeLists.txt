@@ -26,8 +26,6 @@ set(QT5_ROOT CACHE PATH "Path to Qt5 installation")
 
 set(BOOST_ROOT ${third_party_dir})
 # this is redundant
-#set(BOOST_INCLUDEDIR "${third_party_dir}/include")
-#set(BOOST_LIBRARYDIR "${third_party_dir}/lib")
 
 #set(VTK_DIR ${third_party_dir}/lib/cmake/vtk-8.1)
 
@@ -46,6 +44,8 @@ set(Qt53DExtras_DIR "${QT5_ROOT}/lib/cmake/Qt53DExtras")
 message(STATUS "THIRD_PARTY_ROOT=${THIRD_PARTY_ROOT}")
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message("BOOST_ROOT=${BOOST_ROOT}")
+message("BOOST_INCLUDEDIR=${BOOST_INCLUDEDIR}")
+message("BOOST_LIBRARYDIR=${BOOST_LIBRARYDIR}")
 #message("VTK_DIR=${VTK_DIR}")
 message("OpenCV_DIR=${OpenCV_DIR}")
 message("OMICRON_SOURCE_PATH=${OMICRON_SOURCE_PATH}")
@@ -62,16 +62,16 @@ set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_RELEASE_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-set(Boost_NAMESPACE "libboost")
 set(Boost_ARCHITECTURE "-x64")
-set(Boost_ADDITIONAL_VERSIONS "1.69" "1.69.0")
-
-set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
 
 find_package(Boost REQUIRED COMPONENTS
+    date_time
     system
     filesystem
     log_setup
+    log
+    program_options
+    thread)
     log
     program_options
     thread)
