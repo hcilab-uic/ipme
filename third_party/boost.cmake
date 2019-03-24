@@ -12,9 +12,9 @@ ProcessorCount(N_CORES)
 set(url_prefix "https://dl.bintray.com/boostorg/release")
 set(major_version "1")
 set(minor_version "68")
-set(release_build "0")
-set(release_tag "${major_version}.${minor_version}.${release_build}")
-set(file_name "boost_${major_version}_${minor_version}_${release_build}.tar.gz")
+set(subminor_version "0")
+set(version_string "${major_version}.${minor_version}.${subminor_version}")
+set(file_name "boost_${major_version}_${minor_version}_${subminor_version}.tar.gz")
 
 if(MSVC)
     set(b2_command "b2")
@@ -33,7 +33,7 @@ set(boost_build
         address-model=64
 )
 
-set(boost_url "${url_prefix}/${release_tag}/source/${file_name}")
+set(boost_url "${url_prefix}/${version_string}/source/${file_name}")
 
 ExternalProject_Add(Boost
   PREFIX boost

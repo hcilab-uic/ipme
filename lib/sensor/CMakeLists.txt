@@ -43,4 +43,4 @@ target_include_directories(sensor PUBLIC
     $<BUILD_INTERFACE:${OMICRON_SOURCE_PATH}/include>
 )
 
-target_link_libraries(sensor proto)
+target_link_libraries(sensor proto utils)

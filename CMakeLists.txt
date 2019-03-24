@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.13)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -25,9 +25,6 @@ set(CMAKE_INSTALL_RPATH "${third_party_dir}/lib")
 set(QT5_ROOT CACHE PATH "Path to Qt5 installation")
 
 set(BOOST_ROOT ${third_party_dir})
-# this is redundant
-
-#set(VTK_DIR ${third_party_dir}/lib/cmake/vtk-8.1)
 
 if(MSVC)
     set(OpenCV_DIR ${third_party_dir}/lib)
@@ -44,15 +41,10 @@ set(Qt53DExtras_DIR "${QT5_ROOT}/lib/cmake/Qt53DExtras")
 message(STATUS "THIRD_PARTY_ROOT=${THIRD_PARTY_ROOT}")
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message("BOOST_ROOT=${BOOST_ROOT}")
-message("BOOST_INCLUDEDIR=${BOOST_INCLUDEDIR}")
-message("BOOST_LIBRARYDIR=${BOOST_LIBRARYDIR}")
-#message("VTK_DIR=${VTK_DIR}")
 message("OpenCV_DIR=${OpenCV_DIR}")
 message("OMICRON_SOURCE_PATH=${OMICRON_SOURCE_PATH}")
 message(STATUS "Qt53DCore_DIR=${Qt53DCore_DIR}")
 
-set(BUILD_VISUALIZATION_TOOLS false CACHE BOOL "Build visualiztion tools")
-set(BUILD_SENSOR_WALABOT false CACHE BOOL "Build code that uses Walabot SDK")
 set(BUILD_VICON_CODE true CACHE BOOL "Build code using VICON motion capture")
 set(BUILD_TESTS false CACHE BOOL "Build unittests")
 
@@ -72,19 +64,12 @@ find_package(Boost REQUIRED COMPONENTS
     log
     program_options
     thread)
-    log
-    program_options
-    thread)
 
 find_package(OpenCV REQUIRED CONFIG)
-#find_package(VTK REQUIRED CONFIG)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
-#include_directories(${VTK_INCLUDE_DIRS})
 
-if(${BUILD_SENSOR_WALABOT})
-    include_directories(${CMAKE_SOURCE_DIR}/sensor)
-endif()
+include_directories(${CMAKE_SOURCE_DIR}/sensor)
 
 add_subdirectory(lib)
 add_subdirectory(tools)

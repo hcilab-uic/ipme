@@ -23,6 +23,8 @@
 
 #include "utils/logger.h"
 
+#include "opencv2/videoio.hpp"
+
 Video_window::Video_window(QWidget* parent)
     : QMainWindow{parent}, ui{new Ui::Video_window}, video_timer_{
                                                          new QTimer{this}}
@@ -68,11 +70,11 @@ void Video_window::load_video()
 {
     auto video_path = dirpath_ + "/video.avi";
     capture_.open(video_path.toStdString());
-    frame_width_ = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_WIDTH));
-    frame_height_ = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
+    frame_width_ = static_cast<int>(capture_.get(cv::CAP_PROP_FRAME_WIDTH));
+    frame_height_ = static_cast<int>(capture_.get(cv::CAP_PROP_FRAME_HEIGHT));
     ui->label_video->resize(frame_width_, frame_height_);
 
-    double fps = capture_.get(CV_CAP_PROP_FPS) / 1.15;
+    double fps = capture_.get(cv::CAP_PROP_FPS) / 1.15;
     INFO() << "FPS " << fps;
 
     int msec = static_cast<int>(1000.0 / fps);
@@ -90,7 +92,7 @@ void Video_window::process_video()
             return;
         }
 
-        cv::cvtColor(frame, frame, CV_BGR2RGB);
+        cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
         cv::resize(frame, frame, cv::Size{frame_width_, frame_height_}, 0, 0,
                    cv::INTER_CUBIC);
         QImage widget_image(static_cast<uchar*>(frame.data), frame.cols,

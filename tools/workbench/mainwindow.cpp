@@ -328,20 +328,20 @@ void MainWindow::on_action_load_video_triggered()
     const auto file_name = QFileDialog::getOpenFileName(
         this, tr("Open CSV file"), QDir::homePath(), filters);
 
+    using namespace cv;
     capture_.open(file_name.toStdString());
-    video_total_frames_ =
-        static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_COUNT));
+    video_total_frames_ = static_cast<int>(capture_.get(CAP_PROP_FRAME_COUNT));
     last_video_frame_ = video_total_frames_ - 1;
 
-    int frame_width = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_WIDTH));
-    int frame_height = static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
+    int frame_width = static_cast<int>(capture_.get(CAP_PROP_FRAME_WIDTH));
+    int frame_height = static_cast<int>(capture_.get(CAP_PROP_FRAME_HEIGHT));
     ui->video_label->resize(frame_width, frame_height);
 
     emit success("Opened video file " + file_name +
                  ", frames loaded: " + QString::number(video_total_frames_) +
                  ", frame width: " + QString::number(frame_width) +
                  ", height: " + QString::number(frame_height) +
-                 ", FPS: " + QString::number(capture_.get(CV_CAP_PROP_FPS)));
+                 ", FPS: " + QString::number(capture_.get(CAP_PROP_FPS)));
 }
 
 void MainWindow::process_video()
@@ -358,7 +358,7 @@ void MainWindow::process_video()
             return;
         }
 
-        cv::cvtColor(frame, frame, CV_BGR2RGB);
+        cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
         cv::resize(frame, frame, cv::Size(640, 360), 0, 0, cv::INTER_CUBIC);
         QImage widget_image(static_cast<uchar*>(frame.data), frame.cols,
                             frame.rows, frame.step, QImage::Format_RGB888);
@@ -366,7 +366,7 @@ void MainWindow::process_video()
         ui->video_label->setPixmap(QPixmap::fromImage(widget_image));
 
         int frame_number =
-            static_cast<int>(capture_.get(CV_CAP_PROP_POS_FRAMES));
+            static_cast<int>(capture_.get(cv::CAP_PROP_POS_FRAMES));
         ui->video_frame_number->display(frame_number);
 
         if(video_total_frames_ > 0) {
@@ -378,7 +378,7 @@ void MainWindow::process_video()
 
         if(frame_number == last_video_frame_) {
             video_play_ = false;
-            capture_.set(CV_CAP_PROP_POS_FRAMES, 0);
+            capture_.set(cv::CAP_PROP_POS_FRAMES, 0);
             ui->playpause_button->setText("Play");
             ui->video_slider->setValue(0);
 
@@ -400,9 +400,9 @@ void MainWindow::on_playpause_button_clicked()
 
     if(!video_play_) {
         emit log("Paused at frame " +
-                 QString::number(capture_.get(CV_CAP_PROP_POS_FRAMES)) +
+                 QString::number(capture_.get(cv::CAP_PROP_POS_FRAMES)) +
                  " at " +
-                 QString::number(capture_.get(CV_CAP_PROP_POS_MSEC) / 1000) +
+                 QString::number(capture_.get(cv::CAP_PROP_POS_MSEC) / 1000) +
                  " seconds");
     }
 }
@@ -411,11 +411,11 @@ void MainWindow::on_video_slider_sliderMoved(int position)
 {
     double frame_to_advance = static_cast<double>(position) / 100.00 *
                               static_cast<double>(video_total_frames_);
-    capture_.set(CV_CAP_PROP_POS_FRAMES, frame_to_advance);
+    capture_.set(cv::CAP_PROP_POS_FRAMES, frame_to_advance);
     emit log("Slider moved to position " + QString::number(position) +
              ", jumping to frame " +
              QString::number(static_cast<int>(frame_to_advance)) + ", " +
-             QString::number(capture_.get(CV_CAP_PROP_POS_MSEC) / 1000) +
+             QString::number(capture_.get(cv::CAP_PROP_POS_MSEC) / 1000) +
              " seconds");
 }
 

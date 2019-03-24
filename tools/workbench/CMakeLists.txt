@@ -76,10 +76,15 @@ add_library(workbench_ui SHARED
     live_window.cpp
     video_window.cpp ${UI_SOURCES})
 
-target_link_libraries(workbench_ui ipme Qt5::Core Qt5::Widgets Qt5::Gui
-    Qt5::3DCore Qt5::3DExtras Qt5::3DRender Qt5::3DInput)
+target_link_libraries(workbench_ui
+    ipme
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::Gui
+    Qt5::3DCore
+    Qt5::3DExtras
+    Qt5::3DRender
+    Qt5::3DInput)
 
 add_executable(${TARGET} ${SOURCES} resources.qrc)
-target_link_libraries(${TARGET}
-    workbench_ui ipme sensor GL ${OpenCV_LIBS}
-)
+target_link_libraries(${TARGET} workbench_ui ipme sensor GL ${OpenCV_LIBS})

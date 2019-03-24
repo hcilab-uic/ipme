@@ -142,7 +142,7 @@ void Live_window::process_video()
             return;
         }
 
-        cv::cvtColor(frame, display_frame, CV_BGR2RGB);
+        cv::cvtColor(frame, display_frame, cv::COLOR_BGR2RGB);
         //        cv::circle(frame, cv::Point{100, 100}, 50, cv::Scalar{255,
         //        0, 0});
         QImage widget_image(static_cast<uchar*>(display_frame.data),
@@ -243,17 +243,17 @@ bool Live_window::reset_camera()
     capture_.open(video_device_index);
 
     const int frame_width =
-        static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_WIDTH));
+        static_cast<int>(capture_.get(cv::CAP_PROP_FRAME_WIDTH));
     const int frame_height =
-        static_cast<int>(capture_.get(CV_CAP_PROP_FRAME_HEIGHT));
-    const int fps = static_cast<int>(capture_.get(CV_CAP_PROP_FPS));
+        static_cast<int>(capture_.get(cv::CAP_PROP_FRAME_HEIGHT));
+    const int fps = static_cast<int>(capture_.get(cv::CAP_PROP_FPS));
 
     if(fps == 0) {
         ERROR() << "Error: could not get FPS information from camera";
         return false;
     }
 
-    const auto codec = CV_FOURCC('M', 'J', 'P', 'G');
+    const auto codec = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
     const auto frame_size = cv::Size(frame_width, frame_height);
 
     auto frame_dimensions =
