@@ -45,7 +45,7 @@ message("OpenCV_DIR=${OpenCV_DIR}")
 message("OMICRON_SOURCE_PATH=${OMICRON_SOURCE_PATH}")
 message(STATUS "Qt53DCore_DIR=${Qt53DCore_DIR}")
 
-set(BUILD_VICON_CODE true CACHE BOOL "Build code using VICON motion capture")
+set(BUILD_MOCAP_CODE true CACHE BOOL "Build motion capture code")
 set(BUILD_TESTS false CACHE BOOL "Build unittests")
 
 set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)

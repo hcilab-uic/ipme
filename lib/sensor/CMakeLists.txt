@@ -16,7 +16,7 @@ set(SRCS
     walabot_receiver_writer.h walabot_receiver_writer.ipp
 )
 
-if(${BUILD_VICON_CODE})
+if(${BUILD_MOCAP_CODE})
     list(APPEND SRCS
         vicon_csvwriter.h vicon_csvwriter.cpp
         vicon_datahandler.h
@@ -29,13 +29,6 @@ if(${BUILD_VICON_CODE})
         list(APPEND SRCS vicon_3dwriter.h vicon_3dwriter.cpp)
     endif()
 endif()
-
-if(${BUILD_SENSOR_WALABOT})
-    list(APPEND SRCS
-        walabot.cpp
-    )
-endif()
-
 
 add_library(sensor SHARED ${SRCS})
 
