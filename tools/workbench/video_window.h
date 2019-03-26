@@ -40,6 +40,14 @@ class Video_window : public QMainWindow {
     Q_OBJECT
 
 public:
+    enum struct Mode
+    {
+        play,
+        pause,
+        stop,
+        replay
+    };
+
     explicit Video_window(QWidget* parent = 0);
     ~Video_window();
 
@@ -47,6 +55,9 @@ public:
 
     void set_scene_visualization(
         std::shared_ptr<ipme::wb::Scene_visualization> handle);
+
+public slots:
+    void on_replay_section(size_t begin_frame, size_t end_frame);
 
 private slots:
     void on_action_play_triggered();
@@ -68,6 +79,8 @@ private:
     int frame_height_ = 360;
     cv::VideoCapture capture_;
     std::shared_ptr<ipme::wb::Scene_visualization> scene_handle_;
+    Mode mode_{Mode::stop};
+    size_t replay_end_frame_{std::numeric_limits<size_t>::infinity()};
 };
 
 #endif // VIDEO_WINDOW_H

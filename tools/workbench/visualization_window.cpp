@@ -64,6 +64,8 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
 
     connect(this, &Visualization_window::current_frame_number, this,
             &Visualization_window::display_frame_number);
+    connect(this, &Visualization_window::replay_section, video_window_.get(),
+            &Video_window::on_replay_section);
 
     auto& box = ui->vrpn_filter_policy_combobox;
     box->addItems(QStringList{"Average", "First", "Middle", "Last"});
@@ -424,6 +426,18 @@ void Visualization_window::on_action_load_labels_triggered()
 void Visualization_window::on_Visualization_window_destroyed()
 {
     INFO() << "Shutting down visualization window";
+}
+
+void Visualization_window::on_replay_button_clicked()
+{
+    auto start = ui->start_frame_edit->text().toULong();
+    auto end = ui->end_frame_edit->text().toULong();
+
+    emit replay_section(start, end);
+}
+
+void Visualization_window::on_findsimilar_button_clicked()
+{
 }
 
 void Visualization_window::on_replay_button_clicked()

@@ -51,19 +51,32 @@ void Video_window::set_scene_visualization(
     scene_handle_ = handle;
 }
 
+void Video_window::on_replay_section(size_t begin_frame, size_t end_frame)
+{
+    replay_end_frame_ = end_frame;
+    mode_ = Mode::replay;
+    play_video_ = false;
+    frame_index_ = begin_frame;
+    capture_.set(cv::CAP_PROP_POS_FRAMES, begin_frame);
+    //    play_video_ = true;
+}
+
 void Video_window::on_action_play_triggered()
 {
-    play_video_ = true;
+    mode_ = Mode::play;
+    //    play_video_ = true;
 }
 
 void Video_window::on_action_pause_triggered()
 {
-    play_video_ = false;
+    mode_ = Mode::pause;
+    //    play_video_ = false;
 }
 
 void Video_window::on_action_stop_triggered()
 {
-    play_video_ = false;
+    mode_ = Mode::stop;
+    //    play_video_ = false;
 }
 
 void Video_window::load_video()
@@ -74,7 +87,7 @@ void Video_window::load_video()
     frame_height_ = static_cast<int>(capture_.get(cv::CAP_PROP_FRAME_HEIGHT));
     ui->label_video->resize(frame_width_, frame_height_);
 
-    double fps = capture_.get(cv::CAP_PROP_FPS) / 1.15;
+    double fps = capture_.get(cv::CAP_PROP_FPS);
     INFO() << "FPS " << fps;
 
     int msec = static_cast<int>(1000.0 / fps);
@@ -85,7 +98,10 @@ void Video_window::load_video()
 
 void Video_window::process_video()
 {
-    if(capture_.isOpened() && play_video_) {
+    if(capture_.isOpened() &&
+       ((mode_ == Mode::play) ||
+        (mode_ == Mode::replay && frame_index_ < replay_end_frame_))) {
+
         cv::Mat frame;
         capture_ >> frame;
         if(frame.empty()) {

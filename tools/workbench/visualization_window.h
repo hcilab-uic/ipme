@@ -57,10 +57,8 @@ public:
 private slots:
     void on_action_show_top_view_triggered();
 
-private slots:
     void on_action_show_front_view_triggered();
 
-private slots:
     void on_action_previous_triggered();
     void on_action_next_triggered();
     void on_file_open_triggered();
@@ -82,6 +80,8 @@ private slots:
 
 signals:
     void current_frame_number(int);
+
+    void replay_section(size_t begin_frame, size_t end_frame);
 
 private:
     void make_axes();
