@@ -76,6 +76,10 @@ private slots:
 
     void on_Visualization_window_destroyed();
 
+    void on_replay_button_clicked();
+
+    void on_findsimilar_button_clicked();
+
 signals:
     void current_frame_number(int);
 

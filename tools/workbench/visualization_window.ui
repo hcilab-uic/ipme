@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>140</y>
+      <y>88</y>
       <width>985</width>
-      <height>521</height>
+      <height>573</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="scene_vertical_layout"/>
@@ -80,6 +80,21 @@
       </item>
       <item row="2" column="2">
        <layout class="QGridLayout" name="frame_range_grid">
+        <item row="0" column="2">
+         <widget class="QComboBox" name="outcome_label_combobox"/>
+        </item>
+        <item row="0" column="4">
+         <widget class="QPushButton" name="findsimilar_button">
+          <property name="styleSheet">
+           <string notr="true">background: #669900;
+color: #444;
+font-weight: bold;</string>
+          </property>
+          <property name="text">
+           <string>Find Similar Section</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLineEdit" name="start_frame_edit">
           <property name="text">
@@ -87,6 +102,17 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QPushButton" name="save_outcome_button">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(0, 85, 0);
+font-weight: bold;</string>
+          </property>
+          <property name="text">
+           <string>Save</string>
           </property>
          </widget>
         </item>
@@ -101,18 +127,16 @@
          </widget>
         </item>
         <item row="0" column="3">
-         <widget class="QPushButton" name="save_outcome_button">
+         <widget class="QPushButton" name="replay_button">
           <property name="styleSheet">
-           <string notr="true">background-color: rgb(0, 85, 0);
+           <string notr="true">background: #333300;
+color: #999;
 font-weight: bold;</string>
           </property>
           <property name="text">
-           <string>Save</string>
+           <string>Replay Section</string>
           </property>
          </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QComboBox" name="outcome_label_combobox"/>
         </item>
        </layout>
       </item>
@@ -187,7 +211,7 @@ font-weight: bold;</string>
      <x>0</x>
      <y>0</y>
      <width>987</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_file">

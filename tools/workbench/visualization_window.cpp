@@ -425,3 +425,11 @@ void Visualization_window::on_Visualization_window_destroyed()
 {
     INFO() << "Shutting down visualization window";
 }
+
+void Visualization_window::on_replay_button_clicked()
+{
+}
+
+void Visualization_window::on_findsimilar_button_clicked()
+{
+}
