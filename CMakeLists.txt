@@ -38,6 +38,8 @@ set(Qt5Widgets_DIR "${QT5_ROOT}/lib/cmake/Qt5Widgets")
 set(Qt53DCore_DIR "${QT5_ROOT}/lib/cmake/Qt53DCore")
 set(Qt53DExtras_DIR "${QT5_ROOT}/lib/cmake/Qt53DExtras")
 
+set(dlib_DIR "${third_party_dir}/lib/cmake/dlib")
+
 message(STATUS "THIRD_PARTY_ROOT=${THIRD_PARTY_ROOT}")
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message("BOOST_ROOT=${BOOST_ROOT}")
@@ -45,10 +47,12 @@ message("OpenCV_DIR=${OpenCV_DIR}")
 message("OMICRON_SOURCE_PATH=${OMICRON_SOURCE_PATH}")
 message(STATUS "Qt53DCore_DIR=${Qt53DCore_DIR}")
 
+set(BUILD_EXAMPLES true CACHE BOOL "Build example code")
 set(BUILD_MOCAP_CODE true CACHE BOOL "Build motion capture code")
 set(BUILD_TESTS false CACHE BOOL "Build unittests")
 
 set(ipmelib_DIR ${CMAKE_SOURCE_DIR}/lib)
+
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_RELEASE_LIBS ON)
@@ -66,6 +70,7 @@ find_package(Boost REQUIRED COMPONENTS
     thread)
 
 find_package(OpenCV REQUIRED CONFIG)
+find_package(dlib REQUIRED CONFIG)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
 
@@ -77,4 +82,8 @@ add_subdirectory(tools)
 if(${BUILD_TESTS})
     set(GTEST_BUILD_DIR CACHE PATH "Path to GTest Libraries")
     add_subdirectory(tests)
+endif()
+
+if(${BUILD_EXAMPLES})
+    add_subdirectory(examples)
 endif()

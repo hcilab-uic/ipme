@@ -32,13 +32,14 @@ set(CMAKE_INSTALL_RPATH ${EXT_INSTALL_DIR}/lib)
 if(MSVC)
   set(ZLIB_INCLUDE_DIR "${ZLIB_ROOT}/include")
   set(ZLIB_LIBRARY "${ZLIB_ROOT}/lib/zlib.lib")
-  message(STATUS "Building for Microsoft platform, set ZLIB_LIBRARY=${ZLIB_LIBRARY}, ZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}")
+  message(STATUS "Building for Microsoft platform,
+      set ZLIB_LIBRARY=${ZLIB_LIBRARY}, ZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}")
 endif(MSVC)
 
 include(boost.cmake)
-include(protobuf.cmake)
-#include(vtk.cmake)
+include(dlib.cmake)
 include(opencv.cmake)
 include(omicron.cmake)
+include(protobuf.cmake)
 
 message("Important: Third-party install directory: ${EXT_INSTALL_DIR}")
