@@ -35,6 +35,7 @@
 #include "protobuf/scene.pb.h"
 #include "scene_modifier.h"
 #include "scene_visualization.h"
+#include "similarity_finder.h"
 #include "video_window.h"
 
 namespace Ui {
@@ -83,6 +84,8 @@ signals:
 
     void replay_section(size_t begin_frame, size_t end_frame);
 
+    void find_similar(size_t begin_frame, size_t end_frame);
+
 private:
     void make_axes();
     void init();
@@ -108,6 +111,7 @@ private:
     ipme::wb::Frame_collection frames_;
     std::unordered_map<std::string, int> outcome_labels_;
     ipme::wb::Config config_;
+    ipme::wb::Similarity_finder similarity_finder_{frames_};
 };
 
 #endif // VISUALIZATION_WINDOW_H

@@ -71,6 +71,7 @@ include_directories(${Boost_INCLUDE_DIR})
 
 add_library(workbench_ui SHARED
     mainwindow.cpp
+    similarity_finder.cpp
     visualization_window.cpp
     workbench_window.cpp
     live_window.cpp

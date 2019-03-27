@@ -40,6 +40,7 @@
 #include "data/scene.h"
 #include "protobuf/scene.pb.h"
 #include "scene_modifier.h"
+#include "similarity_finder.h"
 #include "utils/json.h"
 #include "utils/logger.h"
 #include "utils/string_utils.h"
@@ -66,6 +67,9 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
             &Visualization_window::display_frame_number);
     connect(this, &Visualization_window::replay_section, video_window_.get(),
             &Video_window::on_replay_section);
+
+    connect(this, &Visualization_window::find_similar, &similarity_finder_,
+            &ipme::wb::Similarity_finder::on_find_similar);
 
     auto& box = ui->vrpn_filter_policy_combobox;
     box->addItems(QStringList{"Average", "First", "Middle", "Last"});
@@ -438,4 +442,8 @@ void Visualization_window::on_replay_button_clicked()
 
 void Visualization_window::on_findsimilar_button_clicked()
 {
+    auto start = ui->start_frame_edit->text().toULong();
+    auto end = ui->end_frame_edit->text().toULong();
+
+    emit find_similar(start, end);
 }
