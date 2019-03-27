@@ -1,6 +1,7 @@
 #include "similarity_finder.h"
 
 #include <QDebug>
+#include <dlib/dnn.h>
 
 namespace ipme::wb {
 Similarity_finder::Similarity_finder(
@@ -23,6 +24,25 @@ void Similarity_finder::on_find_similar(size_t begin, size_t end)
 
     [[maybe_unused]] int new_begin = begin + buffer_length;
     [[maybe_unused]] int new_end = end - buffer_length;
+}
+
+Similarity_finder::Input_matrix
+Similarity_finder::generate_training_data(size_t range_begin, size_t range_end)
+{
+    Input_matrix matrix;
+    for(size_t i = range_begin; i < range_end; ++i) {
+        std::vector<double> row;
+        for(const auto& person : frames_[i].persons) {
+            auto pose = person.pose();
+            row.push_back(pose.position().x());
+            row.push_back(pose.position().y());
+            row.push_back(pose.position().z());
+        }
+
+        matrix.push_back(row);
+    }
+
+    return matrix;
 }
 
 } // namespace ipme::wb
