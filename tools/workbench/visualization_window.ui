@@ -228,8 +228,15 @@ font-weight: bold;</string>
     <addaction name="action_previous"/>
     <addaction name="action_next"/>
    </widget>
+   <widget class="QMenu" name="menu_actions">
+    <property name="title">
+     <string>Actions</string>
+    </property>
+    <addaction name="action_start_viz"/>
+   </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_navigate"/>
+   <addaction name="menu_actions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="tool_bar">
@@ -258,6 +265,7 @@ font-weight: bold;</string>
    <addaction name="separator"/>
    <addaction name="action_launch_video"/>
    <addaction name="action_load_labels"/>
+   <addaction name="action_start_viz"/>
   </widget>
   <action name="file_open">
    <property name="text">
@@ -324,6 +332,11 @@ font-weight: bold;</string>
   <action name="action_load_labels">
    <property name="text">
     <string>Load Labels</string>
+   </property>
+  </action>
+  <action name="action_start_viz">
+   <property name="text">
+    <string>Start Visualization</string>
    </property>
   </action>
  </widget>

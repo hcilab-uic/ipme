@@ -67,6 +67,8 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
             &Visualization_window::display_frame_number);
     connect(this, &Visualization_window::replay_section, video_window_.get(),
             &Video_window::on_replay_section);
+    connect(this, &Visualization_window::start_visualization,
+            video_window_.get(), &Video_window::on_action_play_triggered);
 
     connect(this, &Visualization_window::find_similar, &similarity_finder_,
             &ipme::wb::Similarity_finder::on_find_similar);
@@ -446,4 +448,12 @@ void Visualization_window::on_findsimilar_button_clicked()
     auto end = ui->end_frame_edit->text().toULong();
 
     emit find_similar(start, end);
+}
+
+void Visualization_window::on_action_start_viz_triggered()
+{
+    video_window_->show();
+    video_window_->set_scene_visualization(shared_from_this());
+
+    emit start_visualization();
 }

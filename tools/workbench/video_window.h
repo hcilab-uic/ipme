@@ -59,8 +59,9 @@ public:
 public slots:
     void on_replay_section(size_t begin_frame, size_t end_frame);
 
-private slots:
     void on_action_play_triggered();
+
+private slots:
 
     void on_action_pause_triggered();
 

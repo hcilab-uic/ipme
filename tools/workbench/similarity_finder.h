@@ -13,7 +13,7 @@ class Similarity_finder : public QObject {
     Q_OBJECT;
 
 public:
-    using Row_type = dlib::matrix<double, 0, 1>;
+    using Row_type = dlib::matrix<double, 1, 1>;
     using Matrix_type = std::vector<Row_type>;
     using Label_vector = std::vector<unsigned long>;
     using Range_container = std::vector<std::pair<size_t, size_t>>;

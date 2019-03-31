@@ -79,12 +79,16 @@ private slots:
 
     void on_findsimilar_button_clicked();
 
+    void on_action_start_viz_triggered();
+
 signals:
     void current_frame_number(int);
 
     void replay_section(size_t begin_frame, size_t end_frame);
 
     void find_similar(size_t begin_frame, size_t end_frame);
+
+    void start_visualization();
 
 private:
     void make_axes();

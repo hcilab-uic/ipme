@@ -22,6 +22,7 @@
 #include "ui_video_window.h"
 
 #include "utils/logger.h"
+#include "visualization_window.h"
 
 #include "opencv2/videoio.hpp"
 
@@ -32,10 +33,14 @@ Video_window::Video_window(QWidget* parent)
     ui->setupUi(this);
 
     connect(video_timer_, &QTimer::timeout, this, &Video_window::process_video);
+    //    connect(parent, &Visualization_window::start_visualization, this,
+    //            &Video_window::on_action_play_triggered);
 }
 
 Video_window::~Video_window()
 {
+    mode_ = Mode::stop;
+
     delete ui;
 }
 
