@@ -89,6 +89,10 @@ private slots:
 
     void on_action_pause_viz_triggered();
 
+    void on_progress_slider_sliderMoved(int position);
+
+    void on_show_log(const QString& msg);
+
 signals:
     void current_frame_number(int);
 
@@ -97,6 +101,10 @@ signals:
     void find_similar(size_t begin_frame, size_t end_frame);
 
     void start_visualization();
+
+    void set_video_frame_index(size_t index);
+
+    void show_log(const QString& msg);
 
 private:
     void make_axes();

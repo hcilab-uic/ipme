@@ -4,14 +4,17 @@
         <file>icons/open-folder.png</file>
         <file>icons/video-camera.png</file>
         <file>icons/ccw-x.png</file>
-        <file>icons/cw-x.png</file>
         <file>icons/play.png</file>
         <file>icons/pause.png</file>
         <file>icons/stop.png</file>
-        <file>icons/next.png</file>
-        <file>icons/back.png</file>
         <file>icons/replay.png</file>
         <file>icons/binoculars.png</file>
         <file>icons/floppy-disk.png</file>
+        <file>icons/zoom-out.png</file>
+        <file>icons/video.png</file>
+        <file>icons/back.png</file>
+        <file>icons/forward.png</file>
+        <file>icons/zoom-in.png</file>
+        <file>icons/cw-x.png</file>
     </qresource>
 </RCC>

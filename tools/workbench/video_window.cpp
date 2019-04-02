@@ -67,25 +67,30 @@ void Video_window::replay_section(size_t begin_frame, size_t end_frame)
     play_video_ = false;
     frame_index_ = begin_frame;
     capture_.set(cv::CAP_PROP_POS_FRAMES, begin_frame);
-    //    play_video_ = true;
 }
 
 void Video_window::on_action_play_triggered()
 {
     mode_ = Mode::play;
-    //    play_video_ = true;
+}
+
+void Video_window::on_set_video_frame(size_t frame_index)
+{
+    auto temp_mode = mode_;
+    mode_ = Mode::pause;
+    frame_index_ = frame_index;
+    capture_.set(cv::CAP_PROP_POS_FRAMES, frame_index);
+    mode_ = temp_mode;
 }
 
 void Video_window::on_action_pause_triggered()
 {
     mode_ = Mode::pause;
-    //    play_video_ = false;
 }
 
 void Video_window::on_action_stop_triggered()
 {
     mode_ = Mode::stop;
-    //    play_video_ = false;
 }
 
 void Video_window::load_video()

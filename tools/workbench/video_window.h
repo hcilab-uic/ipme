@@ -67,6 +67,8 @@ public slots:
 
     void on_action_play_triggered();
 
+    void on_set_video_frame(size_t frame_index);
+
 private slots:
 
     void on_action_pause_triggered();

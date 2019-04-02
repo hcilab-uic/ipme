@@ -70,8 +70,13 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
     connect(this, &Visualization_window::start_visualization,
             video_window_.get(), &Video_window::on_action_play_triggered);
 
+    connect(this, &Visualization_window::set_video_frame_index,
+            video_window_.get(), &Video_window::on_set_video_frame);
+
     connect(this, &Visualization_window::find_similar, this,
             &Visualization_window::on_find_similar);
+    connect(this, &Visualization_window::show_log, this,
+            &Visualization_window::on_show_log);
 
     auto& box = ui->vrpn_filter_policy_combobox;
     box->addItems(QStringList{"Average", "First", "Middle", "Last"});
@@ -79,8 +84,6 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
     for(const auto& policy : ipme::wb::Frame::policy_map.left) {
         ui->frame_policy_combobox->addItem(policy.second.c_str());
     }
-
-    ui->viz_progress_bar->setMinimum(0);
 
     init();
 }
@@ -114,9 +117,6 @@ void Visualization_window::on_file_open_triggered()
 
     scene_modifier_->set_displays(scene_pb.config());
 
-    ui->video_progressbar->setRange(0, frames_.size());
-    ui->video_progressbar->setValue(0);
-
     frames_.load(scene_pb);
     apply_frames_filter();
     ui->end_frame_edit->setText(QString::number(scene_pb.frames().size()));
@@ -132,7 +132,6 @@ void Visualization_window::show_frame(int frame_index)
 
     frame_index_ = frames_.get_frame_id(frame_index);
     show_current_frame();
-    ui->video_progressbar->setValue(frame_index_);
 }
 
 void Visualization_window::make_axis(float x, float y, float z, float length,
@@ -270,6 +269,14 @@ void Visualization_window::show_current_frame()
         scene_modifier_->add_screen();
         scene_modifier_->add_frame(frames_[frame_index_ - 1]);
 
+        int percent = static_cast<int>(static_cast<double>(frame_index_) * 100 /
+                                       static_cast<double>(frames_.size()));
+
+        ui->video_progressbar->setValue(percent);
+        ui->progress_slider->setValue(percent);
+
+        DEBUG() << "frame number " << frame_index_ << "/" << frames_.size()
+                << " (" << percent << " percent)";
         emit current_frame_number(frame_index_);
     }
 }
@@ -464,6 +471,8 @@ void Visualization_window::on_action_start_viz_triggered()
 
 void Visualization_window::on_replay_section(size_t begin, size_t end)
 {
+    emit show_log("replaying frames " + QString::number(begin) + " to " +
+                  QString::number(end));
     video_window_->replay_section(begin, end);
 }
 
@@ -480,4 +489,20 @@ void Visualization_window::on_action_stop_viz_triggered()
 void Visualization_window::on_action_pause_viz_triggered()
 {
     emit video_window_->pause_video();
+}
+
+void Visualization_window::on_progress_slider_sliderMoved(int position)
+{
+    DEBUG() << "slider moved to position " << position;
+    frame_index_ = static_cast<size_t>(
+        static_cast<double>(position * frames_.size()) / 100.0);
+    ui->start_frame_edit->setText(QString::number(frame_index_));
+    ui->end_frame_edit->setText(QString::number(frame_index_));
+
+    emit set_video_frame_index(frame_index_);
+}
+
+void Visualization_window::on_show_log(const QString& msg)
+{
+    ui->log_window->append(msg);
 }
