@@ -5,5 +5,13 @@
         <file>icons/video-camera.png</file>
         <file>icons/ccw-x.png</file>
         <file>icons/cw-x.png</file>
+        <file>icons/play.png</file>
+        <file>icons/pause.png</file>
+        <file>icons/stop.png</file>
+        <file>icons/next.png</file>
+        <file>icons/back.png</file>
+        <file>icons/replay.png</file>
+        <file>icons/binoculars.png</file>
+        <file>icons/floppy-disk.png</file>
     </qresource>
 </RCC>

@@ -9,9 +9,7 @@
 #include "frame_collection.h"
 
 namespace ipme::wb {
-class Similarity_finder : public QObject {
-    Q_OBJECT;
-
+class Similarity_finder {
 public:
     using Row_type = dlib::matrix<double, 1, 1>;
     using Matrix_type = std::vector<Row_type>;
@@ -25,11 +23,7 @@ public:
         return similar_ranges_;
     }
 
-public slots:
-    void on_find_similar(size_t begin, size_t end);
-
-signals:
-    void finished_similarity_finding();
+    void find_similar(size_t begin, size_t end);
 
 private:
     Row_type generate_row(const ipme::wb::Frame& frame);

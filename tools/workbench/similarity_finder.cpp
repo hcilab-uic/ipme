@@ -14,7 +14,7 @@ Similarity_finder::Similarity_finder(
 {
 }
 
-void Similarity_finder::on_find_similar(size_t range_begin, size_t range_end)
+void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
 {
     qDebug() << "finding similarity to range " << range_begin << "-"
              << range_end;
@@ -27,7 +27,7 @@ void Similarity_finder::on_find_similar(size_t range_begin, size_t range_end)
     // set. Use all of the data outside the original begin and end as input data
     // for prediction
 
-    size_t span = range_end - range_begin + 1;
+    int span = range_end - range_begin + 1;
 
     static constexpr size_t label_similar = 1;
     static constexpr size_t label_different = 2;
@@ -45,21 +45,34 @@ void Similarity_finder::on_find_similar(size_t range_begin, size_t range_end)
 
     std::random_device rd;
     std::mt19937 gen{rd()};
+
+    DEBUG() << "uniform integer distribution [" << 0 << ", " << frames_.size()
+            << ")";
+
     std::uniform_int_distribution<> dist{0, static_cast<int>(frames_.size())};
 
     // Randomly select span number of frames from rest of the data-set
-    size_t count{0};
+    int count{0};
     while(count < span) {
         int random_index = dist(gen);
         if(training_set.find(random_index) != end(training_set)) {
             continue;
+            DEBUG() << "random index " << random_index
+                    << " already exists, skipping";
         }
+
+        DEBUG() << "random index " << random_index
+                << " does not already exist, adding to collection of "
+                   "different_label set";
 
         x_train.push_back(generate_row(frames_[random_index]));
         y_train.push_back(label_different);
         training_set.insert(random_index);
 
         ++count;
+
+        DEBUG() << "number of different labels added " << count
+                << " (span=" << span << ")";
     }
 
     // Collect all of the data not in the range to as prediction data
@@ -75,9 +88,9 @@ void Similarity_finder::on_find_similar(size_t range_begin, size_t range_end)
 
     //    auto[x_train, y_train, x_predict] = split_data(begin, end);
 
-    qDebug() << "x_train: " << x_train.size()
-             << " samples, y_train: " << y_train.size()
-             << "labels, x_predict: " << x_predict.size() << " data points";
+    DEBUG() << "x_train: " << x_train.size()
+            << " samples, y_train: " << y_train.size()
+            << " labels, x_predict: " << x_predict.size() << " data points";
 
     // setup dlib
     using namespace dlib;
@@ -86,18 +99,19 @@ void Similarity_finder::on_find_similar(size_t range_begin, size_t range_end)
     dnn_trainer<net_type> trainer{net};
     trainer.set_learning_rate(0.1);
 
+    DEBUG() << "beginning training";
     while(trainer.get_learning_rate() >= 1e-4) {
         trainer.train_one_step(x_train, y_train);
     }
 
-    qDebug() << "waiting for training to finish";
+    DEBUG() << "waiting for training to finish";
     trainer.get_net();
-    qDebug() << "finished training";
+    DEBUG() << "finished training";
 
     // check training accuracy
     const auto embedded = net(x_train);
     for(const auto& e : embedded) {
-        qDebug() << e;
+        DEBUG() << e;
     }
     //    auto embedded = net(x_predict);
     //    const size_t embedded_size = embedded.size();

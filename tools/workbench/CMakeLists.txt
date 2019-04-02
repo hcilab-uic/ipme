@@ -29,6 +29,7 @@ find_package(OpenGL REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(SOURCES
@@ -64,6 +65,8 @@ set(UI_SOURCES
     workbench_window.ui
     live_window.ui
     video_window.ui
+
+    resources.qrc
 )
 
 include_directories(${OMICRON_SOURCE_PATH}/include)

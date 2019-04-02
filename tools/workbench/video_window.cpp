@@ -33,8 +33,12 @@ Video_window::Video_window(QWidget* parent)
     ui->setupUi(this);
 
     connect(video_timer_, &QTimer::timeout, this, &Video_window::process_video);
-    //    connect(parent, &Visualization_window::start_visualization, this,
-    //            &Video_window::on_action_play_triggered);
+    connect(this, &Video_window::play_video, this,
+            &Video_window::on_action_play_triggered);
+    connect(this, &Video_window::pause_video, this,
+            &Video_window::on_action_pause_triggered);
+    connect(this, &Video_window::stop_video, this,
+            &Video_window::on_action_stop_triggered);
 }
 
 Video_window::~Video_window()
@@ -56,7 +60,7 @@ void Video_window::set_scene_visualization(
     scene_handle_ = handle;
 }
 
-void Video_window::on_replay_section(size_t begin_frame, size_t end_frame)
+void Video_window::replay_section(size_t begin_frame, size_t end_frame)
 {
     replay_end_frame_ = end_frame;
     mode_ = Mode::replay;

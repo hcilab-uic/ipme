@@ -81,6 +81,14 @@ private slots:
 
     void on_action_start_viz_triggered();
 
+    void on_replay_section(size_t begin, size_t end);
+
+    void on_find_similar(size_t begin, size_t end);
+
+    void on_action_stop_viz_triggered();
+
+    void on_action_pause_viz_triggered();
+
 signals:
     void current_frame_number(int);
 

@@ -65,13 +65,13 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
 
     connect(this, &Visualization_window::current_frame_number, this,
             &Visualization_window::display_frame_number);
-    connect(this, &Visualization_window::replay_section, video_window_.get(),
-            &Video_window::on_replay_section);
+    connect(this, &Visualization_window::replay_section, this,
+            &Visualization_window::on_replay_section);
     connect(this, &Visualization_window::start_visualization,
             video_window_.get(), &Video_window::on_action_play_triggered);
 
-    connect(this, &Visualization_window::find_similar, &similarity_finder_,
-            &ipme::wb::Similarity_finder::on_find_similar);
+    connect(this, &Visualization_window::find_similar, this,
+            &Visualization_window::on_find_similar);
 
     auto& box = ui->vrpn_filter_policy_combobox;
     box->addItems(QStringList{"Average", "First", "Middle", "Last"});
@@ -114,6 +114,9 @@ void Visualization_window::on_file_open_triggered()
 
     scene_modifier_->set_displays(scene_pb.config());
 
+    ui->video_progressbar->setRange(0, frames_.size());
+    ui->video_progressbar->setValue(0);
+
     frames_.load(scene_pb);
     apply_frames_filter();
     ui->end_frame_edit->setText(QString::number(scene_pb.frames().size()));
@@ -129,6 +132,7 @@ void Visualization_window::show_frame(int frame_index)
 
     frame_index_ = frames_.get_frame_id(frame_index);
     show_current_frame();
+    ui->video_progressbar->setValue(frame_index_);
 }
 
 void Visualization_window::make_axis(float x, float y, float z, float length,
@@ -455,5 +459,25 @@ void Visualization_window::on_action_start_viz_triggered()
     video_window_->show();
     video_window_->set_scene_visualization(shared_from_this());
 
-    emit start_visualization();
+    emit video_window_->play_video();
+}
+
+void Visualization_window::on_replay_section(size_t begin, size_t end)
+{
+    video_window_->replay_section(begin, end);
+}
+
+void Visualization_window::on_find_similar(size_t begin, size_t end)
+{
+    similarity_finder_.find_similar(begin, end);
+}
+
+void Visualization_window::on_action_stop_viz_triggered()
+{
+    emit video_window_->stop_video();
+}
+
+void Visualization_window::on_action_pause_viz_triggered()
+{
+    emit video_window_->pause_video();
 }
