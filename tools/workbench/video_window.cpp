@@ -101,7 +101,8 @@ void Video_window::load_video()
     frame_height_ = static_cast<int>(capture_.get(cv::CAP_PROP_FRAME_HEIGHT));
     ui->label_video->resize(frame_width_, frame_height_);
 
-    double fps = capture_.get(cv::CAP_PROP_FPS);
+    //    double fps = capture_.get(cv::CAP_PROP_FPS);
+    double fps = 24.0;
     INFO() << "FPS " << fps;
 
     int msec = static_cast<int>(1000.0 / fps);
