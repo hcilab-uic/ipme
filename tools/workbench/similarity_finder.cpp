@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <dlib/dnn.h>
 #include <random>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "utils/logger.h"
@@ -36,6 +37,7 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
     Label_vector y_train;
 
     std::unordered_set<size_t> training_set;
+    std::unordered_map<size_t, size_t> index_map;
 
     for(size_t i = range_begin; i < range_end; ++i) {
         training_set.insert(i);
@@ -77,12 +79,17 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
 
     // Collect all of the data not in the range to as prediction data
     Matrix_type x_predict;
+    size_t predict_running_count{0};
     for(size_t i = 0; i < range_begin; ++i) {
         x_predict.push_back(generate_row(frames_[i]));
+        index_map.emplace(predict_running_count, frames_[i].frame_id());
+        ++predict_running_count;
     }
 
     for(size_t i = range_end; i < frames_.size(); ++i) {
         x_predict.push_back(generate_row(frames_[i]));
+        index_map.emplace(predict_running_count, frames_[i].frame_id());
+        ++predict_running_count;
     }
     ///////////////////////// finish data setup ////////////////////////////////
 
@@ -148,17 +155,25 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
     DEBUG() << "embedded_size " << result_predict_size;
     DEBUG() << "distance_threshold " << distance_threshold;
 
-    size_t num_size_below{0};
-    for(size_t i = 0; i < result_predict_size; ++i) {
-        for(size_t j = 0; j < result_predict_size; ++j) {
-            auto diff = length(result_predict[i] - result_predict[j]);
-            if(diff < distance_threshold) {
-                ++num_size_below;
-            }
+    //    size_t num_size_below{0};
+    //    for(size_t i = 0; i < result_predict_size; ++i) {
+    //        for(size_t j = 0; j < result_predict_size; ++j) {
+    //            auto diff = length(result_predict[i] - result_predict[j]);
+    //            if(diff < distance_threshold) {
+    //                ++num_size_below;
+    //            }
+    //        }
+    //    }
+
+    //    DEBUG() << num_size_below << " results were below threshold";
+
+    std::vector<size_t> similar_frames;
+    for(size_t i = 0; i < result_predict.size(); ++i) {
+        if(length(result_train[0] - result_predict[i]) < distance_threshold) {
+            similar_frames.push_back(index_map[i]);
+            DEBUG() << "similar index " << index_map[i];
         }
     }
-
-    DEBUG() << num_size_below << " results were below threshold";
 }
 
 std::tuple<Similarity_finder::Matrix_type, Similarity_finder::Label_vector,
