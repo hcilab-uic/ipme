@@ -26,6 +26,7 @@
 
 #include <boost/tokenizer.hpp>
 
+#include <QDesktopWidget>
 #include <QDir>
 #include <QFileDialog>
 #include <QHBoxLayout>
@@ -56,9 +57,13 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
 {
     ui->setupUi(this);
 
-    ui->action_pitch_clockwise->setIcon(QIcon{":/icons/cw-x.png"});
+    setWindowTitle("Analysis");
 
-    setWindowTitle("Visualization Window");
+    // center myself
+    //    auto r = geometry();
+    //    r.moveCenter(QApplication::desktop()->availableGeometry().center());
+    //    setGeometry(r);
+
     make_axes();
 
     scene_modifier_ = std::make_unique<ipme::wb::Scene_modifier>(root_entity_);
@@ -104,13 +109,14 @@ Visualization_window::~Visualization_window()
 
 void Visualization_window::on_file_open_triggered()
 {
-    QString dir_path = QFileDialog::getExistingDirectory(
-        this, "tracking.pb", "/home/harish/ipme_experiments");
+    const QString pbfile = "tracking.pb";
+    QString dir_path =
+        QFileDialog::getExistingDirectory(this, pbfile, QDir::homePath());
     DEBUG() << dir_path.toStdString() << "\n";
 
     video_window_->set_dirpath(dir_path);
 
-    std::ifstream ifs{dir_path.toStdString() + "/tracking.pb"};
+    std::ifstream ifs{dir_path.toStdString() + "/" + pbfile.toStdString()};
 
     ipme::scene::Scene scene_pb;
     scene_pb.ParseFromIstream(&ifs);
@@ -233,7 +239,7 @@ void Visualization_window::init()
     h_layout->addWidget(container, 1);
     h_layout->addLayout(v_layout);
 
-    widget->setWindowTitle("Visualization Window");
+    widget->setWindowTitle("Analysis & Visualization");
 
     auto input = new Qt3DInput::QInputAspect;
     view_->registerAspect(input);
@@ -466,6 +472,7 @@ void Visualization_window::on_action_start_viz_triggered()
     video_window_->show();
     video_window_->set_scene_visualization(shared_from_this());
 
+    emit show_log("Playing video");
     emit video_window_->play_video();
 }
 
@@ -478,16 +485,20 @@ void Visualization_window::on_replay_section(size_t begin, size_t end)
 
 void Visualization_window::on_find_similar(size_t begin, size_t end)
 {
+    emit show_log("Finding similarity for ranges " + QString::number(begin) +
+                  " to " + QString::number(end));
     similarity_finder_.find_similar(begin, end);
 }
 
 void Visualization_window::on_action_stop_viz_triggered()
 {
+    emit show_log("Stopping video");
     emit video_window_->stop_video();
 }
 
 void Visualization_window::on_action_pause_viz_triggered()
 {
+    emit show_log("Pausing video");
     emit video_window_->pause_video();
 }
 
