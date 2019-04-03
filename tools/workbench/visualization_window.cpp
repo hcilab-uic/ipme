@@ -467,6 +467,26 @@ void Visualization_window::on_findsimilar_button_clicked()
     emit find_similar(start, end);
 }
 
+void Visualization_window::on_find_similar(size_t begin, size_t end)
+{
+    emit show_log("Finding similarity for ranges " + QString::number(begin) +
+                  " to " + QString::number(end));
+    similarity_finder_.find_similar(begin, end);
+
+    auto similar_ranges = similarity_finder_.similar_ranges();
+    std::stringstream ss;
+    ss << "Found similarity in " << similar_ranges.size() << " intervals";
+    INFO() << ss.str();
+    emit show_log(ss.str().c_str());
+
+    for(const auto& range : similar_ranges) {
+        std::stringstream range_ss;
+        range_ss << range.first << "-" << range.second;
+        INFO() << range_ss.str();
+        emit show_log(range_ss.str().c_str());
+    }
+}
+
 void Visualization_window::on_action_start_viz_triggered()
 {
     video_window_->show();
@@ -481,13 +501,6 @@ void Visualization_window::on_replay_section(size_t begin, size_t end)
     emit show_log("replaying frames " + QString::number(begin) + " to " +
                   QString::number(end));
     video_window_->replay_section(begin, end);
-}
-
-void Visualization_window::on_find_similar(size_t begin, size_t end)
-{
-    emit show_log("Finding similarity for ranges " + QString::number(begin) +
-                  " to " + QString::number(end));
-    similarity_finder_.find_similar(begin, end);
 }
 
 void Visualization_window::on_action_stop_viz_triggered()

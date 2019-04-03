@@ -100,25 +100,65 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
     trainer.set_learning_rate(0.1);
 
     DEBUG() << "beginning training";
-    while(trainer.get_learning_rate() >= 1e-4) {
+    for(size_t iteration_count = 0; trainer.get_learning_rate() >= 1e-4;
+        ++iteration_count) {
         trainer.train_one_step(x_train, y_train);
+
+        if(iteration_count % 1000 == 0) {
+            DEBUG() << iteration_count << " training iterations completed";
+        }
     }
 
-    DEBUG() << "waiting for training to finish";
+    //    DEBUG() << "training complete in " << iteration_count << "
+    //    iterations";
+    DEBUG() << "waiting for training threads to stop";
     trainer.get_net();
     DEBUG() << "finished training";
 
     // check training accuracy
-    const auto embedded = net(x_train);
-    for(const auto& e : embedded) {
-        DEBUG() << e;
+    const auto result_train = net(x_train);
+    //    for(const auto& e : result_train) {
+    //        DEBUG() << e;
+    //    }
+    const auto train_threshold = net.loss_details().get_distance_threshold();
+    size_t num_right{0};
+    for(size_t i = 0; i < y_train.size(); ++i) {
+        for(size_t j = 0; j < y_train.size(); ++j) {
+            auto diff = length(result_train[i] - result_train[j]);
+            if(y_train[i] == y_train[j]) {
+                if(diff < train_threshold) {
+                    ++num_right;
+                }
+            } else {
+                if(diff >= train_threshold) {
+                    ++num_right;
+                }
+            }
+        }
     }
-    //    auto embedded = net(x_predict);
-    //    const size_t embedded_size = embedded.size();
-    //    [[maybe_unused]] const auto distance_threshold =
-    //        net.loss_details().get_distance_threshold();
 
-    //    qDebug() << "embedded_size " << embedded_size;
+    double train_accuracy =
+        static_cast<double>(num_right) / (y_train.size() * y_train.size());
+    DEBUG() << "training accuracy " << train_accuracy * 100 << "%";
+
+    auto result_predict = net(x_predict);
+    const size_t result_predict_size = result_predict.size();
+    const auto distance_threshold = net.loss_details().get_distance_threshold();
+
+    DEBUG() << "embedded_size " << result_predict_size;
+    DEBUG() << "distance_threshold " << distance_threshold;
+
+    size_t num_size_below{0};
+    for(size_t i = 0; i < result_predict_size; ++i) {
+        for(size_t j = 0; j < result_predict_size; ++j) {
+            auto diff = length(result_predict[i] - result_predict[j]);
+            if(diff < distance_threshold) {
+                ++num_size_below;
+            }
+        }
+    }
+
+    DEBUG() << num_size_below << " results were below threshold";
 }
 
 std::tuple<Similarity_finder::Matrix_type, Similarity_finder::Label_vector,
