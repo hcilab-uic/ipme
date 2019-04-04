@@ -59,11 +59,6 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
 
     setWindowTitle("Analysis");
 
-    // center myself
-    //    auto r = geometry();
-    //    r.moveCenter(QApplication::desktop()->availableGeometry().center());
-    //    setGeometry(r);
-
     make_axes();
 
     scene_modifier_ = std::make_unique<ipme::wb::Scene_modifier>(root_entity_);

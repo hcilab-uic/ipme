@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>988</width>
+    <width>1141</width>
     <height>819</height>
    </rect>
   </property>
@@ -14,25 +14,20 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="central_widget">
-   <widget class="QWidget" name="verticalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>112</y>
-      <width>985</width>
-      <height>549</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="scene_vertical_layout"/>
-   </widget>
    <widget class="QGroupBox" name="settings_group_box">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>985</width>
-      <height>85</height>
+      <width>1141</width>
+      <height>109</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <property name="title">
      <string>Settings</string>
@@ -40,27 +35,24 @@
     <widget class="QWidget" name="gridLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>4</x>
+       <x>0</x>
        <y>24</y>
-       <width>1001</width>
-       <height>61</height>
+       <width>1141</width>
+       <height>85</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="settings_grid">
-      <item row="2" column="4">
-       <widget class="QComboBox" name="frame_policy_combobox"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="frame_index_label">
-        <property name="text">
-         <string>Frame Index</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="frame_range_label">
         <property name="text">
          <string>Frame Range</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QComboBox" name="vrpn_filter_policy_combobox">
+        <property name="currentText">
+         <string/>
         </property>
        </widget>
       </item>
@@ -71,12 +63,53 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="4">
+       <widget class="QComboBox" name="frame_policy_combobox"/>
+      </item>
       <item row="1" column="3">
        <widget class="QLabel" name="vrpn_filter_policy_label">
         <property name="text">
-         <string>VRPN Objects Filter Policy</string>
+         <string>Mocap Filter Policy</string>
         </property>
        </widget>
+      </item>
+      <item row="1" column="2">
+       <layout class="QHBoxLayout" name="frame_lcd_validity_layout">
+        <item>
+         <widget class="QLCDNumber" name="frame_index_lcd">
+          <property name="digitCount">
+           <number>28</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Flat</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="frame_validity_checkbox">
+          <property name="text">
+           <string>Validate Frames</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="save_all_frames_checkbox">
+          <property name="text">
+           <string>Save All Frames</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="overwrite_checkbox">
+          <property name="text">
+           <string>Overwrite Output</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item row="2" column="2">
        <layout class="QGridLayout" name="frame_range_grid">
@@ -140,7 +173,8 @@ font-weight: bold;</string>
           </property>
           <property name="styleSheet">
            <string notr="true">background: #666666;
-font-weight: bold;</string>
+font-weight: bold;
+padding: 0px 5px 0px 0px;</string>
           </property>
           <property name="text">
            <string>0</string>
@@ -158,6 +192,11 @@ font-weight: bold;</string>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="styleSheet">
+           <string notr="true">background: #666;
+font-weight: bold;
+padding: 0px 5px 0px 0px;</string>
+          </property>
           <property name="text">
            <string>0</string>
           </property>
@@ -169,7 +208,7 @@ font-weight: bold;</string>
         <item row="0" column="2">
          <widget class="QProgressBar" name="video_progressbar">
           <property name="maximum">
-           <number>100</number>
+           <number>1000</number>
           </property>
           <property name="value">
            <number>0</number>
@@ -178,109 +217,130 @@ font-weight: bold;</string>
         </item>
        </layout>
       </item>
-      <item row="1" column="4">
-       <widget class="QComboBox" name="vrpn_filter_policy_combobox">
-        <property name="currentText">
-         <string/>
+      <item row="1" column="0">
+       <widget class="QLabel" name="frame_index_label">
+        <property name="text">
+         <string>Frame Index</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <layout class="QHBoxLayout" name="frame_lcd_validity_layout">
-        <item>
-         <widget class="QLCDNumber" name="frame_index_lcd">
-          <property name="digitCount">
-           <number>28</number>
-          </property>
-          <property name="segmentStyle">
-           <enum>QLCDNumber::Flat</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="frame_validity_checkbox">
-          <property name="text">
-           <string>Validate Frames</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="save_all_frames_checkbox">
-          <property name="text">
-           <string>Save All Frames</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="overwrite_checkbox">
-          <property name="text">
-           <string>Overwrite Output</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <item row="3" column="0">
+       <widget class="QLabel" name="position_label">
+        <property name="text">
+         <string>Position</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" colspan="3">
+       <widget class="QSlider" name="progress_slider">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>5</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="invertedAppearance">
+         <bool>false</bool>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::TicksBothSides</enum>
+        </property>
+        <property name="tickInterval">
+         <number>1</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
    </widget>
-   <widget class="QSlider" name="progress_slider">
+   <widget class="QSplitter" name="main_splitter">
     <property name="geometry">
      <rect>
-      <x>4</x>
-      <y>88</y>
-      <width>973</width>
-      <height>21</height>
+      <x>-4</x>
+      <y>112</y>
+      <width>1149</width>
+      <height>621</height>
      </rect>
     </property>
     <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+     <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
       <horstretch>0</horstretch>
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
-    <property name="minimumSize">
-     <size>
-      <width>0</width>
-      <height>5</height>
-     </size>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
     <property name="orientation">
-     <enum>Qt::Horizontal</enum>
+     <enum>Qt::Vertical</enum>
     </property>
-    <property name="invertedAppearance">
-     <bool>false</bool>
-    </property>
-    <property name="tickPosition">
-     <enum>QSlider::TicksBothSides</enum>
-    </property>
-    <property name="tickInterval">
-     <number>1</number>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="log_window">
-    <property name="geometry">
-     <rect>
-      <x>4</x>
-      <y>664</y>
-      <width>981</width>
-      <height>70</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
+    <widget class="QSplitter" name="viz_vid_splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <layout class="QVBoxLayout" name="scene_vertical_layout"/>
+     </widget>
+    </widget>
+    <widget class="QTextEdit" name="log_window">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="baseSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background: #999;
+font-weight: bold;
+padding: 10px 25px 10px 25px;
+</string>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menu_bar">
@@ -288,7 +348,7 @@ font-weight: bold;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>988</width>
+     <width>1141</width>
      <height>21</height>
     </rect>
    </property>
