@@ -30,6 +30,11 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
 
     int span = range_end - range_begin + 1;
 
+    if(span < 0) {
+        ERROR() << "Invalid range [" << range_begin << "," << range_end << ")";
+        return;
+    }
+
     static constexpr size_t label_similar = 1;
     static constexpr size_t label_different = 2;
 
@@ -73,8 +78,8 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
 
         ++count;
 
-        DEBUG() << "number of different labels added " << count
-                << " (span=" << span << ")";
+        //        DEBUG() << "number of different labels added " << count
+        //                << " (span=" << span << ")";
     }
 
     // Collect all of the data not in the range to as prediction data
@@ -111,7 +116,7 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
         ++iteration_count) {
         trainer.train_one_step(x_train, y_train);
 
-        if(iteration_count % 1000 == 0) {
+        if(iteration_count % 1000 == 0 && iteration_count > 0) {
             DEBUG() << iteration_count << " training iterations completed";
         }
     }
@@ -155,32 +160,39 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
     DEBUG() << "embedded_size " << result_predict_size;
     DEBUG() << "distance_threshold " << distance_threshold;
 
-    size_t temp_begin{0};
-    size_t temp_end{0};
+    static constexpr int inf = std::numeric_limits<int>::infinity();
+    int chain_begin{inf};
+    int chain_next{0};
+
+    //    std::vector<int> collected;
     for(size_t i = 0; i < result_predict.size(); ++i) {
         bool similar = true;
-        for(size_t j = 0; j < 10; ++j) {
-            if(length(result_train[j] - result_predict[i]) >=
-               distance_threshold) {
+        double difference{0.0};
+        for(size_t j = 0; j < static_cast<size_t>(span); ++j) {
+            difference = length(result_train[j] - result_predict[i]);
+            if(difference >= distance_threshold) {
                 similar = false;
                 break;
             }
         }
 
         if(!similar) {
+            DEBUG() << "difference " << difference << " greater than threshold "
+                    << distance_threshold << ", not including index " << i
+                    << "(frame: " << index_map[i] << ")";
+
             continue;
         }
 
-        auto frame_id = index_map[i];
-
-        if((temp_end + 1) != frame_id) {
-            if(static_cast<int>(temp_end - temp_begin) > 30) {
-                similar_ranges_.emplace_back(temp_begin, temp_end);
-                temp_begin = frame_id;
+        int frame_id = static_cast<int>(index_map[i]);
+        if(frame_id - chain_next > 5) {
+            if((chain_next - chain_begin) > 15) {
+                similar_ranges_.emplace_back(chain_begin, chain_next);
             }
+            chain_begin = frame_id;
         }
 
-        temp_end = frame_id;
+        chain_next = frame_id;
     }
 }
 

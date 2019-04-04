@@ -115,7 +115,7 @@ void Video_window::process_video()
 {
     if(capture_.isOpened() &&
        ((mode_ == Mode::play) ||
-        (mode_ == Mode::replay && frame_index_ < replay_end_frame_))) {
+        (mode_ == Mode::replay && frame_index_ <= replay_end_frame_))) {
 
         cv::Mat frame;
         capture_ >> frame;

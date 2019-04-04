@@ -384,7 +384,6 @@ void Visualization_window::on_save_outcome_button_clicked()
     size_t count_frames_saved{0};
     const bool validate_frame = ui->frame_validity_checkbox->isChecked();
     for(size_t i = begin; i < end; ++i) {
-        //        const auto frame = filter(frames_[i]);
         const auto& frame = frames_[i];
         if(validate_frame && !frame.has_all_registered_ids()) {
             WARN() << "Frame " << i << " invalid, skipping";
@@ -456,10 +455,12 @@ void Visualization_window::on_replay_button_clicked()
 
 void Visualization_window::on_findsimilar_button_clicked()
 {
-    auto start = ui->start_frame_edit->text().toULong();
+    auto begin = ui->start_frame_edit->text().toULong();
     auto end = ui->end_frame_edit->text().toULong();
 
-    emit find_similar(start, end);
+    emit show_log("finding sections similar to frame range" +
+                  QString::number(begin) + "-" + QString::number(end));
+    emit find_similar(begin, end);
 }
 
 void Visualization_window::on_find_similar(size_t begin, size_t end)
@@ -523,5 +524,7 @@ void Visualization_window::on_progress_slider_sliderMoved(int position)
 
 void Visualization_window::on_show_log(const QString& msg)
 {
-    ui->log_window->append(msg);
+    auto full_message =
+        QString("[") + QTime::currentTime().toString() + QString("] ") + msg;
+    ui->log_window->append(full_msg);
 }
