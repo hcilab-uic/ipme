@@ -305,7 +305,7 @@ padding: 0px 5px 0px 0px;</string>
     </widget>
     <widget class="QTextEdit" name="log_window">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -332,9 +332,9 @@ padding: 0px 5px 0px 0px;</string>
       <bool>true</bool>
      </property>
      <property name="styleSheet">
-      <string notr="true">background: #999;
+      <string notr="true">background: #bcd;
 font-weight: bold;
-padding: 10px 25px 10px 25px;
+padding: 5px 25px 5px 25px;
 </string>
      </property>
      <property name="readOnly">
