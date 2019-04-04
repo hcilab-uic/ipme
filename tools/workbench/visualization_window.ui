@@ -332,9 +332,8 @@ padding: 0px 5px 0px 0px;</string>
       <bool>true</bool>
      </property>
      <property name="styleSheet">
-      <string notr="true">background: #bcd;
-font-weight: bold;
-padding: 5px 25px 5px 25px;
+      <string notr="true">background: #ccc;
+padding: 3px;
 </string>
      </property>
      <property name="readOnly">

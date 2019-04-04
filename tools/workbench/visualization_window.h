@@ -93,6 +93,8 @@ private slots:
 
     void on_show_log(const QString& msg);
 
+    void on_show_similar_ranges(const std::vector<std::pair<int, int>>& ranges);
+
 signals:
     void current_frame_number(int);
 
@@ -105,6 +107,8 @@ signals:
     void set_video_frame_index(size_t index);
 
     void show_log(const QString& msg);
+
+    void show_similar_ranges(const std::vector<std::pair<int, int>>& ranges);
 
 private:
     void make_axes();

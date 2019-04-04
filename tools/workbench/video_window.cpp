@@ -62,7 +62,8 @@ void Video_window::set_scene_visualization(
 
 void Video_window::replay_section(size_t begin_frame, size_t end_frame)
 {
-    replay_end_frame_ = end_frame;
+    DEBUG() << "replaying section " << begin_frame << "-" << end_frame;
+    replay_end_frame_ = end_frame + 1;
     mode_ = Mode::replay;
     play_video_ = false;
     frame_index_ = begin_frame;

@@ -77,6 +77,8 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
             &Visualization_window::on_find_similar);
     connect(this, &Visualization_window::show_log, this,
             &Visualization_window::on_show_log);
+    connect(this, &Visualization_window::show_similar_ranges, this,
+            &Visualization_window::on_show_similar_ranges);
 
     auto& box = ui->vrpn_filter_policy_combobox;
     box->addItems(QStringList{"Average", "First", "Middle", "Last"});
@@ -457,30 +459,16 @@ void Visualization_window::on_findsimilar_button_clicked()
 {
     auto begin = ui->start_frame_edit->text().toULong();
     auto end = ui->end_frame_edit->text().toULong();
-
-    emit show_log("finding sections similar to frame range" +
-                  QString::number(begin) + "-" + QString::number(end));
     emit find_similar(begin, end);
 }
 
 void Visualization_window::on_find_similar(size_t begin, size_t end)
 {
-    emit show_log("Finding similarity for ranges " + QString::number(begin) +
-                  " to " + QString::number(end));
+    emit show_log("Finding similarity for frame range " +
+                  QString::number(begin) + " to " + QString::number(end));
     similarity_finder_.find_similar(begin, end);
-
     auto similar_ranges = similarity_finder_.similar_ranges();
-    std::stringstream ss;
-    ss << "Found similarity in " << similar_ranges.size() << " intervals";
-    INFO() << ss.str();
-    emit show_log(ss.str().c_str());
-
-    for(const auto& range : similar_ranges) {
-        std::stringstream range_ss;
-        range_ss << range.first << "-" << range.second;
-        INFO() << range_ss.str();
-        emit show_log(range_ss.str().c_str());
-    }
+    emit show_similar_ranges(similar_ranges);
 }
 
 void Visualization_window::on_action_start_viz_triggered()
@@ -524,7 +512,29 @@ void Visualization_window::on_progress_slider_sliderMoved(int position)
 
 void Visualization_window::on_show_log(const QString& msg)
 {
-    auto full_message =
+    auto full_msg =
         QString("[") + QTime::currentTime().toString() + QString("] ") + msg;
     ui->log_window->append(full_msg);
+}
+
+void Visualization_window::on_show_similar_ranges(
+    const std::vector<std::pair<int, int>>& ranges)
+{
+    std::stringstream ss;
+    ss << "Found similarity in " << ranges.size() << " intervals";
+    INFO() << ss.str();
+    emit show_log(ss.str().c_str());
+
+    for(const auto& range : ranges) {
+        std::stringstream range_ss;
+        range_ss << range.first << "-" << range.second;
+        INFO() << range_ss.str();
+        emit show_log(range_ss.str().c_str());
+    }
+
+    QLabel* label = new QLabel;
+    label->setGeometry(0, ui->progress_slider->y(), 15, 50);
+    label->setStyleSheet("background: #ff0000;");
+    label->setParent(ui->progress_slider);
+    label->show();
 }
