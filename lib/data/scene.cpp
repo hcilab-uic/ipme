@@ -166,16 +166,42 @@ void Scene::reset()
     scene_.clear_frames();
 }
 
-void Scene::write(std::shared_ptr<Scene> scene,
-                  const std::filesystem::path& output_path)
+// void Scene::write(std::shared_ptr<Scene> scene,
+//                  const std::filesystem::path& output_path)
+//{
+//    auto dirname = output_path.parent_path();
+//    std::filesystem::create_directories(dirname);
+
+//    std::ofstream ofs{output_path,
+//                      std::ios::out | std::ios::trunc | std::ios::binary};
+
+//    DEBUG() << "Trying to write " << scene->scene_.ByteSize() << " bytes to "
+//            << output_path;
+
+//    if(ofs.is_open()) {
+//        DEBUG() << "Opened stream to " << output_path;
+//    } else {
+//        ERROR() << "Could not open stream to " << output_path;
+//    }
+
+//    if(scene->scene_.SerializeToOstream(&ofs)) {
+//        INFO() << "Wrote output to " << output_path;
+//    } else {
+//        WARN() << "Could not write " << output_path;
+//    }
+//}
+
+void Scene::write(const std::filesystem::path& output_path)
 {
     auto dirname = output_path.parent_path();
+
+    TRACE() << "creating directory " << dirname;
     std::filesystem::create_directories(dirname);
 
     std::ofstream ofs{output_path,
                       std::ios::out | std::ios::trunc | std::ios::binary};
 
-    DEBUG() << "Trying to write " << scene->scene_.ByteSize() << " bytes to "
+    DEBUG() << "Trying to write " << scene_.ByteSize() << " bytes to "
             << output_path;
 
     if(ofs.is_open()) {
@@ -184,7 +210,7 @@ void Scene::write(std::shared_ptr<Scene> scene,
         ERROR() << "Could not open stream to " << output_path;
     }
 
-    if(scene->scene_.SerializeToOstream(&ofs)) {
+    if(scene_.SerializeToOstream(&ofs)) {
         INFO() << "Wrote output to " << output_path;
     } else {
         WARN() << "Could not write " << output_path;
@@ -214,6 +240,11 @@ Scene Scene::load(std::ifstream& ifs)
 
 void Scene::finalize()
 {
+    if(scene_.frames().size() == 0) {
+        DEBUG() << "no frames to save";
+        return;
+    }
+
     save();
 }
 

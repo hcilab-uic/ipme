@@ -57,7 +57,8 @@ public:
     inline void save()
     {
         try {
-            write(shared_from_this(), output_path_);
+            //            write(shared_from_this(), output_path_);
+            write(output_path_);
         } catch(const std::exception& ex) {
             ERROR() << "Could not complete saving the file: " << ex.what();
         }
@@ -69,11 +70,12 @@ public:
     /*!
      * \brief write static convenience function that takes a scene object and an
      * output path and writes the scene to the file
-     * \param scene the @c scene object to write
+//     * \param scene the @c scene object to write
      * \param output_path the file path to write the scene to
      */
-    static void write(std::shared_ptr<Scene> scene,
-                      const std::filesystem::path& output_path);
+    //    static void write(std::shared_ptr<Scene> scene,
+    //                      const std::filesystem::path& output_path);
+    void write(const std::filesystem::path& output_path);
 
     static Display_map build_display_map(const ipme::scene::Scene& scene);
 

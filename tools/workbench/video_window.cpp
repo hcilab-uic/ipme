@@ -22,6 +22,7 @@
 #include "ui_video_window.h"
 
 #include "utils/logger.h"
+#include "visualization_window.h"
 
 #include "opencv2/videoio.hpp"
 
@@ -32,10 +33,18 @@ Video_window::Video_window(QWidget* parent)
     ui->setupUi(this);
 
     connect(video_timer_, &QTimer::timeout, this, &Video_window::process_video);
+    connect(this, &Video_window::play_video, this,
+            &Video_window::on_action_play_triggered);
+    connect(this, &Video_window::pause_video, this,
+            &Video_window::on_action_pause_triggered);
+    connect(this, &Video_window::stop_video, this,
+            &Video_window::on_action_stop_triggered);
 }
 
 Video_window::~Video_window()
 {
+    mode_ = Mode::stop;
+
     delete ui;
 }
 
@@ -51,32 +60,37 @@ void Video_window::set_scene_visualization(
     scene_handle_ = handle;
 }
 
-void Video_window::on_replay_section(size_t begin_frame, size_t end_frame)
+void Video_window::replay_section(size_t begin_frame, size_t end_frame)
 {
     replay_end_frame_ = end_frame;
     mode_ = Mode::replay;
     play_video_ = false;
     frame_index_ = begin_frame;
     capture_.set(cv::CAP_PROP_POS_FRAMES, begin_frame);
-    //    play_video_ = true;
 }
 
 void Video_window::on_action_play_triggered()
 {
     mode_ = Mode::play;
-    //    play_video_ = true;
+}
+
+void Video_window::on_set_video_frame(size_t frame_index)
+{
+    auto temp_mode = mode_;
+    mode_ = Mode::pause;
+    frame_index_ = frame_index;
+    capture_.set(cv::CAP_PROP_POS_FRAMES, frame_index);
+    mode_ = temp_mode;
 }
 
 void Video_window::on_action_pause_triggered()
 {
     mode_ = Mode::pause;
-    //    play_video_ = false;
 }
 
 void Video_window::on_action_stop_triggered()
 {
     mode_ = Mode::stop;
-    //    play_video_ = false;
 }
 
 void Video_window::load_video()
@@ -87,7 +101,8 @@ void Video_window::load_video()
     frame_height_ = static_cast<int>(capture_.get(cv::CAP_PROP_FRAME_HEIGHT));
     ui->label_video->resize(frame_width_, frame_height_);
 
-    double fps = capture_.get(cv::CAP_PROP_FPS);
+    //    double fps = capture_.get(cv::CAP_PROP_FPS);
+    double fps = 24.0;
     INFO() << "FPS " << fps;
 
     int msec = static_cast<int>(1000.0 / fps);

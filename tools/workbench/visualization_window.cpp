@@ -26,6 +26,7 @@
 
 #include <boost/tokenizer.hpp>
 
+#include <QDesktopWidget>
 #include <QDir>
 #include <QFileDialog>
 #include <QHBoxLayout>
@@ -40,6 +41,7 @@
 #include "data/scene.h"
 #include "protobuf/scene.pb.h"
 #include "scene_modifier.h"
+#include "similarity_finder.h"
 #include "utils/json.h"
 #include "utils/logger.h"
 #include "utils/string_utils.h"
@@ -55,17 +57,31 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
 {
     ui->setupUi(this);
 
-    ui->action_pitch_clockwise->setIcon(QIcon{":/icons/cw-x.png"});
+    setWindowTitle("Analysis");
 
-    setWindowTitle("Visualization Window");
+    // center myself
+    //    auto r = geometry();
+    //    r.moveCenter(QApplication::desktop()->availableGeometry().center());
+    //    setGeometry(r);
+
     make_axes();
 
     scene_modifier_ = std::make_unique<ipme::wb::Scene_modifier>(root_entity_);
 
     connect(this, &Visualization_window::current_frame_number, this,
             &Visualization_window::display_frame_number);
-    connect(this, &Visualization_window::replay_section, video_window_.get(),
-            &Video_window::on_replay_section);
+    connect(this, &Visualization_window::replay_section, this,
+            &Visualization_window::on_replay_section);
+    connect(this, &Visualization_window::start_visualization,
+            video_window_.get(), &Video_window::on_action_play_triggered);
+
+    connect(this, &Visualization_window::set_video_frame_index,
+            video_window_.get(), &Video_window::on_set_video_frame);
+
+    connect(this, &Visualization_window::find_similar, this,
+            &Visualization_window::on_find_similar);
+    connect(this, &Visualization_window::show_log, this,
+            &Visualization_window::on_show_log);
 
     auto& box = ui->vrpn_filter_policy_combobox;
     box->addItems(QStringList{"Average", "First", "Middle", "Last"});
@@ -73,8 +89,6 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
     for(const auto& policy : ipme::wb::Frame::policy_map.left) {
         ui->frame_policy_combobox->addItem(policy.second.c_str());
     }
-
-    ui->viz_progress_bar->setMinimum(0);
 
     init();
 }
@@ -95,13 +109,14 @@ Visualization_window::~Visualization_window()
 
 void Visualization_window::on_file_open_triggered()
 {
-    QString dir_path = QFileDialog::getExistingDirectory(
-        this, "tracking.pb", "/home/harish/ipme_experiments");
+    const QString pbfile = "tracking.pb";
+    QString dir_path =
+        QFileDialog::getExistingDirectory(this, pbfile, QDir::homePath());
     DEBUG() << dir_path.toStdString() << "\n";
 
     video_window_->set_dirpath(dir_path);
 
-    std::ifstream ifs{dir_path.toStdString() + "/tracking.pb"};
+    std::ifstream ifs{dir_path.toStdString() + "/" + pbfile.toStdString()};
 
     ipme::scene::Scene scene_pb;
     scene_pb.ParseFromIstream(&ifs);
@@ -224,7 +239,7 @@ void Visualization_window::init()
     h_layout->addWidget(container, 1);
     h_layout->addLayout(v_layout);
 
-    widget->setWindowTitle("Visualization Window");
+    widget->setWindowTitle("Analysis & Visualization");
 
     auto input = new Qt3DInput::QInputAspect;
     view_->registerAspect(input);
@@ -260,6 +275,14 @@ void Visualization_window::show_current_frame()
         scene_modifier_->add_screen();
         scene_modifier_->add_frame(frames_[frame_index_ - 1]);
 
+        int percent = static_cast<int>(static_cast<double>(frame_index_) * 100 /
+                                       static_cast<double>(frames_.size()));
+
+        ui->video_progressbar->setValue(percent);
+        ui->progress_slider->setValue(percent);
+
+        DEBUG() << "frame number " << frame_index_ << "/" << frames_.size()
+                << " (" << percent << " percent)";
         emit current_frame_number(frame_index_);
     }
 }
@@ -438,4 +461,72 @@ void Visualization_window::on_replay_button_clicked()
 
 void Visualization_window::on_findsimilar_button_clicked()
 {
+    auto start = ui->start_frame_edit->text().toULong();
+    auto end = ui->end_frame_edit->text().toULong();
+
+    emit find_similar(start, end);
+}
+
+void Visualization_window::on_find_similar(size_t begin, size_t end)
+{
+    emit show_log("Finding similarity for ranges " + QString::number(begin) +
+                  " to " + QString::number(end));
+    similarity_finder_.find_similar(begin, end);
+
+    auto similar_ranges = similarity_finder_.similar_ranges();
+    std::stringstream ss;
+    ss << "Found similarity in " << similar_ranges.size() << " intervals";
+    INFO() << ss.str();
+    emit show_log(ss.str().c_str());
+
+    for(const auto& range : similar_ranges) {
+        std::stringstream range_ss;
+        range_ss << range.first << "-" << range.second;
+        INFO() << range_ss.str();
+        emit show_log(range_ss.str().c_str());
+    }
+}
+
+void Visualization_window::on_action_start_viz_triggered()
+{
+    video_window_->show();
+    video_window_->set_scene_visualization(shared_from_this());
+
+    emit show_log("Playing video");
+    emit video_window_->play_video();
+}
+
+void Visualization_window::on_replay_section(size_t begin, size_t end)
+{
+    emit show_log("replaying frames " + QString::number(begin) + " to " +
+                  QString::number(end));
+    video_window_->replay_section(begin, end);
+}
+
+void Visualization_window::on_action_stop_viz_triggered()
+{
+    emit show_log("Stopping video");
+    emit video_window_->stop_video();
+}
+
+void Visualization_window::on_action_pause_viz_triggered()
+{
+    emit show_log("Pausing video");
+    emit video_window_->pause_video();
+}
+
+void Visualization_window::on_progress_slider_sliderMoved(int position)
+{
+    DEBUG() << "slider moved to position " << position;
+    frame_index_ = static_cast<size_t>(
+        static_cast<double>(position * frames_.size()) / 100.0);
+    ui->start_frame_edit->setText(QString::number(frame_index_));
+    ui->end_frame_edit->setText(QString::number(frame_index_));
+
+    emit set_video_frame_index(frame_index_);
+}
+
+void Visualization_window::on_show_log(const QString& msg)
+{
+    ui->log_window->append(msg);
 }

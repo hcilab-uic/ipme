@@ -43,7 +43,8 @@ int main(int argc, char* argv[])
         ("log-prefix,l", po::value(&logfile_prefix), "log file prefix")
         ("config,c", po::value(&config_path)->default_value("config.json"),
          "path to config file")
-        ("screen,s", po::value(&screen_number), "screen to launch the app on")
+        ("screen,s", po::value(&screen_number)->default_value(0),
+         "screen to launch the app on")
     ;
     // clang-format on
 

@@ -6,6 +6,11 @@
 
 #include "dlib/dnn.h"
 
+using Input_matrix = std::vector<dlib::matrix<double, 0, 1>>;
+using Label_vector = std::vector<unsigned long>;
+
+std::pair<Input_matrix, Label_vector> generate_input();
+
 int main() try {
     using namespace dlib;
 
@@ -14,32 +19,8 @@ int main() try {
     // labeled objects.  So here we create our dataset.  We make up some simple
     // vectors and label them with the integers 1,2,3,4.  The specific values of
     // the integer labels don't matter.
-    std::vector<dlib::matrix<double, 0, 1>> samples;
-    std::vector<unsigned long> labels;
 
-    // class 1 training vectors
-    samples.push_back({1, 0, 0, 0, 0, 0, 0, 0});
-    labels.push_back(1);
-    samples.push_back({0, 1, 0, 0, 0, 0, 0, 0});
-    labels.push_back(1);
-
-    // class 2 training vectors
-    samples.push_back({0, 0, 1, 0, 0, 0, 0, 0});
-    labels.push_back(2);
-    samples.push_back({0, 0, 0, 1, 0, 0, 0, 0});
-    labels.push_back(2);
-
-    // class 3 training vectors
-    samples.push_back({0, 0, 0, 0, 1, 0, 0, 0});
-    labels.push_back(3);
-    samples.push_back({0, 0, 0, 0, 0, 1, 0, 0});
-    labels.push_back(3);
-
-    // class 4 training vectors
-    samples.push_back({0, 0, 0, 0, 0, 0, 1, 0});
-    labels.push_back(4);
-    samples.push_back({0, 0, 0, 0, 0, 0, 0, 1});
-    labels.push_back(4);
+    auto[samples, labels] = generate_input();
 
     // Make a network that simply learns a linear mapping from 8D vectors to 2D
     // vectors.
@@ -54,8 +35,9 @@ int main() try {
     // that should be close as well as pairs of objects that should be far apart
     // during each training step.  Here we just keep training on the same small
     // batch so this constraint is trivially satisfied.
-    while(trainer.get_learning_rate() >= 1e-4)
+    while(trainer.get_learning_rate() >= 1e-4) {
         trainer.train_one_step(samples, labels);
+    }
 
     // Wait for training threads to stop
     trainer.get_net();
@@ -83,16 +65,18 @@ int main() try {
                 // distance from each other.  So we can use that distance value
                 // as our testing threshold for "being near to each other".
                 if(length(embedded[i] - embedded[j]) <
-                   net.loss_details().get_distance_threshold())
+                   net.loss_details().get_distance_threshold()) {
                     ++num_right;
-                else
+                } else {
                     ++num_wrong;
+                }
             } else {
                 if(length(embedded[i] - embedded[j]) >=
-                   net.loss_details().get_distance_threshold())
+                   net.loss_details().get_distance_threshold()) {
                     ++num_right;
-                else
+                } else {
                     ++num_wrong;
+                }
             }
         }
     }
@@ -101,4 +85,36 @@ int main() try {
     std::cout << "num_wrong: " << num_wrong << std::endl;
 } catch(std::exception& e) {
     std::cerr << e.what() << std::endl;
+}
+
+///////////////////////////////// Implementations //////////////////////////////
+std::pair<Input_matrix, Label_vector> generate_input()
+{
+    Input_matrix samples;
+    Label_vector labels;
+    // class 1 training vectors
+    samples.push_back({1, 0, 0, 0, 0, 0, 0, 0});
+    labels.push_back(1);
+    samples.push_back({0, 1, 0, 0, 0, 0, 0, 0});
+    labels.push_back(1);
+
+    // class 2 training vectors
+    samples.push_back({0, 0, 1, 0, 0, 0, 0, 0});
+    labels.push_back(2);
+    samples.push_back({0, 0, 0, 1, 0, 0, 0, 0});
+    labels.push_back(2);
+
+    // class 3 training vectors
+    samples.push_back({0, 0, 0, 0, 1, 0, 0, 0});
+    labels.push_back(3);
+    samples.push_back({0, 0, 0, 0, 0, 1, 0, 0});
+    labels.push_back(3);
+
+    // class 4 training vectors
+    samples.push_back({0, 0, 0, 0, 0, 0, 1, 0});
+    labels.push_back(4);
+    samples.push_back({0, 0, 0, 0, 0, 0, 0, 1});
+    labels.push_back(4);
+
+    return {samples, labels};
 }

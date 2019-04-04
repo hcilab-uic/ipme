@@ -35,6 +35,7 @@
 #include "protobuf/scene.pb.h"
 #include "scene_modifier.h"
 #include "scene_visualization.h"
+#include "similarity_finder.h"
 #include "video_window.h"
 
 namespace Ui {
@@ -78,10 +79,32 @@ private slots:
 
     void on_findsimilar_button_clicked();
 
+    void on_action_start_viz_triggered();
+
+    void on_replay_section(size_t begin, size_t end);
+
+    void on_find_similar(size_t begin, size_t end);
+
+    void on_action_stop_viz_triggered();
+
+    void on_action_pause_viz_triggered();
+
+    void on_progress_slider_sliderMoved(int position);
+
+    void on_show_log(const QString& msg);
+
 signals:
     void current_frame_number(int);
 
     void replay_section(size_t begin_frame, size_t end_frame);
+
+    void find_similar(size_t begin_frame, size_t end_frame);
+
+    void start_visualization();
+
+    void set_video_frame_index(size_t index);
+
+    void show_log(const QString& msg);
 
 private:
     void make_axes();
@@ -108,6 +131,7 @@ private:
     ipme::wb::Frame_collection frames_;
     std::unordered_map<std::string, int> outcome_labels_;
     ipme::wb::Config config_;
+    ipme::wb::Similarity_finder similarity_finder_{frames_};
 };
 
 #endif // VISUALIZATION_WINDOW_H

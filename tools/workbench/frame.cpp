@@ -127,9 +127,9 @@ Frame Frame::create_from_pb(
             screen_object.size().height()});
     }
 
-    INFO() << "Loaded " << people_count << " people and " << device_count
-           << " devices " << scene_frame.screen_objects().size()
-           << " screen objects";
+    TRACE() << "Loaded " << people_count << " people and " << device_count
+            << " devices " << scene_frame.screen_objects().size()
+            << " screen objects";
 
     bool found{true};
     for(const auto& ro : registered_objects) {
@@ -214,7 +214,7 @@ Screen_object::Screen_object(const ipme::scene::Position& position,
     mutable_position->set_y(-(rotated.y() * scale_factor) + offset.y());
     mutable_position->set_z((rotated.z() * scale_factor) + offset.z());
 
-    DEBUG() << "quaternion for display_id " << config.display_id() << " ["
+    TRACE() << "quaternion for display_id " << config.display_id() << " ["
             << q.scalar() << "," << q.x() << "," << q.y() << "," << q.z()
             << "]";
 

@@ -56,11 +56,20 @@ public:
     void set_scene_visualization(
         std::shared_ptr<ipme::wb::Scene_visualization> handle);
 
+    void replay_section(size_t begin_frame, size_t end_frame);
+
+signals:
+    void play_video();
+    void pause_video();
+    void stop_video();
+
 public slots:
-    void on_replay_section(size_t begin_frame, size_t end_frame);
+
+    void on_action_play_triggered();
+
+    void on_set_video_frame(size_t frame_index);
 
 private slots:
-    void on_action_play_triggered();
 
     void on_action_pause_triggered();
 
