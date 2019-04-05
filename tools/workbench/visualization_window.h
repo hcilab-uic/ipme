@@ -21,11 +21,13 @@
 #ifndef VISUALIZATION_WINDOW_H
 #define VISUALIZATION_WINDOW_H
 
+#include <array>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
 #include <QMainWindow>
+#include <QTableView>
 #include <QVector3D>
 #include <Qt3DExtras/Qt3DWindow>
 
@@ -35,6 +37,7 @@
 #include "protobuf/scene.pb.h"
 #include "scene_modifier.h"
 #include "scene_visualization.h"
+#include "similar_ranges_table.h"
 #include "similarity_finder.h"
 #include "video_window.h"
 
@@ -93,6 +96,10 @@ private slots:
 
     void on_show_log(const QString& msg);
 
+    void on_show_similar_ranges(const std::vector<std::pair<int, int>>& ranges);
+
+    void on_similarity_table_clicked(const QModelIndex& index);
+
 signals:
     void current_frame_number(int);
 
@@ -105,6 +112,8 @@ signals:
     void set_video_frame_index(size_t index);
 
     void show_log(const QString& msg);
+
+    void show_similar_ranges(const std::vector<std::pair<int, int>>& ranges);
 
 private:
     void make_axes();
@@ -121,17 +130,16 @@ private:
     int64_t frame_index_{0};
     Ui::Visualization_window* ui;
     Qt3DCore::QEntity* root_entity_ = nullptr;
-    //    Qt3DExtras::Qt3DWindow* view_ = nullptr;
     std::shared_ptr<Qt3DExtras::Qt3DWindow> view_;
     std::unique_ptr<ipme::wb::Scene_modifier> scene_modifier_;
-    //    std::vector<ipme::wb::Frame> frames_;
     std::shared_ptr<Video_window> video_window_;
-    //    std::unordered_map<uint32_t, size_t> frame_index_map_;
     QString labeled_file_path_;
     ipme::wb::Frame_collection frames_;
     std::unordered_map<std::string, int> outcome_labels_;
     ipme::wb::Config config_;
-    ipme::wb::Similarity_finder similarity_finder_{frames_};
+    std::shared_ptr<ipme::wb::Similarity_finder> similarity_finder_{nullptr};
+    ipme::wb::Similar_ranges_table* ranges_table_;
+    QTableView* similarity_table_;
 };
 
 #endif // VISUALIZATION_WINDOW_H

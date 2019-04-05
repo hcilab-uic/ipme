@@ -52,6 +52,7 @@ set(SOURCES
     scene_widget.cpp
     scene_modifier.cpp
     sensor_manager.cpp
+    similar_ranges_table.cpp
 
     color.h
     frame_model.h

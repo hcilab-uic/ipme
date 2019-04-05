@@ -14,7 +14,7 @@ public:
     using Row_type = dlib::matrix<double, 1, 1>;
     using Matrix_type = std::vector<Row_type>;
     using Label_vector = std::vector<unsigned long>;
-    using Range_container = std::vector<std::pair<size_t, size_t>>;
+    using Range_container = std::vector<std::pair<int, int>>;
 
     Similarity_finder(const ipme::wb::Frame_collection& collection);
 
@@ -26,13 +26,13 @@ public:
     void find_similar(size_t begin, size_t end);
 
 private:
-    Row_type generate_row(const ipme::wb::Frame& frame);
+    Row_type generate_row(const Frame& frame);
 
     std::tuple<Matrix_type, Label_vector, Matrix_type>
     split_data(size_t range_begin, size_t range_end);
 
-    const ipme::wb::Frame_collection& frames_;
-    std::vector<std::pair<size_t, size_t>> similar_ranges_;
+    const Frame_collection& frames_;
+    Range_container similar_ranges_;
 };
 
 } // namespace ipme::wb
