@@ -30,9 +30,11 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QQuaternion>
+#include <QTableView>
 #include <QVBoxLayout>
 #include <Qt3DCore>
 #include <Qt3DExtras>
@@ -41,6 +43,7 @@
 #include "data/scene.h"
 #include "protobuf/scene.pb.h"
 #include "scene_modifier.h"
+#include "similar_ranges_table.h"
 #include "similarity_finder.h"
 #include "utils/json.h"
 #include "utils/logger.h"
@@ -53,7 +56,9 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
     : QMainWindow{parent}, ui{new Ui::Visualization_window},
       root_entity_{new Qt3DCore::QEntity},
       view_{std::make_shared<Qt3DExtras::Qt3DWindow>()},
-      video_window_{std::make_shared<Video_window>(this)}, config_{config}
+      video_window_{std::make_shared<Video_window>(this)}, config_{config},
+      ranges_table_{
+          new ipme::wb::Similar_ranges_table{similarity_finder_, this}}
 {
     ui->setupUi(this);
 
@@ -86,6 +91,28 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
     for(const auto& policy : ipme::wb::Frame::policy_map.left) {
         ui->frame_policy_combobox->addItem(policy.second.c_str());
     }
+
+    x_model_ = new Xmodel{this};
+    x_model_->add_row({234, 53534});
+
+    similarity_table_ = new QTableView;
+    similarity_table_->setModel(ranges_table_);
+    //    similarity_table_->setModel(x_model_);
+    similarity_table_->setEnabled(true);
+    similarity_table_->verticalHeader()->setDefaultSectionSize(12);
+    similarity_table_->horizontalHeader()->setDefaultSectionSize(30);
+    similarity_table_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    similarity_table_->setMaximumWidth(210);
+    similarity_table_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    similarity_table_->setSelectionMode(QAbstractItemView::SingleSelection);
+    similarity_table_->setStyleSheet("padding: 0px 0px 0px 3px;"
+                                     "background: #999;"
+                                     "font-weight: bold;");
+
+    x_model_->add_row({23442345, 53534});
+    similarity_table_->update();
+
+    emit x_model_->dataChanged(QModelIndex{}, QModelIndex{});
 
     init();
 }
@@ -123,6 +150,8 @@ void Visualization_window::on_file_open_triggered()
     frames_.load(scene_pb);
     apply_frames_filter();
     ui->end_frame_edit->setText(QString::number(scene_pb.frames().size()));
+    similarity_finder_ = std::make_shared<ipme::wb::Similarity_finder>(frames_);
+    ranges_table_->set_similarity_finder(similarity_finder_);
 
     on_action_next_triggered();
 }
@@ -263,6 +292,8 @@ void Visualization_window::init()
     view_->setRootEntity(root_entity_);
 
     ui->scene_vertical_layout->addWidget(widget);
+
+    ui->scene_vertical_layout->addWidget(similarity_table_);
 }
 
 void Visualization_window::show_current_frame()
@@ -464,10 +495,15 @@ void Visualization_window::on_findsimilar_button_clicked()
 
 void Visualization_window::on_find_similar(size_t begin, size_t end)
 {
+    if(!similarity_finder_) {
+        emit show_log("finder not initialized");
+        return;
+    }
+
     emit show_log("Finding similarity for frame range " +
                   QString::number(begin) + " to " + QString::number(end));
-    similarity_finder_.find_similar(begin, end);
-    auto similar_ranges = similarity_finder_.similar_ranges();
+    similarity_finder_->find_similar(begin, end);
+    auto similar_ranges = similarity_finder_->similar_ranges();
     emit show_similar_ranges(similar_ranges);
 }
 
@@ -513,7 +549,7 @@ void Visualization_window::on_progress_slider_sliderMoved(int position)
 void Visualization_window::on_show_log(const QString& msg)
 {
     auto full_msg =
-        QString("[") + QTime::currentTime().toString() + QString("] ") + msg;
+        QString("[") + QTime::currentTime().toString() + QString("]  ") + msg;
     ui->log_window->append(full_msg);
 }
 
@@ -532,9 +568,33 @@ void Visualization_window::on_show_similar_ranges(
         emit show_log(range_ss.str().c_str());
     }
 
-    QLabel* label = new QLabel;
-    label->setGeometry(0, ui->progress_slider->y(), 15, 50);
-    label->setStyleSheet("background: #ff0000;");
-    label->setParent(ui->progress_slider);
-    label->show();
+    ranges_table_->add_ranges(ranges);
+}
+
+int Xmodel::rowCount(const QModelIndex& parent) const
+{
+    return rows_.size();
+}
+
+int Xmodel::columnCount(const QModelIndex& parent) const
+{
+    return 2;
+}
+
+QVariant Xmodel::data(const QModelIndex& index, int role) const
+{
+    if(role == Qt::DisplayRole) {
+        return rows_[index.row()][index.column()];
+    }
+
+    return QVariant{};
+}
+
+bool Xmodel::insertRows(int position, int rows, const QModelIndex& index)
+{
+    beginInsertRows(QModelIndex(), position, position + rows - 1);
+    rows_.emplace_back(Row_type{position, rows});
+    endInsertColumns();
+
+    return true;
 }

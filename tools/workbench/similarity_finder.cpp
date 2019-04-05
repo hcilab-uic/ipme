@@ -64,13 +64,13 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
         int random_index = dist(gen);
         if(training_set.find(random_index) != end(training_set)) {
             continue;
-            DEBUG() << "random index " << random_index
-                    << " already exists, skipping";
+            //            DEBUG() << "random index " << random_index
+            //                    << " already exists, skipping";
         }
 
-        DEBUG() << "random index " << random_index
-                << " does not already exist, adding to collection of "
-                   "different_label set";
+        //        DEBUG() << "random index " << random_index
+        //                << " does not already exist, adding to collection of "
+        //                   "different_label set";
 
         x_train.push_back(generate_row(frames_[random_index]));
         y_train.push_back(label_different);
@@ -112,13 +112,18 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
     trainer.set_learning_rate(0.1);
 
     DEBUG() << "beginning training";
-    for(size_t iteration_count = 0; trainer.get_learning_rate() >= 1e-4;
+    size_t iteration_count{0};
+    for(; trainer.get_learning_rate() >= 1e-4 && iteration_count < 10000;
         ++iteration_count) {
         trainer.train_one_step(x_train, y_train);
 
         if(iteration_count % 1000 == 0 && iteration_count > 0) {
             DEBUG() << iteration_count << " training iterations completed";
         }
+    }
+
+    if(iteration_count >= 10000) {
+        WARN() << "training exited because of too many iteration counts";
     }
 
     //    DEBUG() << "training complete in " << iteration_count << "
@@ -164,7 +169,6 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
     int chain_begin{inf};
     int chain_next{0};
 
-    //    std::vector<int> collected;
     for(size_t i = 0; i < result_predict.size(); ++i) {
         bool similar = true;
         double difference{0.0};
@@ -177,9 +181,11 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
         }
 
         if(!similar) {
-            DEBUG() << "difference " << difference << " greater than threshold "
-                    << distance_threshold << ", not including index " << i
-                    << "(frame: " << index_map[i] << ")";
+            //            DEBUG() << "difference " << difference << " greater
+            //            than threshold "
+            //                    << distance_threshold << ", not including
+            //                    index " << i
+            //                    << "(frame: " << index_map[i] << ")";
 
             continue;
         }

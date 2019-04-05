@@ -282,8 +282,8 @@ padding: 0px 5px 0px 0px;</string>
      <rect>
       <x>-4</x>
       <y>112</y>
-      <width>1149</width>
-      <height>621</height>
+      <width>1145</width>
+      <height>625</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -300,7 +300,7 @@ padding: 0px 5px 0px 0px;</string>
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QWidget" name="verticalLayoutWidget">
-      <layout class="QVBoxLayout" name="scene_vertical_layout"/>
+      <layout class="QHBoxLayout" name="scene_vertical_layout"/>
      </widget>
     </widget>
     <widget class="QTextEdit" name="log_window">

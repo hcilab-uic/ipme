@@ -21,11 +21,13 @@
 #ifndef VISUALIZATION_WINDOW_H
 #define VISUALIZATION_WINDOW_H
 
+#include <array>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
 #include <QMainWindow>
+#include <QTableView>
 #include <QVector3D>
 #include <Qt3DExtras/Qt3DWindow>
 
@@ -35,8 +37,35 @@
 #include "protobuf/scene.pb.h"
 #include "scene_modifier.h"
 #include "scene_visualization.h"
+#include "similar_ranges_table.h"
 #include "similarity_finder.h"
 #include "video_window.h"
+
+class Xmodel : public QAbstractTableModel {
+public:
+    using Row_type = std::array<int, 2>;
+
+    using Row_container = std::vector<Row_type>;
+    explicit Xmodel(QObject* parent = nullptr) : QAbstractTableModel{parent}
+    {
+    }
+
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex& index,
+                  int role = Qt::DisplayRole) const override;
+    bool insertRows(int position, int rows, const QModelIndex& index) override;
+
+    inline void add_row(const Row_type& row)
+    {
+        beginInsertRows(QModelIndex{}, rows_.size(), rows_.size());
+        rows_.push_back(row);
+        endInsertRows();
+    }
+
+private:
+    Row_container rows_;
+};
 
 namespace Ui {
 class Visualization_window;
@@ -135,7 +164,10 @@ private:
     ipme::wb::Frame_collection frames_;
     std::unordered_map<std::string, int> outcome_labels_;
     ipme::wb::Config config_;
-    ipme::wb::Similarity_finder similarity_finder_{frames_};
+    std::shared_ptr<ipme::wb::Similarity_finder> similarity_finder_{nullptr};
+    ipme::wb::Similar_ranges_table* ranges_table_;
+    QTableView* similarity_table_;
+    Xmodel* x_model_;
 };
 
 #endif // VISUALIZATION_WINDOW_H
