@@ -300,7 +300,21 @@ padding: 0px 5px 0px 0px;</string>
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QWidget" name="verticalLayoutWidget">
-      <layout class="QHBoxLayout" name="scene_vertical_layout"/>
+      <layout class="QHBoxLayout" name="scene_vertical_layout">
+       <item>
+        <widget class="QLabel" name="video_label">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QTextEdit" name="log_window">

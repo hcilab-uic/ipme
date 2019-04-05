@@ -127,6 +127,8 @@ private:
 
     ipme::wb::Frame filter(const ipme::wb::Frame& frame);
 
+    void load_video(const std::filesystem::path& dirpath);
+
     int64_t frame_index_{0};
     Ui::Visualization_window* ui;
     Qt3DCore::QEntity* root_entity_ = nullptr;
@@ -140,6 +142,10 @@ private:
     std::shared_ptr<ipme::wb::Similarity_finder> similarity_finder_{nullptr};
     ipme::wb::Similar_ranges_table* ranges_table_;
     QTableView* similarity_table_;
+
+    //
+    QTimer* video_timer_{nullptr};
+    cv::VideoCapture capture_;
 };
 
 #endif // VISUALIZATION_WINDOW_H

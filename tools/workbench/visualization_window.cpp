@@ -58,7 +58,8 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
       view_{std::make_shared<Qt3DExtras::Qt3DWindow>()},
       video_window_{std::make_shared<Video_window>(this)}, config_{config},
       ranges_table_{
-          new ipme::wb::Similar_ranges_table{similarity_finder_, this}}
+          new ipme::wb::Similar_ranges_table{similarity_finder_, this}},
+      video_timer_{new QTimer{this}}
 {
     ui->setupUi(this);
 
@@ -147,6 +148,8 @@ void Visualization_window::on_file_open_triggered()
     ranges_table_->set_similarity_finder(similarity_finder_);
 
     on_action_next_triggered();
+
+    load_video(dir_path.toStdString());
 }
 
 void Visualization_window::show_frame(int frame_index)
@@ -576,4 +579,23 @@ void Visualization_window::on_similarity_table_clicked(const QModelIndex& index)
     auto row = ranges[index.row()];
     ui->start_frame_edit->setText(QString::number(row.first));
     ui->end_frame_edit->setText(QString::number(row.second));
+}
+
+void Visualization_window::load_video(const std::filesystem::path& dirpath)
+{
+    auto video_path = dirpath / "video.avi";
+    capture_.open(video_path.string());
+    int frame_width = static_cast<int>(capture_.get(cv::CAP_PROP_FRAME_WIDTH));
+    int frame_height =
+        static_cast<int>(capture_.get(cv::CAP_PROP_FRAME_HEIGHT));
+    ui->video_label->resize(frame_width, frame_height);
+
+    //    double fps = capture_.get(cv::CAP_PROP_FPS);
+    double fps = 24.0;
+    INFO() << "FPS " << fps;
+
+    int msec = static_cast<int>(1000.0 / fps);
+    video_timer_->start(msec);
+
+    INFO() << "setting timer delay = " << msec;
 }
