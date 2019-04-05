@@ -26,7 +26,7 @@ QVariant Similar_ranges_table::headerData(int section,
     }
 
     if(orientation == Qt::Orientation::Vertical) {
-        return QString::number(section);
+        return QString::number(section + 1);
     }
 
     return QVariant{};
@@ -34,19 +34,16 @@ QVariant Similar_ranges_table::headerData(int section,
 
 int Similar_ranges_table::rowCount(const QModelIndex& parent) const
 {
-    DEBUG() << "row_count " << ranges_.size();
     return ranges_.size();
 }
 
 int Similar_ranges_table::columnCount(const QModelIndex& parent) const
 {
-    DEBUG() << "col count 2";
     return 2;
 }
 
 QVariant Similar_ranges_table::data(const QModelIndex& index, int role) const
 {
-    DEBUG() << "data() called";
     int size = static_cast<int>(ranges_.size());
 
     if(index.row() >= size || index.column() > 1) {

@@ -41,32 +41,6 @@
 #include "similarity_finder.h"
 #include "video_window.h"
 
-class Xmodel : public QAbstractTableModel {
-public:
-    using Row_type = std::array<int, 2>;
-
-    using Row_container = std::vector<Row_type>;
-    explicit Xmodel(QObject* parent = nullptr) : QAbstractTableModel{parent}
-    {
-    }
-
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex& index,
-                  int role = Qt::DisplayRole) const override;
-    bool insertRows(int position, int rows, const QModelIndex& index) override;
-
-    inline void add_row(const Row_type& row)
-    {
-        beginInsertRows(QModelIndex{}, rows_.size(), rows_.size());
-        rows_.push_back(row);
-        endInsertRows();
-    }
-
-private:
-    Row_container rows_;
-};
-
 namespace Ui {
 class Visualization_window;
 }
@@ -124,6 +98,8 @@ private slots:
 
     void on_show_similar_ranges(const std::vector<std::pair<int, int>>& ranges);
 
+    void on_similarity_table_clicked(const QModelIndex& index);
+
 signals:
     void current_frame_number(int);
 
@@ -154,12 +130,9 @@ private:
     int64_t frame_index_{0};
     Ui::Visualization_window* ui;
     Qt3DCore::QEntity* root_entity_ = nullptr;
-    //    Qt3DExtras::Qt3DWindow* view_ = nullptr;
     std::shared_ptr<Qt3DExtras::Qt3DWindow> view_;
     std::unique_ptr<ipme::wb::Scene_modifier> scene_modifier_;
-    //    std::vector<ipme::wb::Frame> frames_;
     std::shared_ptr<Video_window> video_window_;
-    //    std::unordered_map<uint32_t, size_t> frame_index_map_;
     QString labeled_file_path_;
     ipme::wb::Frame_collection frames_;
     std::unordered_map<std::string, int> outcome_labels_;
@@ -167,7 +140,6 @@ private:
     std::shared_ptr<ipme::wb::Similarity_finder> similarity_finder_{nullptr};
     ipme::wb::Similar_ranges_table* ranges_table_;
     QTableView* similarity_table_;
-    Xmodel* x_model_;
 };
 
 #endif // VISUALIZATION_WINDOW_H

@@ -92,27 +92,20 @@ Visualization_window::Visualization_window(const ipme::wb::Config& config,
         ui->frame_policy_combobox->addItem(policy.second.c_str());
     }
 
-    x_model_ = new Xmodel{this};
-    x_model_->add_row({234, 53534});
-
     similarity_table_ = new QTableView;
     similarity_table_->setModel(ranges_table_);
-    //    similarity_table_->setModel(x_model_);
     similarity_table_->setEnabled(true);
+    similarity_table_->verticalHeader()->hide();
     similarity_table_->verticalHeader()->setDefaultSectionSize(12);
-    similarity_table_->horizontalHeader()->setDefaultSectionSize(30);
     similarity_table_->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    similarity_table_->setMaximumWidth(210);
+    similarity_table_->setMaximumWidth(200);
     similarity_table_->setSelectionBehavior(QAbstractItemView::SelectRows);
     similarity_table_->setSelectionMode(QAbstractItemView::SingleSelection);
-    similarity_table_->setStyleSheet("padding: 0px 0px 0px 3px;"
-                                     "background: #999;"
+    similarity_table_->setStyleSheet("padding: 1px 1px 1px 3px;"
                                      "font-weight: bold;");
 
-    x_model_->add_row({23442345, 53534});
-    similarity_table_->update();
-
-    emit x_model_->dataChanged(QModelIndex{}, QModelIndex{});
+    connect(similarity_table_, &QTableView::clicked, this,
+            &Visualization_window::on_similarity_table_clicked);
 
     init();
 }
@@ -571,30 +564,16 @@ void Visualization_window::on_show_similar_ranges(
     ranges_table_->add_ranges(ranges);
 }
 
-int Xmodel::rowCount(const QModelIndex& parent) const
+void Visualization_window::on_similarity_table_clicked(const QModelIndex& index)
 {
-    return rows_.size();
-}
-
-int Xmodel::columnCount(const QModelIndex& parent) const
-{
-    return 2;
-}
-
-QVariant Xmodel::data(const QModelIndex& index, int role) const
-{
-    if(role == Qt::DisplayRole) {
-        return rows_[index.row()][index.column()];
+    auto ranges = similarity_finder_->similar_ranges();
+    if(index.row() >= static_cast<int>(ranges.size())) {
+        ERROR() << "Invalid row clicked";
+        emit show_log("Invalid row clicked");
+        return;
     }
 
-    return QVariant{};
-}
-
-bool Xmodel::insertRows(int position, int rows, const QModelIndex& index)
-{
-    beginInsertRows(QModelIndex(), position, position + rows - 1);
-    rows_.emplace_back(Row_type{position, rows});
-    endInsertColumns();
-
-    return true;
+    auto row = ranges[index.row()];
+    ui->start_frame_edit->setText(QString::number(row.first));
+    ui->end_frame_edit->setText(QString::number(row.second));
 }
