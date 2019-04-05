@@ -62,6 +62,10 @@ QVariant Similar_ranges_table::data(const QModelIndex& index, int role) const
 void Similar_ranges_table::add_ranges(
     const Similarity_finder::Range_container& ranges)
 {
+    beginRemoveRows(QModelIndex{}, 0, static_cast<int>(ranges.size()) - 1);
+    ranges_.clear();
+    endRemoveRows();
+
     beginInsertRows(QModelIndex{}, 0, static_cast<int>(ranges.size()) - 1);
     ranges_ = ranges;
     endInsertRows();

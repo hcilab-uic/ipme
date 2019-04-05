@@ -169,6 +169,8 @@ void Similarity_finder::find_similar(size_t range_begin, size_t range_end)
     int chain_begin{inf};
     int chain_next{0};
 
+    // Assemble similar ranges
+    similar_ranges_.clear();
     for(size_t i = 0; i < result_predict.size(); ++i) {
         bool similar = true;
         double difference{0.0};
