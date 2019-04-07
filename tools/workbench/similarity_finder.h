@@ -16,6 +16,9 @@ public:
     using Label_vector = std::vector<unsigned long>;
     using Range_container = std::vector<std::pair<int, int>>;
 
+    static constexpr size_t num_outputs = 2;
+    using Net_type = dlib::loss_metric<dlib::fc<num_outputs, dlib::input<Row_type>>>;
+
     Similarity_finder(const ipme::wb::Frame_collection& collection);
 
     inline const Range_container& similar_ranges() const
