@@ -30,6 +30,7 @@ set(boost_build
         runtime-link=shared
         dll-path=${boost_rpath}
         threading=multi
+		threading=single
         address-model=64
 )
 
