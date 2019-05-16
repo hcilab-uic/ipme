@@ -1,4 +1,4 @@
-# Interaction Proxemics in Multi-Device Ecologies
+# Proxemics-Engine Suite
 
 ---
 #### Build system
