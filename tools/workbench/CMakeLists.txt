@@ -53,12 +53,7 @@ set(SOURCES
     scene_modifier.cpp
     sensor_manager.cpp
     similar_ranges_table.cpp
-
-    color.h
-    frame_model.h
-    geometry.h
-    scene_object.h
-    scene_widget.h)
+)
 
 set(UI_SOURCES
     mainwindow.ui
