@@ -21,11 +21,13 @@
 #ifndef LIVE_WINDOW_H
 #define LIVE_WINDOW_H
 
-#include <filesystem>
 #include <memory>
 #include <shared_mutex>
 #include <string_view>
 #include <thread>
+
+// This needs to be below other include, else weird Qt5 MOC errors occur
+#include <filesystem>
 
 #include <QDialog>
 #include <QStatusBar>
