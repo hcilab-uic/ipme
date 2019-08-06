@@ -51,12 +51,12 @@
 #include "utils/utils.h"
 #include "video_window.h"
 
-Visualization_window::Visualization_window(const ipme::wb::Config& config,
+Visualization_window::Visualization_window(const ipme::wb::Config& /*config*/,
                                            QWidget* parent)
     : QMainWindow{parent}, ui{new Ui::Visualization_window},
       root_entity_{new Qt3DCore::QEntity},
       view_{std::make_shared<Qt3DExtras::Qt3DWindow>()},
-      video_window_{std::make_shared<Video_window>(this)}, config_{config},
+      video_window_{std::make_shared<Video_window>(this)}, // config_{config},
       ranges_table_{
           new ipme::wb::Similar_ranges_table{similarity_finder_, this}}
 {
@@ -138,7 +138,8 @@ void Visualization_window::on_file_open_triggered()
     ipme::scene::Scene scene_pb;
     scene_pb.ParseFromIstream(&ifs);
 
-    scene_modifier_->set_displays(scene_pb.config());
+    config_ = scene_pb.config();
+    scene_modifier_->set_displays(config_);
 
     frames_.load(scene_pb);
     apply_frames_filter();
@@ -370,7 +371,11 @@ void Visualization_window::on_save_outcome_button_clicked()
     std::ofstream ofs{labeled_file_path_.toStdString(), mode};
     ofs << "seq_id,timestamp";
 
-    for(int i = 0; i < config_.scene_config().registered_objects_size(); ++i) {
+    size_t registered_object_count = config_.registered_objects_size();
+
+    DEBUG() << "Saving " << registered_object_count << " objects to file";
+
+    for(int i = 0; i < config_.registered_objects_size(); ++i) {
         const int index = i + 1;
         // clang-format off
         ofs << ",src_id" << index
@@ -409,10 +414,12 @@ void Visualization_window::on_save_outcome_button_clicked()
 
     size_t count_frames_saved{0};
     const bool validate_frame = ui->frame_validity_checkbox->isChecked();
+    size_t invalid_frames{0};
     for(size_t i = begin; i < end; ++i) {
         const auto& frame = frames_[i];
         if(validate_frame && !frame.has_all_registered_ids()) {
             WARN() << "Frame " << i << " invalid, skipping";
+            ++invalid_frames;
             continue;
         }
         ofs << frame.frame_id() << "," << frame.timestamp() << ",";
@@ -438,6 +445,10 @@ void Visualization_window::on_save_outcome_button_clicked()
 
         ofs << label << "\n";
         ++count_frames_saved;
+    }
+
+    if(invalid_frames > 0) {
+        INFO() << invalid_frames << " invalid frames skipped";
     }
 
     ui->start_frame_edit->setText(QString::number(end));

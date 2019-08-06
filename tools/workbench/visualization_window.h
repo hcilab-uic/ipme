@@ -136,7 +136,8 @@ private:
     QString labeled_file_path_;
     ipme::wb::Frame_collection frames_;
     std::unordered_map<std::string, int> outcome_labels_;
-    ipme::wb::Config config_;
+    // ipme::wb::Config config_;
+    ipme::scene::Scene_config config_;
     std::shared_ptr<ipme::wb::Similarity_finder> similarity_finder_{nullptr};
     ipme::wb::Similar_ranges_table* ranges_table_;
     QTableView* similarity_table_;
