@@ -6,418 +6,412 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1025</width>
-    <height>638</height>
+    <width>1102</width>
+    <height>738</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Live Window</string>
   </property>
-  <widget class="QSplitter" name="main_vertical_splitter">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1011</width>
-     <height>765</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <layout class="QHBoxLayout" name="content_layout">
-     <item>
-      <layout class="QVBoxLayout" name="control_layout">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QSplitter" name="main_vertical_splitter">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QHBoxLayout" name="content_layout">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetFixedSize</enum>
+       </property>
        <item>
-        <widget class="QPushButton" name="set_output_dir_button">
-         <property name="text">
-          <string>Set Output Directory</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="button_layout">
+        <layout class="QVBoxLayout" name="control_layout">
          <item>
-          <widget class="QPushButton" name="start_experiment_button">
-           <property name="styleSheet">
-            <string notr="true">font-weight: bold;
-font-size: 24px;
-border-radius: 25px;</string>
-           </property>
+          <widget class="QPushButton" name="set_output_dir_button">
            <property name="text">
-            <string/>
+            <string>Set Output Directory</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="stop_experiment_button">
-           <property name="styleSheet">
-            <string notr="true">background: transparent;
+          <layout class="QHBoxLayout" name="button_layout">
+           <item>
+            <widget class="QPushButton" name="start_experiment_button">
+             <property name="styleSheet">
+              <string notr="true">font-weight: bold;
+font-size: 24px;
+border-radius: 25px;</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stop_experiment_button">
+             <property name="styleSheet">
+              <string notr="true">background: transparent;
 border-color: transparent;
 border-radius: 50%;
 font-weight: bold;
 font-size: 24px;</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="hspacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="connection_settings_layout">
-         <item row="1" column="3">
-          <widget class="QLineEdit" name="sage_port_edit">
-           <property name="maximumSize">
-            <size>
-             <width>75</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Port</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="4">
-          <widget class="QLineEdit" name="vrpn_data_port_edit">
-           <property name="maximumSize">
-            <size>
-             <width>75</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string> Data Port</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLineEdit" name="vrpn_host_edit">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>VRPN Host</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLineEdit" name="sage_host_edit">
-           <property name="text">
-            <string>SAGE2 Host</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="QLineEdit" name="vrpn_port_edit">
-           <property name="maximumSize">
-            <size>
-             <width>75</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Port</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QCheckBox" name="on_sage_checkbox">
-           <property name="text">
-            <string>ON</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="on_vrpn_checkbox">
-           <property name="text">
-            <string>ON</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="4">
-          <widget class="QLineEdit" name="sage_session_token_edit"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="status_indicator_layout">
          <item>
-          <widget class="QLabel" name="video_status_indicator_label">
-           <property name="font">
-            <font>
-             <pointsize>-1</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
+          <spacer name="hspacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-           <property name="autoFillBackground">
-            <bool>false</bool>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
            </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: #ff1a16;
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="connection_settings_layout">
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="sage_port_edit">
+             <property name="maximumSize">
+              <size>
+               <width>75</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Port</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <widget class="QLineEdit" name="vrpn_data_port_edit">
+             <property name="maximumSize">
+              <size>
+               <width>75</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string> Data Port</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLineEdit" name="vrpn_host_edit">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>150</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>VRPN Host</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLineEdit" name="sage_host_edit">
+             <property name="text">
+              <string>SAGE2 Host</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QLineEdit" name="vrpn_port_edit">
+             <property name="maximumSize">
+              <size>
+               <width>75</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Port</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="on_sage_checkbox">
+             <property name="text">
+              <string>ON</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="on_vrpn_checkbox">
+             <property name="text">
+              <string>ON</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="4">
+            <widget class="QLineEdit" name="sage_session_token_edit"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="status_indicator_layout">
+           <item>
+            <widget class="QLabel" name="video_status_indicator_label">
+             <property name="font">
+              <font>
+               <pointsize>-1</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: #ff1a16;
 border-radius: 40px;
 font-size: 22px;
 font-weight: bold;
 border-style: inset;</string>
-           </property>
-           <property name="text">
-            <string>Camera</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="vrpn_status_indicator_label">
-           <property name="font">
-            <font>
-             <pointsize>-1</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: #ff1a16;
+             </property>
+             <property name="text">
+              <string>Video</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="vrpn_status_indicator_label">
+             <property name="font">
+              <font>
+               <pointsize>-1</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: #ff1a16;
 border-radius: 40px;
 font-size: 22px;
 font-weight: bold;
 border-style: outset;</string>
-           </property>
-           <property name="text">
-            <string> VRPN</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="sage_status_indicator_label">
-           <property name="font">
-            <font>
-             <pointsize>-1</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: #ff1a16;
+             </property>
+             <property name="text">
+              <string>MoCap</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="sage_status_indicator_label">
+             <property name="font">
+              <font>
+               <pointsize>-1</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: #ff1a16;
 border-radius: 40px;
 font-size: 22px;
 font-weight: bold;
 border-style: outset;</string>
-           </property>
-           <property name="text">
-            <string>SAGE</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
+             </property>
+             <property name="text">
+              <string>SAGE</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="camera_settings_grid">
+           <item row="3" column="2">
+            <widget class="QLabel" name="frame_num_value_label">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">text-align: right;</string>
+             </property>
+             <property name="text">
+              <string>0</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="frame_rate_label">
+             <property name="text">
+              <string>Frame Rate:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="on_camera_checkbox">
+             <property name="text">
+              <string>ON</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QLabel" name="frame_rate_value_label">
+             <property name="styleSheet">
+              <string notr="true">font-weight: bold;</string>
+             </property>
+             <property name="text">
+              <string> Unknown</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="elapsed_time_label">
+             <property name="text">
+              <string>Elapsed Time</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="frame_num_label">
+             <property name="text">
+              <string>Frame Number:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="video_device_index_label">
+             <property name="text">
+              <string>Video Device Index</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
+            <widget class="QLabel" name="elapsed_time_value_label">
+             <property name="styleSheet">
+              <string notr="true">font-weight: bold;</string>
+             </property>
+             <property name="text">
+              <string>00:00:00</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLineEdit" name="video_device_index_edit">
+             <property name="maximumSize">
+              <size>
+               <width>50</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QGridLayout" name="camera_settings_grid">
-         <item row="3" column="2">
-          <widget class="QLabel" name="frame_num_value_label">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">text-align: right;</string>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="frame_rate_label">
-           <property name="text">
-            <string>Frame Rate:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QCheckBox" name="on_camera_checkbox">
-           <property name="text">
-            <string>ON</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="2">
-          <widget class="QLabel" name="frame_rate_value_label">
-           <property name="styleSheet">
-            <string notr="true">font-weight: bold;</string>
-           </property>
-           <property name="text">
-            <string> Unknown</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="elapsed_time_label">
-           <property name="text">
-            <string>Elapsed Time</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="frame_num_label">
-           <property name="text">
-            <string>Frame Number:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="video_device_index_label">
-           <property name="text">
-            <string>Video Device Index</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="2">
-          <widget class="QLabel" name="elapsed_time_value_label">
-           <property name="styleSheet">
-            <string notr="true">font-weight: bold;</string>
-           </property>
-           <property name="text">
-            <string>00:00:00</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QLineEdit" name="video_device_index_edit">
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QLabel" name="video_feed_label">
+         <property name="minimumSize">
+          <size>
+           <width>800</width>
+           <height>640</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: transparent;</string>
+         </property>
+         <property name="text">
+          <string>Video Stream</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
        </item>
       </layout>
-     </item>
-     <item>
-      <spacer name="hspacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>10</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="video_feed_label">
-       <property name="maximumSize">
-        <size>
-         <width>640</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: transparent;</string>
-       </property>
-       <property name="text">
-        <string>Video Stream</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="hspacer_1">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>10</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <layout class="QVBoxLayout" name="bottom_layout" stretch="0">
-     <item>
-      <widget class="QTextBrowser" name="log_window">
-       <property name="styleSheet">
-        <string notr="true">background-color: #e6e8ed;
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget">
+      <layout class="QVBoxLayout" name="bottom_layout" stretch="0">
+       <item>
+        <widget class="QTextBrowser" name="log_window">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #e6e8ed;
 font-weight: bold;
 border-radius: 5px;
 border-width: 2px;
 border-style: inset;</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
