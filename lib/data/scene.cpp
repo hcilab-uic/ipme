@@ -68,6 +68,41 @@ void Scene::add_object(const omicronConnector::EventData& event)
                << ", ignoring";
     }
 
+    if(event.extraDataItems > 0) {
+        if(event.extraDataType ==
+           omicronConnector::EventData::ExtraDataFloatArray) {
+            const float* ptr = reinterpret_cast<const float*>(event.extraData);
+            for(int k = 0; k < event.extraDataItems; ++k) {
+                DEBUG() << "extra data items " << k << ": [" << ptr[k] << "]";
+            }
+        } else {
+            float val[3];
+            for(int k = 0; k < event.extraDataItems; ++k) {
+                event.getExtraDataVector3(k, val);
+                fill_new_frame(event, val[0], val[1], val[2],
+                               // no-rotation quaternion because we don't have
+                               // rotation information in Kinect data
+                               1, 0, 0, 0);
+
+                DEBUG() << event.timestamp << "," << current_frame_ << "," << k
+                        << "," << val[0] << "," << val[1] << "," << val[2];
+            }
+        }
+    } else {
+        fill_new_frame(event, event.posx, event.posy, event.posz, event.orw,
+                       event.orx, event.ory, event.orz);
+
+        //        DEBUG() << "Added object with source id: " << event.sourceId
+        //                << ", position " << position->DebugString() << ",
+        //                quaternion "
+        //                << orientation->DebugString();
+    }
+}
+
+void Scene::fill_new_frame(const omicronConnector::EventData& event, float x,
+                           float y, float z, float rw, float rx, float ry,
+                           float rz)
+{
     auto object = current_frame_->add_vrpn_objects();
     object->set_timestamp(static_cast<uint64_t>(event.timestamp));
     object->set_vrpn_source_id(event.sourceId);
@@ -78,20 +113,14 @@ void Scene::add_object(const omicronConnector::EventData& event)
 
     auto pose = object->mutable_pose();
 
-    auto position = pose->mutable_position();
-    position->set_x(static_cast<double>(event.posx));
-    position->set_y(static_cast<double>(event.posy));
-    position->set_z(static_cast<double>(event.posz));
+    pose->mutable_position()->set_x(static_cast<double>(x));
+    pose->mutable_position()->set_y(static_cast<double>(y));
+    pose->mutable_position()->set_z(static_cast<double>(z));
 
-    auto orientation = pose->mutable_orientation();
-    orientation->set_w(static_cast<double>(event.orw));
-    orientation->set_x(static_cast<double>(event.orx));
-    orientation->set_y(static_cast<double>(event.ory));
-    orientation->set_z(static_cast<double>(event.orz));
-
-    DEBUG() << "Added object with source id: " << event.sourceId
-            << ", position " << position->DebugString() << ", quaternion "
-            << orientation->DebugString();
+    pose->mutable_orientation()->set_w(static_cast<double>(rw));
+    pose->mutable_orientation()->set_x(static_cast<double>(rx));
+    pose->mutable_orientation()->set_y(static_cast<double>(ry));
+    pose->mutable_orientation()->set_z(static_cast<double>(rz));
 }
 
 void Scene::add_object(std::shared_ptr<scene::Object> object)

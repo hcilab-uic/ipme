@@ -84,6 +84,10 @@ public:
 private:
     void finalize();
 
+    void fill_new_frame(const omicronConnector::EventData& event, float x,
+                        float y, float z, float rw, float rx, float ry,
+                        float rz);
+
     scene::Frame* current_frame_ = nullptr;
     scene::Scene scene_;
     std::filesystem::path output_path_;
