@@ -245,11 +245,13 @@ void Visualization_window::make_axes()
 
 void Visualization_window::init()
 {
-    view_->defaultFrameGraph()->setClearColor(QColor{QRgb{0x4d4d4f}});
+    //    view_->defaultFrameGraph()->setClearColor(QColor{QRgb{0x4d4d4f}});
+    view_->defaultFrameGraph()->setClearColor(QColor{QRgb{0x222222}});
     auto container = QWidget::createWindowContainer(view_.get());
     auto screen_size = view_->screen()->size();
     container->setMinimumSize(QSize{200, 100});
     container->setMaximumSize(screen_size);
+    container->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     auto widget = new QWidget;
 
     auto h_layout = new QHBoxLayout{widget};
@@ -266,7 +268,6 @@ void Visualization_window::init()
     auto camera_entity = view_->camera();
     camera_entity->lens()->setPerspectiveProjection(90.f, 16.f / 9.f, .1f,
                                                     1000.f);
-    on_action_show_top_view_triggered();
 
     auto light_entity = new Qt3DCore::QEntity{root_entity_};
     auto light = new Qt3DRender::QPointLight{light_entity};
@@ -329,14 +330,14 @@ void Visualization_window::on_action_previous_triggered()
 
 void Visualization_window::on_action_show_front_view_triggered()
 {
-    view_->camera()->setPosition(QVector3D{0, 0, 25.f});
+    view_->camera()->setPosition(QVector3D{0, 0, 10.f});
     view_->camera()->setUpVector(QVector3D{0, 1, 0});
     view_->camera()->setViewCenter(QVector3D{0, 0, 0});
 }
 
 void Visualization_window::on_action_show_top_view_triggered()
 {
-    view_->camera()->setPosition(QVector3D{0, 25.f, 0});
+    view_->camera()->setPosition(QVector3D{0, 10.f, 0});
     view_->camera()->setUpVector(QVector3D{0, 0, -1.f});
     view_->camera()->setViewCenter(QVector3D{0, 0, 0});
 }

@@ -278,16 +278,8 @@ padding: 0px 5px 0px 0px;</string>
        <enum>Qt::Vertical</enum>
       </property>
       <widget class="QSplitter" name="viz_vid_splitter">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <widget class="QWidget" name="verticalLayoutWidget">
-        <layout class="QHBoxLayout" name="scene_vertical_layout"/>
-       </widget>
-      </widget>
-      <widget class="QTextEdit" name="log_window">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -295,7 +287,31 @@ padding: 0px 5px 0px 0px;</string>
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>50</height>
+         <height>600</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <widget class="QWidget" name="verticalLayoutWidget">
+        <layout class="QHBoxLayout" name="scene_vertical_layout">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QTextEdit" name="log_window">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
