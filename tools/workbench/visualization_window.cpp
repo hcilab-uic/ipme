@@ -268,6 +268,7 @@ void Visualization_window::init()
     auto camera_entity = view_->camera();
     camera_entity->lens()->setPerspectiveProjection(90.f, 16.f / 9.f, .1f,
                                                     1000.f);
+    on_action_show_front_view_triggered();
 
     auto light_entity = new Qt3DCore::QEntity{root_entity_};
     auto light = new Qt3DRender::QPointLight{light_entity};
@@ -370,15 +371,18 @@ void Visualization_window::on_save_outcome_button_clicked()
     std::ios::openmode mode =
         ui->overwrite_checkbox->isChecked() ? std::ios::out : std::ios::app;
     std::ofstream ofs{labeled_file_path_.toStdString(), mode};
-    ofs << "seq_id,timestamp";
+    if(mode == std::ios::out) {
+        ofs << "seq_id,timestamp";
+    }
 
     size_t registered_object_count = config_.registered_objects_size();
 
     DEBUG() << "Saving " << registered_object_count << " objects to file";
 
-    for(int i = 0; i < config_.registered_objects_size(); ++i) {
-        const int index = i + 1;
-        // clang-format off
+    if(mode == std::ios::out) {
+        for(int i = 0; i < config_.registered_objects_size(); ++i) {
+            const int index = i + 1;
+            // clang-format off
         ofs << ",src_id" << index
             << ",x" << index
             << ",y" << index
@@ -387,9 +391,10 @@ void Visualization_window::on_save_outcome_button_clicked()
             << ",rx" << index
             << ",ry" << index
             << ",rz" << index;
-        // clang-format on
+            // clang-format on
+        }
+        ofs << ",label\n";
     }
-    ofs << ",label\n";
 
     const auto record_vrpn_object = [&ofs](auto vrpn_object) {
         const auto& pose = vrpn_object.pose();
